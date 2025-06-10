@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monãt</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <header class="header">
+        <a href="index.html"><img src="img/logo_claro.png" alt="Monãt" class="logo" /></a>
+        <form class="search-form" id="search-form">
+            <input type="search" id="search-input" placeholder="Buscar pides, bebidas, combos...">
+            <i class='bx bx-search'></i>
+        </form>
+    </header>
+
+    <nav class="categories">
+        <button class="active" data-category="combos">Combos</button>
+        <button data-category="pizzas">Pizzas</button>
+        <button data-category="carlitos">Carlitos</button>
+        <button data-category="empanadas">Empanadas</button>
+        <button data-category="bebidas">Bebidas</button>
+    </nav>
+
+    <main id="product-sections-container"></main>
+
+    <div id="product-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" data-modal-close="product-modal">×</span>
+            <img id="modal-img" src="" alt="Imagen del producto" />
+            <h3 id="modal-title"></h3>
+            <p id="modal-description"></p>
+            <p id="modal-price" class="price"></p>
+            <div class="quantity-container">
+                <label for="cantidad">Cantidad:</label>
+                <button class="quantity-btn" id="quantity-minus">-</button>
+                <input type="number" id="cantidad" value="1" min="1" readonly />
+                <button class="quantity-btn" id="quantity-plus">+</button>
+            </div>
+            <button id="add-to-cart-btn" class="btn-primary">Agregar al carrito</button>
+        </div>
+    </div>
+    
+    <div id="checkout-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" data-modal-close="checkout-modal">×</span>
+            <h3>Completá tus datos para el pedido</h3>
+            <form id="checkout-form">
+                <input type="text" id="client-name" placeholder="Tu Nombre" required>
+                <input type="tel" id="client-phone" placeholder="Tu Teléfono (ej: 2991234567)" required>
+
+                <!-- NUEVO: Selector de tipo de entrega -->
+                <div class="delivery-options">
+                    <label>
+                        <input type="radio" name="delivery-type" value="pickup" checked> Retiro en el local
+                    </label>
+                    <label>
+                        <input type="radio" name="delivery-type" value="delivery"> Envío a domicilio ($1500)
+                    </label>
+                </div>
+
+                <!-- NUEVO: Contenedor para campos de envío -->
+                <div id="delivery-info" class="hidden">
+                    <input type="text" id="client-address" placeholder="Tu Dirección">
+                    <a href="img/zona_envios.png" target="_blank" class="delivery-zone-link">
+                        <i class='bx bx-map-alt'></i> Ver nuestra zona de envíos ⚠️❗
+                    </a>
+                </div>
+
+                <select id="payment-method">
+                    <option value="Efectivo">Pagar con Efectivo</option>
+                    <option value="MercadoPago">Pagar con Transferencia</option>
+                </select>
+                <textarea id="order-notes" placeholder="Aclaraciones (ej: piso 2B, timbre no funciona...)"></textarea>
+                <button type="submit" class="btn-primary">Confirmar y Enviar Pedido por WhatsApp</button>
+            </form>
+        </div>
+    </div>
+
+    <aside id="cart-panel" class="cart-panel">
+        <div class="cart-header">
+            <h2>Tu Pedido</h2>
+            <button id="close-cart-btn" class="close">×</button>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <strong>Total:</strong>
+                <span id="cart-total-price">$0</span>
+            </div>
+            <button id="checkout-btn" class="btn-primary" disabled>Finalizar Pedido</button>
+        </div>
+    </aside>
+
+    <div id="cart-toggle" class="cart-toggle">
+        <i class='bx bxs-shopping-bag'></i>
+        <span id="cart-item-count" class="cart-item-count hidden">0</span>
+    </div>
+    
+    <div id="toast-container"></div>
+    
+    <script src="js/main.js" type="module" defer></script>
+</body>
+</html>
