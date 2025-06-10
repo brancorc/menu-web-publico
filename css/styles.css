@@ -112,6 +112,19 @@ body {
     color: var(--color-texto);
     box-shadow: 0 6px 12px rgba(0,0,0,0.4);
     transform: translateY(-3px);
+    font-weight: bold; /* Hacerlo más grueso aumenta la legibilidad */
+}
+
+/* --- NUEVO: Animación para el botón del carrito --- */
+@keyframes cart-jiggle {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.15) rotate(5deg); }
+    60% { transform: scale(1.15) rotate(-5deg); }
+    100% { transform: scale(1); }
+}
+
+.cart-jiggle-animation {
+    animation: cart-jiggle 0.5s ease-in-out;
 }
 
 /* Items de categoría */
@@ -125,11 +138,25 @@ body {
     box-shadow: 0 2px 6px rgba(0,0,0,0.5);
     align-items: center;
     cursor: pointer;
-    transition: transform 0.2s;
+
+    /* --- NUEVO: Para la animación en cascada --- */
+    opacity: 0;
+    transform: translateY(20px); /* Empieza 20px más abajo */
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+
 }
+
+/* MODIFICADO: Movimos el :hover a una regla separada para que no interfiera */
 .category-section .item:hover {
-    transform: scale(1.02);
+    transform: scale(1.02) translateY(0);
 }
+
+/* --- NUEVO: Clase que activará la animación --- */
+.category-section .item.visible {
+    opacity: 1;
+    transform: translateY(0); /* Vuelve a su posición original */
+}
+
 .category-section .item img {
     width: 120px;
     height: 90px;
@@ -167,7 +194,19 @@ body {
     z-index: 1200;
     padding: 20px;
     box-sizing: border-box;
+
+    /* --- NUEVO: Para la animación --- */
+    opacity: 0;
+    pointer-events: none; /* El modal no es clickeable cuando está oculto */
+    transition: opacity 0.4s ease-in-out;
 }
+
+.modal.open {
+    /* --- NUEVO: Clase que muestra el modal --- */
+    opacity: 1;
+    pointer-events: auto; /* Hacemos que sea clickeable al abrirse */
+}
+
 .modal-content {
     background-color: var(--color-fondo);
     padding: 24px;
@@ -177,7 +216,20 @@ body {
     text-align: center;
     position: relative;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+
+    /* --- NUEVO: Para la animación del contenido --- */
+    transform: scale(0.9); /* Empieza un 10% más pequeño */
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Transición con efecto "rebote" */
+    transition-delay: 0.1s; /* Un pequeño retraso para que aparezca después del fondo */
 }
+
+.modal.open .modal-content {
+    /* --- NUEVO: Estilos del contenido cuando el modal está abierto --- */
+    transform: scale(1); /* Vuelve a su tamaño normal */
+    opacity: 1;
+}
+
 .modal .close {
     position: absolute;
     top: 10px;
@@ -434,6 +486,33 @@ body {
     align-items: center;
     font-size: 14px;
     font-weight: bold;
+}
+
+/* Botón flotante de WhatsApp */
+.whatsapp-float {
+    position: fixed;
+    bottom: 25px;
+    left: 25px; /* <--- Cambiado de 'right' a 'left' */
+    width: 60px;
+    height: 60px;
+    background-color: #25D366; /* Color oficial de WhatsApp */
+    color: #FFF; /* Color del icono */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    z-index: 1050; /* Mismo z-index que el carrito */
+    transition: transform 0.2s ease;
+    
+    /* --- NUEVO: Ajuste para el icono de BoxIcons --- */
+    text-decoration: none; /* Evitamos subrayado */
+    font-size: 35px; /* Controlamos el tamaño del icono con font-size */
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.1); /* Mismo efecto hover que el carrito */
 }
 
 /* Toasts */

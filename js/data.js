@@ -88,9 +88,9 @@ const productos = {
   combos: [
     {
       id: "combo-1",
-      nombre: "polimardo?",
-      descripcion: "buenardopolis",
-      precio: 5000,
+      nombre: "Combo pareja",
+      descripcion: "2 pides + 2 bebidas",
+      precio: 10000,
       imagen: "img/logo_claro.png"
     },
   ],

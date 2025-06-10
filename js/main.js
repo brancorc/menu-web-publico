@@ -63,6 +63,10 @@ function handleProductModalClick(event) {
         agregarAlCarrito(productoSeleccionado, cantidad);
         cerrarModal(modal);
     }
+    // Cerrar el modal si se hace clic fuera del contenido
+    if (event.target.classList.contains('modal')) {
+        cerrarModal(modal);
+    } 
     if (event.target.classList.contains('close')) cerrarModal(modal);
 }
 

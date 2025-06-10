@@ -17,6 +17,15 @@ export const agregarAlCarrito = (producto, cantidad) => {
     }
     guardarCarrito();
     mostrarToast(`${cantidad}x ${producto.nombre} agregado(s)`);
+
+    // --- NUEVO: Disparamos la animación del botón ---
+    const cartToggle = document.getElementById('cart-toggle');
+    cartToggle.classList.add('cart-jiggle-animation');
+    // Removemos la clase después de que la animación termine para poder volver a usarla
+    setTimeout(() => {
+        cartToggle.classList.remove('cart-jiggle-animation');
+    }, 500); // 500ms es la duración de la animación
+    
 };
 
 export const actualizarCantidad = (productoId, nuevaCantidad) => {

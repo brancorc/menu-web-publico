@@ -6,6 +6,7 @@
     <title>Monãt</title>
     <link rel="stylesheet" href="css/styles.css" />
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧉</text></svg>">
 </head>
 <body>
 
@@ -27,7 +28,7 @@
 
     <main id="product-sections-container"></main>
 
-    <div id="product-modal" class="modal hidden">
+    <div id="product-modal" class="modal">
         <div class="modal-content">
             <span class="close" data-modal-close="product-modal">×</span>
             <img id="modal-img" src="" alt="Imagen del producto" />
@@ -44,7 +45,7 @@
         </div>
     </div>
     
-    <div id="checkout-modal" class="modal hidden">
+    <div id="checkout-modal" class="modal">
         <div class="modal-content">
             <span class="close" data-modal-close="checkout-modal">×</span>
             <h3>Completá tus datos para el pedido</h3>
@@ -95,10 +96,19 @@
         </div>
     </aside>
 
+
+    <!-- Boton flotante carrito -->  
+
     <div id="cart-toggle" class="cart-toggle">
         <i class='bx bxs-shopping-bag'></i>
         <span id="cart-item-count" class="cart-item-count hidden">0</span>
     </div>
+
+    <!-- Botón Flotante de WhatsApp -->
+
+    <a href="https://wa.me/5493412625341?text=Hola!%20Quisiera%20hacer%20una%20consulta." class="whatsapp-float" target="_blank" rel="noopener noreferrer">
+        <i class='bx bxl-whatsapp'></i>
+    </a>
     
     <div id="toast-container"></div>
     
