@@ -3,8 +3,11 @@ import { renderizarCarrito, mostrarToast } from './ui.js';
 let carrito = JSON.parse(localStorage.getItem('monatCarrito')) || [];
 
 const guardarCarrito = () => {
+
     localStorage.setItem('monatCarrito', JSON.stringify(carrito));
-    const tipoEntregaActual = document.querySelector('input[name="delivery-type"]:checked')?.value || 'pickup';
+
+    const tipoEntregaActual = document.querySelector('input[name="delivery-type"]:checked')?.value;
+    
     renderizarCarrito(carrito, tipoEntregaActual);
 };
 
@@ -25,7 +28,7 @@ export const agregarAlCarrito = (producto, cantidad) => {
     setTimeout(() => {
         cartToggle.classList.remove('cart-jiggle-animation');
     }, 500); // 500ms es la duración de la animación
-    
+
 };
 
 export const actualizarCantidad = (productoId, nuevaCantidad) => {

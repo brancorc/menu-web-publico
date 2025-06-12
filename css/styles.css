@@ -326,7 +326,22 @@ body {
     background-color: var(--color-boton-inactivo);
     padding: 8px;
     border-radius: 10px;
+    position: relative;
 }
+
+/* --- AÑADE ESTE BLOQUE NUEVO --- */
+.delivery-options::after {
+    content: "";
+    position: absolute;
+    top: 50%; /* Centra verticalmente */
+    left: 50%; /* Centra horizontalmente */
+    transform: translate(-50%, -50%); /* Ajuste fino para el centrado perfecto */
+    
+    width: 1px; /* Grosor de la línea */
+    height: 60%; /* Altura de la línea (ej. 60% de la altura del contenedor) */
+    background-color: var(--color-oscuro);
+}
+
 .delivery-options label {
     flex: 1;
     padding: 7px;

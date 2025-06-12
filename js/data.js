@@ -88,11 +88,20 @@ const productos = {
   combos: [
     {
       id: "combo-1",
-      nombre: "Combo pareja",
-      descripcion: "2 pides + 2 bebidas",
+      nombre: "Promo Apertura Pides",
+      descripcion: "2 pides de jamon + 2 Gaseosas 500ml",
       precio: 10000,
-      imagen: "img/logo_claro.png"
+      imagen: "img/combos/1.jpg"
     },
+
+    {
+      id: "combo-2",
+      nombre: "Promo Apertura Carlitos",
+      descripcion: "2 Carlitos jamon y queso + 2 Gaseosas 500ml",
+      precio: 13000,
+      imagen: "img/combos/2.jpg"
+    },
+
   ],
   carlitos: [
       {
@@ -104,7 +113,57 @@ const productos = {
   }
   ],
   empanadas: [],
-  bebidas: []
+
+  bebidas: [
+  {
+    id: "cocacola",
+    nombre: "Coca-Cola 500ml",
+    descripcion: "Gaseosa Coca-Cola de 500ml",
+    precio: 2000,
+    imagen: "img/bebidas/cocacola500.jpg"
+  },
+
+  {
+    id: "fanta",
+    nombre: "Fanta 500ml",
+    descripcion: "Gaseosa Fanta de 500ml",
+    precio: 2000,
+    imagen: "img/bebidas/fanta500.jpg"
+  },
+  {
+    id: "sprite",
+    nombre: "Sprite 500ml",
+    descripcion: "Gaseosa Sprite de 500ml",
+    precio: 2000,
+    imagen: "img/bebidas/sprite500.jpg"
+  },
+  {
+    id: "quilmes",
+    nombre: "Quilmes 473ml",
+    descripcion: "Lata quilmes de 473ml",
+    precio: 2500,
+    imagen: "img/bebidas/quilmes473.jpg"
+  },
+  {
+    id: "brahma",
+    nombre: "Brahma 473ml",
+    descripcion: "Lata Brahma de 473ml",
+    precio: 2500,
+    imagen: "img/bebidas/brahma473.jpg"
+  },
+
+  {
+    id: "schneider",
+    nombre: "Schneider 473ml",
+    descripcion: "Lata Schneider de 473ml",
+    precio: 2500,
+    imagen: "img/bebidas/schneider473.jpg"
+  }
+
+  
+
+
+  ]
 };
 
 export default productos;

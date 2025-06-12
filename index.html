@@ -22,7 +22,7 @@
         <button class="active" data-category="combos">Combos</button>
         <button data-category="pizzas">Pizzas</button>
         <button data-category="carlitos">Carlitos</button>
-        <button data-category="empanadas">Empanadas</button>
+        <!--<button data-category="empanadas">Empanadas</button> -->
         <button data-category="bebidas">Bebidas</button>
     </nav>
 
@@ -56,10 +56,10 @@
                 <!-- NUEVO: Selector de tipo de entrega -->
                 <div class="delivery-options">
                     <label>
-                        <input type="radio" name="delivery-type" value="pickup" checked> Retiro en el local
+                        <input type="radio" name="delivery-type" value="pickup" required> Retiro en el local
                     </label>
                     <label>
-                        <input type="radio" name="delivery-type" value="delivery"> Envío a domicilio ($1500)
+                        <input type="radio" name="delivery-type" value="delivery" required> Envío a domicilio ($1500)
                     </label>
                 </div>
 
