@@ -24,7 +24,7 @@ export const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega) => {
 - *Teléfono:* ${datosCliente.telefono}
 - *Tipo de Entrega:* ${datosCliente.tipoEntrega}
 - *Dirección:* ${datosCliente.direccion}
-- *Horario de Entrega:* ${datosCliente.horaPedido}  // <-- LÍNEA NUEVA
+- *Horario de Entrega:* ${datosCliente.horaPedido}
 - *Método de Pago:* ${datosCliente.pago}
 
 *Aclaraciones:*
