@@ -556,3 +556,22 @@ body {
     opacity: 1;
     transform: translateY(0);
 }
+
+/* styles.css */
+
+/* ... (puedes agregarlo cerca de los estilos de .delivery-options) */
+
+.order-time-options {
+    text-align: center;
+    margin-top: -20px;
+}
+
+.order-time-options h4 {
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+/* Para asegurar que el select de la hora ocupe todo el ancho */
+#schedule-time-container select {
+    width: 100%;
+}

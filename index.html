@@ -57,7 +57,7 @@
                 <!-- NUEVO: Selector de tipo de entrega -->
                 <div class="delivery-options">
                     <label>
-                        <input type="radio" name="delivery-type" value="pickup" required> Retiro en el local
+                        <input type="radio" name="delivery-type" value="pickup" required> Retiro en el local (Laprida 3266)
                     </label>
                     <label>
                         <input type="radio" name="delivery-type" value="delivery" required> Envío a domicilio ($1500)
@@ -71,6 +71,49 @@
                         <i class='bx bx-map-alt'></i> Ver nuestra zona de envíos ⚠️❗
                     </a>
                 </div>
+
+                <!-- index.html (dentro de #checkout-form) -->
+
+                <!-- ... justo después del div #delivery-info -->
+
+                <!-- NUEVO: Selector de horario del pedido -->
+                <div class="order-time-options">
+                    <h4>¿Cuándo querés tu pedido?</h4>
+                    <div class="delivery-options"> <!-- Reutilizamos el estilo de los botones de entrega -->
+                        <label>
+                            <input type="radio" name="order-time-type" value="asap" checked required> Lo antes posible
+                        </label>
+                        <label>
+                            <input type="radio" name="order-time-type" value="schedule" required> Programar hora
+                        </label>
+                    </div>
+                </div>
+
+                <!-- NUEVO: Contenedor para el selector de hora (oculto por defecto) -->
+                <div id="schedule-time-container" class="hidden">
+                    <select id="order-time-select">
+                        <option value="" disabled selected>Seleccioná un horario</option>
+                        <!-- Los horarios se podrían generar con JS, pero para empezar los ponemos aquí -->
+                         <option value="20:00">19:45 hs</option>
+                        <option value="20:00">20:00 hs</option>
+                        <option value="20:15">20:15 hs</option>
+                        <option value="20:30">20:30 hs</option>
+                        <option value="20:45">20:45 hs</option>
+                        <option value="21:00">21:00 hs</option>
+                        <option value="21:15">21:15 hs</option>
+                        <option value="21:30">21:30 hs</option>
+                        <option value="21:45">21:45 hs</option>
+                        <option value="22:00">22:00 hs</option>
+                        <option value="22:15">22:15 hs</option>
+                        <option value="22:30">22:30 hs</option>
+                        <option value="22:45">22:45 hs</option>
+                        <option value="23:00">23:00 hs</option>
+                        <option value="23:00">23:30 hs</option>
+                        <option value="23:00">23:45 hs</option>
+                    </select>
+                </div>
+
+                <!-- El <select id="payment-method"> y el resto del form siguen aquí abajo -->
 
                 <select id="payment-method">
                     <option value="Efectivo">Pagar con Efectivo</option>
@@ -100,14 +143,14 @@
 
     <!-- Boton flotante carrito -->  
 
-    <div id="cart-toggle" class="cart-toggle">
+    <div id="cart-toggle" class="cart-toggle" role="button" aria-label="Abrir carrito de compras">
         <i class='bx bxs-shopping-bag'></i>
         <span id="cart-item-count" class="cart-item-count hidden">0</span>
     </div>
 
     <!-- Botón Flotante de WhatsApp -->
 
-    <a href="https://wa.me/5493412625341?text=Hola!%20Quisiera%20hacer%20una%20consulta." class="whatsapp-float" target="_blank" rel="noopener noreferrer">
+    <a href="https://wa.me/5493412625341?text=Hola!%20Quisiera%20hacer%20una%20consulta." class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Enviar mensaje por WhatsApp">
         <i class='bx bxl-whatsapp'></i>
     </a>
     

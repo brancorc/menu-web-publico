@@ -31,8 +31,11 @@ function setupEventListeners() {
     document.getElementById('search-form').addEventListener('submit', e => e.preventDefault());
     document.getElementById('search-input').addEventListener('input', handleSearch);
 
-    // NUEVO: Listener para las opciones de entrega.
+    // Listener para las opciones de entrega.
     document.querySelector('.delivery-options').addEventListener('change', handleDeliveryTypeChange);
+
+    // --> NUEVO: Listener para las opciones de horario del pedido.
+    document.querySelector('.order-time-options').addEventListener('change', handleOrderTimeChange);
 }
 
 function handleCategoryClick(event) {
@@ -63,11 +66,9 @@ function handleProductModalClick(event) {
         agregarAlCarrito(productoSeleccionado, cantidad);
         cerrarModal(modal);
     }
-    // Cerrar el modal si se hace clic fuera del contenido
-    if (event.target.classList.contains('modal')) {
+    if (event.target.classList.contains('modal') || event.target.classList.contains('close')) {
         cerrarModal(modal);
-    } 
-    if (event.target.classList.contains('close')) cerrarModal(modal);
+    }
 }
 
 function handleCartItemInteraction(event) {
@@ -80,7 +81,6 @@ function handleCartItemInteraction(event) {
     if (event.target.classList.contains('cart-item-remove')) eliminarDelCarrito(productoId);
 }
 
-// NUEVA FUNCIÓN para manejar el cambio de tipo de entrega.
 function handleDeliveryTypeChange(event) {
     const deliveryType = event.target.value;
     const deliveryInfoDiv = document.getElementById('delivery-info');
@@ -96,10 +96,44 @@ function handleDeliveryTypeChange(event) {
     renderizarCarrito(getCarrito(), deliveryType);
 }
 
-// FUNCIÓN ACTUALIZADA para el checkout.
+// --> NUEVO: Función para manejar el cambio de horario del pedido.
+function handleOrderTimeChange(event) {
+    const scheduleContainer = document.getElementById('schedule-time-container');
+    const timeSelect = document.getElementById('order-time-select');
+
+    if (event.target.value === 'schedule') {
+        scheduleContainer.classList.remove('hidden');
+        timeSelect.required = true;
+    } else {
+        scheduleContainer.classList.add('hidden');
+        timeSelect.required = false;
+        timeSelect.value = ""; // Limpiamos el valor por si el usuario vuelve a "Lo antes posible"
+    }
+}
+
+// --> MODIFICADO: Función de checkout actualizada para incluir todas las mejoras.
 function handleCheckout(event) {
     event.preventDefault();
-    
+
+    // 1. Verificación de carrito vacío
+    if (getCarrito().length === 0) {
+        mostrarToast("Tu carrito está vacío. Agrega productos antes de finalizar.");
+        cerrarModal(document.getElementById('checkout-modal'));
+        return;
+    }
+
+    // 2. Verificación de número de teléfono
+    const telefonoInput = document.getElementById('client-phone');
+    const telefono = telefonoInput.value;
+    const telefonoValido = /^\d{7,15}$/.test(telefono); // Acepta entre 7 y 15 dígitos
+
+    if (!telefonoValido) {
+        mostrarToast("Por favor, ingresa un número de teléfono válido (solo números).");
+        telefonoInput.focus();
+        return;
+    }
+
+    // 3. Verificación de dirección para envío a domicilio
     const deliveryType = document.querySelector('input[name="delivery-type"]:checked').value;
     const direccion = document.getElementById('client-address').value;
 
@@ -107,30 +141,56 @@ function handleCheckout(event) {
         mostrarToast("Por favor, ingresa tu dirección para el envío.");
         return;
     }
+    
+    // 4. Verificación de hora programada
+    const timeType = document.querySelector('input[name="order-time-type"]:checked').value;
+    const timeSelect = document.getElementById('order-time-select');
+    let horaPedido;
 
+    if (timeType === 'schedule') {
+        if (!timeSelect.value) {
+            mostrarToast("Por favor, seleccioná una hora para programar tu pedido.");
+            timeSelect.focus();
+            return;
+        }
+        horaPedido = timeSelect.value + ' hs';
+    } else {
+        horaPedido = 'Lo antes posible';
+    }
+
+    // 5. Recopilación de todos los datos
     const datosCliente = {
         nombre: document.getElementById('client-name').value,
-        telefono: document.getElementById('client-phone').value,
+        telefono: telefono,
         tipoEntrega: deliveryType === 'delivery' ? 'Envío a domicilio' : 'Retiro en local',
         direccion: deliveryType === 'delivery' ? direccion : 'N/A',
+        horaPedido: horaPedido,
         pago: document.getElementById('payment-method').value,
         notas: document.getElementById('order-notes').value
     };
 
+    // 6. Envío del pedido
     enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType);
     
+    // 7. Limpieza y reseteo post-envío
     cerrarModal(document.getElementById('checkout-modal'));
     limpiarCarrito();
     mostrarToast("¡Pedido enviado! Gracias por tu compra.");
     document.getElementById('checkout-form').reset();
-    handleDeliveryTypeChange({ target: { value: 'pickup' } }); // Resetea la UI a 'pickup'
+    
+    // Reseteamos los campos de opción a su estado inicial
+    handleDeliveryTypeChange({ target: { value: 'pickup' } });
+    handleOrderTimeChange({ target: { value: 'asap' } });
 }
 
 function handleSearch(event) {
     const termino = event.target.value.toLowerCase().trim();
     if (termino === '') {
         renderizarProductos(productos);
-        activarCategoria(document.querySelector('.categories button.active').dataset.category);
+        const activeCategory = document.querySelector('.categories button.active');
+        if (activeCategory) {
+            activarCategoria(activeCategory.dataset.category);
+        }
         return;
     }
     const productosFiltrados = {};
