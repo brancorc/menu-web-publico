@@ -83,35 +83,62 @@ function handleCartItemInteraction(event) {
     if (event.target.classList.contains('cart-item-remove')) eliminarDelCarrito(productoId);
 }
 
+// En main.js
 function handleDeliveryTypeChange(event) {
     const deliveryType = event.target.value;
     const deliveryInfoDiv = document.getElementById('delivery-info');
     const addressInput = document.getElementById('client-address');
 
+    // --- NUEVO: Manejo de la clase .selected para el estilo ---
+    document.querySelectorAll('input[name="delivery-type"]').forEach(input => {
+        const label = input.closest('label');
+        if (input.value === deliveryType) {
+            label.classList.add('selected');
+        } else {
+            label.classList.remove('selected');
+        }
+    });
+    // --- FIN DEL BLOQUE NUEVO ---
+
     if (deliveryType === 'delivery') {
         deliveryInfoDiv.classList.remove('hidden');
-        addressInput.required = true; // El navegador y nuestro JS usarán esto
+        addressInput.required = true;
     } else {
         deliveryInfoDiv.classList.add('hidden');
         addressInput.required = false;
-        addressInput.value = ''; // --> NUEVO: Limpiamos la dirección al cambiar a retiro
+        addressInput.value = '';
     }
     renderizarCarrito(getCarrito(), deliveryType);
 }
 
-// --> NUEVO: Función para manejar el cambio de horario del pedido.
+// En main.js
 function handleOrderTimeChange(event) {
     const scheduleContainer = document.getElementById('schedule-time-container');
     const timeSelect = document.getElementById('order-time-select');
+    const timeType = event.target.value;
 
-    if (event.target.value === 'schedule') {
+    // --- NUEVO: Manejo de la clase .selected para el estilo ---
+    document.querySelectorAll('input[name="order-time-type"]').forEach(input => {
+        const label = input.closest('label');
+        if (input.value === timeType) {
+            label.classList.add('selected');
+        } else {
+            label.classList.remove('selected');
+        }
+    });
+    // --- FIN DEL BLOQUE NUEVO ---
+    
+    if (timeType === 'schedule') {
         scheduleContainer.classList.remove('hidden');
         timeSelect.required = true;
     } else {
         scheduleContainer.classList.add('hidden');
         timeSelect.required = false;
-        timeSelect.value = ""; // Limpiamos el valor por si el usuario vuelve a "Lo antes posible"
+        timeSelect.value = "";
     }
+
+    const deliveryType = document.querySelector('input[name="delivery-type"]:checked').value;
+    renderizarCarrito(getCarrito(), deliveryType);
 }
 
 // --> MODIFICADO: Función de checkout actualizada para incluir todas las mejoras.
@@ -175,15 +202,21 @@ function handleCheckout(event) {
     // 6. Envío del pedido
     enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType);
     
-    // 7. Limpieza y reseteo post-envío
+    // 7. Limpieza y reseteo post-envío (VERSIÓN CORREGIDA)
     cerrarModal(document.getElementById('checkout-modal'));
-    limpiarCarrito();
+    limpiarCarrito(); // Esto ya llama a renderizarCarrito con el carrito vacío
     mostrarToast("¡Pedido enviado! Gracias por tu compra.");
-    document.getElementById('checkout-form').reset();
     
-    // Reseteamos los campos de opción a su estado inicial
-    handleDeliveryTypeChange({ target: { value: 'pickup' } });
-    handleOrderTimeChange({ target: { value: 'asap' } });
+    const form = document.getElementById('checkout-form');
+    form.reset(); // Resetea el form a los valores 'checked' del HTML
+
+    // Sincroniza la UI post-reseteo
+    document.getElementById('delivery-info').classList.add('hidden');
+    document.getElementById('schedule-time-container').classList.add('hidden');
+
+    // Vuelve a llamar a renderizarCarrito para que se actualice el total SIN costo de envío,
+    // ya que el reset() puso 'pickup' como opción por defecto.
+    renderizarCarrito(getCarrito()); 
 }
 
 function handleSearch(event) {

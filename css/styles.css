@@ -355,7 +355,9 @@ body {
 .delivery-options input[type="radio"] {
     display: none;
 }
-.delivery-options input[type="radio"]:checked + label {
+
+/* NUEVA REGLA MÁS ROBUSTA */
+.delivery-options label.selected {
     background-color: var(--color-oscuro);
     color: var(--color-texto);
     font-weight: bold;
