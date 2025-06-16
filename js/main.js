@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
 });
 
+// En main.js
 function setupEventListeners() {
     document.querySelector('.categories').addEventListener('click', handleCategoryClick);
     document.getElementById('product-sections-container').addEventListener('click', handleProductClick);
@@ -31,11 +32,12 @@ function setupEventListeners() {
     document.getElementById('search-form').addEventListener('submit', e => e.preventDefault());
     document.getElementById('search-input').addEventListener('input', handleSearch);
 
-    // Listener para las opciones de entrega.
-    document.querySelector('.delivery-options').addEventListener('change', handleDeliveryTypeChange);
+    // --- ESTAS SON LAS ÚNICAS LÍNEAS QUE NECESITAS PARA LOS LISTENERS ---
+    // Listener para las opciones de entrega (más específico y seguro)
+    document.getElementById('delivery-type-options').addEventListener('change', handleDeliveryTypeChange);
 
-    // --> NUEVO: Listener para las opciones de horario del pedido.
-    document.querySelector('.order-time-options').addEventListener('change', handleOrderTimeChange);
+    // Listener para las opciones de horario del pedido (más específico y seguro)
+    document.getElementById('order-time-type-options').addEventListener('change', handleOrderTimeChange);
 }
 
 function handleCategoryClick(event) {
@@ -88,10 +90,11 @@ function handleDeliveryTypeChange(event) {
 
     if (deliveryType === 'delivery') {
         deliveryInfoDiv.classList.remove('hidden');
-        addressInput.required = true;
+        addressInput.required = true; // El navegador y nuestro JS usarán esto
     } else {
         deliveryInfoDiv.classList.add('hidden');
         addressInput.required = false;
+        addressInput.value = ''; // --> NUEVO: Limpiamos la dirección al cambiar a retiro
     }
     renderizarCarrito(getCarrito(), deliveryType);
 }

@@ -55,9 +55,9 @@
                 <input type="tel" id="client-phone" placeholder="Tu Teléfono (ej: 2991234567)" required>
 
                 <!-- NUEVO: Selector de tipo de entrega -->
-                <div class="delivery-options">
+                <div class="delivery-options" id="delivery-type-options">
                     <label>
-                        <input type="radio" name="delivery-type" value="pickup" required> Retiro en el local (Laprida 3266)
+                        <input type="radio" name="delivery-type" value="pickup" required checked> Retiro en el local (Laprida 3266)
                     </label>
                     <label>
                         <input type="radio" name="delivery-type" value="delivery" required> Envío a domicilio ($1500)
@@ -79,9 +79,9 @@
                 <!-- NUEVO: Selector de horario del pedido -->
                 <div class="order-time-options">
                     <h4>¿Cuándo querés tu pedido?</h4>
-                    <div class="delivery-options"> <!-- Reutilizamos el estilo de los botones de entrega -->
+                    <div id="order-time-type-options" class="delivery-options"> <!-- Reutilizamos el estilo -->
                         <label>
-                            <input type="radio" name="order-time-type" value="asap" checked required> Lo antes posible
+                            <input type="radio" name="order-time-type" value="asap" checked required checked> Lo antes posible
                         </label>
                         <label>
                             <input type="radio" name="order-time-type" value="schedule" required> Programar hora
@@ -94,7 +94,7 @@
                     <select id="order-time-select">
                         <option value="" disabled selected>Seleccioná un horario</option>
                         <!-- Los horarios se podrían generar con JS, pero para empezar los ponemos aquí -->
-                         <option value="20:00">19:45 hs</option>
+                         <option value="19:45">19:45 hs</option>
                         <option value="20:00">20:00 hs</option>
                         <option value="20:15">20:15 hs</option>
                         <option value="20:30">20:30 hs</option>
@@ -108,8 +108,9 @@
                         <option value="22:30">22:30 hs</option>
                         <option value="22:45">22:45 hs</option>
                         <option value="23:00">23:00 hs</option>
-                        <option value="23:00">23:30 hs</option>
-                        <option value="23:00">23:45 hs</option>
+                        <option value="23:15">23:15 hs</option>
+                        <option value="23:30">23:30 hs</option>
+                        <option value="23:45">23:45 hs</option>
                     </select>
                 </div>
 
