@@ -3,16 +3,31 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Monãt</title>
+    <title>Monãt - Pides, Rosario</title>
     <link rel="stylesheet" href="css/styles.css" />
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-
     <link rel="icon" type="image/png" href="img/fotoportada.png">
+    <meta name="description" content="Descubrí los mejores pizzas turcas, empanadas y carlitos de Rosario. Hacé tu pedido online de forma rápida y fácil para delivery o retiro. ¡Te esperamos en Monãt!">
+    
 </head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DPFEPF7JZN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DPFEPF7JZN');
+</script>
+
 <body>
 
     <header class="header">
-        <a href="index.html"><img src="img/logo_claro.png" alt="Monãt" class="logo" /></a>
+        <a href="#"><img src="img/logo_claro.png" alt="Monãt" class="logo" /></a>
+
+        <h1 style="display: none;">Pides a Domicilio en Rosario - Monãt</h1> 
+        
         <form class="search-form" id="search-form">
             <input type="search" id="search-input" placeholder="Buscar pides, bebidas, combos...">
             <i class='bx bx-search'></i>
@@ -20,11 +35,13 @@
     </header>
 
     <nav class="categories">
-        <button class="active" data-category="combos">Combos</button>
-        <button data-category="pizzas">Pizzas</button>
+        <button class="active" data-category="pizzas">Pizzas</button>
         <button data-category="carlitos">Carlitos</button>
+        <button data-category="combos">Promociones</button>
         <!--<button data-category="empanadas">Empanadas</button> -->
         <button data-category="bebidas">Bebidas</button>
+        <!--<button data-category="empanadas">Nuestros horarios</button> -->
+        <!--<button data-category="empanadas">¿Donde estamos?</button> -->
     </nav>
 
     <main id="product-sections-container"></main>
@@ -120,7 +137,7 @@
                     <option value="Efectivo">Pagar con Efectivo</option>
                     <option value="MercadoPago">Pagar con Transferencia</option>
                 </select>
-                <textarea id="order-notes" placeholder="Aclaraciones (ej: piso 2B, timbre no funciona...)"></textarea>
+                <textarea id="order-notes" placeholder="Aclaraciones (ej: piso 2B, timbre no funciona, bebidas del combo...)"></textarea>
                 <button type="submit" class="btn-primary">Confirmar y Enviar Pedido por WhatsApp</button>
             </form>
         </div>

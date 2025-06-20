@@ -89,7 +89,7 @@ const productos = {
     {
       id: "combo-1",
       nombre: "Promo Apertura Pides",
-      descripcion: "2 pides de jamon + 2 Gaseosas 500ml",
+      descripcion: "2 pides de jamon + 2 Gaseosas a elección 500ml",
       precio: 10000,
       imagen: "img/combos/2.jpg"
     },
@@ -97,7 +97,7 @@ const productos = {
     {
       id: "combo-2",
       nombre: "Promo Apertura Carlitos",
-      descripcion: "2 Carlitos jamon y queso + 2 Gaseosas 500ml",
+      descripcion: "2 Carlitos jamon y queso + 2 Gaseosas a elección 500ml",
       precio: 13000,
       imagen: "img/combos/1.jpg"
     },

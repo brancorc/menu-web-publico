@@ -7,7 +7,7 @@ let productoSeleccionado = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     renderizarProductos(productos);
-    activarCategoria('combos');
+    activarCategoria('pizzas');
     renderizarCarrito(getCarrito());
     setupEventListeners();
 });
