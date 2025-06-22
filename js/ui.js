@@ -78,38 +78,35 @@ export const renderizarCarrito = (carrito, tipoEntrega = 'pickup') => {
 
 // ui.js
 
+// Reemplaza la función activarCategoria en ui.js por esta
 export const activarCategoria = (categoriaId) => {
-    // 1. Manejar la apariencia de los botones de categoría (esto no cambia)
+    // Manejar la apariencia de los botones de categoría
     document.querySelectorAll('.categories button').forEach(button => {
         button.classList.toggle('active', button.dataset.category === categoriaId);
     });
 
-    // 2. Orquestar la animación de los productos
-    const sections = document.querySelectorAll('.category-section');
-    const delayIncrement = 75; // Milisegundos entre la aparición de cada item. ¡Juega con este valor!
+    // Ocultar todas las secciones de contenido (productos e info)
+    document.querySelectorAll('.category-section, .info-section').forEach(section => {
+        section.classList.add('hidden');
+    });
 
-    sections.forEach(section => {
-        if (section.id === categoriaId) {
-            // Es la sección que queremos MOSTRAR
-            section.classList.remove('hidden');
+    // Mostrar la sección correcta
+    const sectionToShow = document.getElementById(categoriaId);
+    if (sectionToShow) {
+        sectionToShow.classList.remove('hidden');
 
-            const items = section.querySelectorAll('.item');
+        // Si es una sección de productos, aplicar la animación
+        if (sectionToShow.classList.contains('category-section')) {
+            const items = sectionToShow.querySelectorAll('.item');
+            const delayIncrement = 75;
             items.forEach((item, index) => {
-                // Quitamos 'visible' por si acaso, para reiniciar la animación
-                item.classList.remove('visible'); 
-
-                // Usamos setTimeout para añadir la clase 'visible' con un retraso escalonado
+                item.classList.remove('visible');
                 setTimeout(() => {
                     item.classList.add('visible');
                 }, index * delayIncrement);
             });
-        } else {
-            // Son las secciones que queremos OCULTAR
-            section.classList.add('hidden');
-            // Opcional: Ocultamos los items inmediatamente para que no se vean en el próximo cambio
-            section.querySelectorAll('.item').forEach(item => item.classList.remove('visible'));
         }
-    });
+    }
 };
 
 export const abrirModal = (modal, producto) => {

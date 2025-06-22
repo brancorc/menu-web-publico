@@ -42,9 +42,11 @@
         <button data-category="bebidas">Bebidas</button>
         <!--<button data-category="empanadas">Nuestros horarios</button> -->
         <!--<button data-category="empanadas">¿Donde estamos?</button> -->
+        <!--<button data-category="empanadas">Zona de envios</button> --> <!-- ¡AÑADE ESTO! -->
+
     </nav>
 
-    <main id="product-sections-container"></main>
+    <main id="product-sections-container"><div id="search-no-results" class="no-results-message hidden"></div></main>
 
     <div id="product-modal" class="modal">
         <div class="modal-content">
@@ -175,5 +177,38 @@
     <div id="toast-container"></div>
     
     <script src="js/main.js" type="module" defer></script>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <!-- Nueva sección con información de contacto -->
+            <div class="footer-contact">
+                <p><i class='bx bxs-map'></i> Laprida 3266, Rosario, Santa Fe</p>
+                <p><i class='bx bxs-phone'></i> 341 262 5341</p> <!-- O el número que prefieras mostrar -->
+            </div>
+
+            <!-- Información legal y copyright -->
+            <div class="footer-legal">
+                <p>© 2024 Monãt. Todos los derechos reservados.</p>
+                <p>Branco Blunda - CUIT 20-12345678-9</p>
+                <nav class="footer-links">
+                    <a href="terminos.html">Términos y Condiciones</a>
+                    <span>•</span>
+                    <a href="privacidad.html">Política de Privacidad</a>
+                </nav>
+            </div>
+        </div>
+    </footer>
+
 </body>
+
+<div id="closed-store-modal" class="store-status-modal hidden">
+    <div class="modal-content">
+        <img src="img/logo_claro.png" alt="Monãt" class="modal-logo" /> 
+        <h3>¡Hola! Ahora mismo estamos cerrados.</h3>
+        <p>Nuestro horario de atención es de <strong>Jueves a Domingos, de 19:00 a 00:00 hs.</strong></p>
+        <p>Podes ver nuestro menú y preparar tu pedido para cuando abramos.</p>
+        <button id="close-store-modal-btn" class="btn-primary">Ver el menú de todos modos</button>
+    </div>
+</div>
+
 </html>

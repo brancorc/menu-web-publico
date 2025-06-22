@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     activarCategoria('pizzas');
     renderizarCarrito(getCarrito());
     setupEventListeners();
+    checkStoreStatus();
 });
 
 // En main.js
@@ -241,4 +242,30 @@ function handleSearch(event) {
         if (section) section.classList.toggle('hidden', productosFiltrados[categoria].length === 0);
     });
     document.querySelectorAll('.categories button').forEach(b => b.classList.remove('active'));
+}
+
+function checkStoreStatus() {
+    const modal = document.getElementById('closed-store-modal');
+    const openButton = document.getElementById('close-store-modal-btn');
+    const addToCartButtons = document.querySelectorAll('#add-to-cart-btn'); // Asumiendo que el botón del modal de producto tiene este ID
+
+    const now = new Date();
+    const day = now.getDay(); // Domingo = 0, Lunes = 1, ..., Sábado = 6
+    const hour = now.getHours();
+
+    // Jueves (4), Viernes (5), Sábado (6), Domingo (0)
+    const openDays = [0, 4, 5, 6];
+    const isOpenDay = openDays.includes(day);
+    const isOpenHour = hour >= 19; // Abierto desde las 19:00 hasta la medianoche
+
+    const isStoreOpen = isOpenDay && isOpenHour;
+
+    if (!isStoreOpen) {
+        modal.classList.remove('hidden');
+    }
+
+    // Evento para cerrar el modal
+    openButton.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
 }

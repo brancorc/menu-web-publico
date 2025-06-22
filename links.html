@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monãt - Enlaces</title>
+    
+    <!-- Reutilizamos tu CSS existente para mantener la consistencia -->
+    <link rel="stylesheet" href="css/styles.css" />
+    
+    <!-- Boxicons para los iconos -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    
+    <!-- Tu Favicon (las rutas son relativas al dominio, así que no cambian) -->
+    <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+
+    <!-- Estilos específicos para esta página de enlaces -->
+    <style>
+        /* Hacemos que el fondo ocupe toda la pantalla */
+        html, body {
+            height: 100%;
+        }
+
+        /* Usamos flexbox para centrar todo vertical y horizontalmente */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+            background: var(--color-fondo); /* Fondo oscuro de tu marca */
+        }
+
+        .links-container {
+            width: 100%;
+            max-width: 400px; /* Ancho máximo para que no se estire demasiado en escritorio */
+            text-align: center;
+        }
+
+        .profile-logo {
+            max-width: 180px;
+            margin-bottom: 30px;
+        }
+
+        .link-button {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Centra el icono y el texto */
+            background-color: var(--color-claro);
+            color: var(--color-fondo);
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .link-button i {
+            font-size: 24px;
+            margin-right: 15px; /* Espacio entre el icono y el texto */
+        }
+
+        .link-button:hover {
+            background-color: var(--color-oscuro);
+            color: var(--color-texto);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+        }
+
+        .footer-social {
+            margin-top: 30px;
+        }
+
+        .footer-social p {
+            color: #888;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="links-container">
+        
+        <!-- Tu Logo -->
+        <img src="img/logo_claro.png" alt="Logo de Monãt" class="profile-logo" />
+
+        <!-- ========================================================== -->
+        <!--  AQUÍ ESTÁ EL CAMBIO CLAVE: El enlace apunta a / o index.html -->
+        <!-- ========================================================== -->
+        <a href="index.html" class="link-button">
+            <i class='bx bxs-food-menu'></i>
+            <span>Ver Nuestra Carta Online</span>
+        </a>
+
+        <!-- Botón para enviar un WhatsApp -->
+        <a href="https://wa.me/5493412625341?text=Hola%20Monãt!%20Quisiera%20hacer%20una%20consulta." class="link-button" target="_blank">
+            <i class='bx bxl-whatsapp'></i>
+            <span>Nuestro WhatsApp</span>
+        </a>
+
+        <!-- Botón para tu perfil de Instagram (¡Asegúrate de poner tu URL real!) -->
+        <a href="https://www.instagram.com/monat.pides/" class="link-button" target="_blank">
+            <i class='bx bxl-instagram-alt'></i>
+            <span>Seguinos en Instagram</span>
+        </a>
+
+        <!-- Pequeño footer con enlace al perfil -->
+        <div class="footer-social">
+            <p>Monãt © 2024</p>
+        </div>
+
+    </div>
+
+</body>
+</html>
