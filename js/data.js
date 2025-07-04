@@ -98,7 +98,7 @@ const productos = {
       id: "combo-2",
       nombre: "Combo Pides + Cervezas",
       descripcion: "2 pides de jamon + 2 Cervezas a elección 473ml",
-      precio: 11400,
+      precio: 11500,
       imagen: "img/combos/2.png"
     },
 
@@ -106,7 +106,7 @@ const productos = {
       id: "combo-3",
       nombre: "Combo Carlitos + Gaseosas",
       descripcion: "2 Carlitos jamon y queso + 2 Gaseosas a elección 500ml",
-      precio: 13600,
+      precio: 13500,
       imagen: "img/combos/3.jpg"
     },
 
