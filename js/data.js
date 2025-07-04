@@ -16,7 +16,7 @@ const productos = {
     id: "pide-jamon",
     nombre: "Pide Jamón",
     descripcion: "Muzzarella fundida y jamón sobre masa fina.",
-    precio: 4000,
+    precio: 4200,
     imagen: "img/pides/jamon.jpg"
   },
   {
@@ -88,18 +88,34 @@ const productos = {
   combos: [
     {
       id: "combo-1",
-      nombre: "Promo Apertura Pides",
+      nombre: "Combo Pides + Gaseosas",
       descripcion: "2 pides de jamon + 2 Gaseosas a elección 500ml",
-      precio: 10000,
-      imagen: "img/combos/2.jpg"
+      precio: 10500,
+      imagen: "img/combos/1.png"
     },
 
     {
       id: "combo-2",
-      nombre: "Promo Apertura Carlitos",
+      nombre: "Combo Pides + Cervezas",
+      descripcion: "2 pides de jamon + 2 Cervezas a elección 473ml",
+      precio: 11400,
+      imagen: "img/combos/2.png"
+    },
+
+    {
+      id: "combo-3",
+      nombre: "Combo Carlitos + Gaseosas",
       descripcion: "2 Carlitos jamon y queso + 2 Gaseosas a elección 500ml",
-      precio: 13000,
-      imagen: "img/combos/1.jpg"
+      precio: 13600,
+      imagen: "img/combos/3.jpg"
+    },
+
+    {
+      id: "combo-4",
+      nombre: "Combo Carlitos + Cervezas",
+      descripcion: "2 Carlitos jamon y queso + 2 Cervezas a elección 473ml",
+      precio: 14500,
+      imagen: "img/combos/4.jpg"
     },
 
   ],
@@ -108,7 +124,7 @@ const productos = {
     id: "carlito-jyq",
     nombre: "Carlito Jamón y Queso",
     descripcion: "El clasico de siempre: jamón de primera calidad y mucho queso",
-    precio: 5500,
+    precio: 6000,
     imagen: "img/carlitos/jamon y queso.jpg"
   }
   ],
