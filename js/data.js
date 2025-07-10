@@ -123,12 +123,39 @@ const productos = {
       {
     id: "carlito-jyq",
     nombre: "Carlito Jamón y Queso",
-    descripcion: "El clasico de siempre: jamón de primera calidad y mucho queso",
+    descripcion: "El clasico de siempre: jamón de primera calidad y mucho queso. Con salsa golf.",
     precio: 6000,
     imagen: "img/carlitos/jamon y queso.jpg"
+  },
+
+  {
+    id: "carlito-especial",
+    nombre: "Carlito Especial",
+    descripcion: "El clasico reinventado: Jamón, queso, huevo, morrón, aceitunas y salsa golf. Una bomba.",
+    precio: 7500,
+    imagen: "img/carlitos/especial.jpg"
   }
+
   ],
-  empanadas: [],
+
+  tostados: [
+      {
+    id: "tostado-jyq",
+    nombre: "Tostado Jamón y Queso",
+    descripcion: "El clasico de siempre: jamón de primera calidad y mucho queso. Con mayonesa.",
+    precio: 6000,
+    imagen: "img/carlitos/jamon y queso.jpg"
+  },
+
+  {
+    id: "tostado-especial",
+    nombre: "Tostado Especial",
+    descripcion: "El clasico reinventado: Jamón, queso, huevo, morrón, aceitunas y mayonesa. Una bomba.",
+    precio: 7500,
+    imagen: "img/carlitos/especial.jpg"
+  }
+
+  ],
 
   bebidas: [
   {
