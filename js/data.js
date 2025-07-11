@@ -124,7 +124,7 @@ const productos = {
     id: "carlito-jyq",
     nombre: "Carlito Jamón y Queso",
     descripcion: "El clasico de siempre: jamón de primera calidad y mucho queso. Con salsa golf.",
-    precio: 6500,
+    precio: 6000,
     imagen: "img/carlitos/jamon y queso.jpg"
   },
 
@@ -143,7 +143,7 @@ const productos = {
     id: "tostado-jyq",
     nombre: "Tostado Jamón y Queso",
     descripcion: "El clasico de siempre: jamón de primera calidad y mucho queso. Con mayonesa.",
-    precio: 6500,
+    precio: 6000,
     imagen: "img/carlitos/jamon y queso.jpg"
   },
 
