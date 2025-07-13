@@ -167,6 +167,9 @@ body {
 }
 .category-section .item-info {
     flex-grow: 1;
+    min-width: 0; /*Permite que el contenedor se encoja. */
+    display: flex; /* Nos aseguramos de que sea un contenedor flex... */
+    flex-direction: column; /* ...para que sus hijos (título, desc, precio) se apilen verticalmente. */
 }
 .category-section .item-info h3 {
     margin: 0 0 8px 0;
@@ -689,7 +692,8 @@ body {
     display: flex;
     align-items: baseline;
     gap: 12px;
-    margin-top: 6px;
+    margin-top: auto;
+    flex-wrap: wrap;
 }
 
 /* El 'div.item-info' que contiene los precios */
@@ -721,6 +725,7 @@ body {
     border-radius: 8px;
     margin-left: 10px;
     vertical-align: middle; /* Para que se alinee bien con el título */
+    margin-top: 5px;/* <-- Pequeño margen para cuando baje de línea */
 }
 
 /* Estilo para los enlaces dentro de la sección de contacto del footer */

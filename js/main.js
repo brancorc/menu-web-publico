@@ -153,17 +153,8 @@ function handleCheckout(event) {
         return;
     }
 
-    // 2. Verificación de número de teléfono
-    const telefonoInput = document.getElementById('client-phone');
-    const telefono = telefonoInput.value;
-    const telefonoValido = /^\d{7,15}$/.test(telefono); // Acepta entre 7 y 15 dígitos
-
-    if (!telefonoValido) {
-        mostrarToast("Por favor, ingresa un número de teléfono válido (solo números).");
-        telefonoInput.focus();
-        return;
-    }
-
+    // 2. Verificación de teléfono (no se requiere) 
+    
     // 3. Verificación de dirección para envío a domicilio
     const deliveryType = document.querySelector('input[name="delivery-type"]:checked').value;
     const direccion = document.getElementById('client-address').value;
@@ -192,7 +183,6 @@ function handleCheckout(event) {
     // 5. Recopilación de todos los datos
     const datosCliente = {
         nombre: document.getElementById('client-name').value,
-        telefono: telefono,
         tipoEntrega: deliveryType === 'delivery' ? 'Envío a domicilio' : 'Retiro en local',
         direccion: deliveryType === 'delivery' ? direccion : 'N/A',
         horaPedido: horaPedido,

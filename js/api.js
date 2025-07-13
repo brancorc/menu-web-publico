@@ -1,7 +1,7 @@
 import { COSTO_ENVIO } from './data.js';
 
 export const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega) => {
-    const tuNumero = '5493412625341'; // <-- ¡¡REEMPLAZA CON TU NÚMERO!!
+    const tuNumero = '5493412625341'; 
 
     const detallePedido = carrito.map(item => 
         `- ${item.cantidad}x ${item.nombre} ($${item.precio * item.cantidad})`
@@ -21,7 +21,6 @@ export const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega) => {
 
 *Datos del Cliente:*
 - *Nombre:* ${datosCliente.nombre}
-- *Teléfono:* ${datosCliente.telefono}
 - *Tipo de Entrega:* ${datosCliente.tipoEntrega}
 - *Dirección:* ${datosCliente.direccion}
 - *Horario de Entrega:* ${datosCliente.horaPedido}
