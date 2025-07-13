@@ -17,16 +17,35 @@ export const renderizarProductos = (productosPorCategoria) => {
             section.classList.add('hidden');
         } else {
             productosPorCategoria[categoria].forEach(producto => {
+                
+                // --- INICIO DE LA LÓGICA CORRECTA ---
+                let priceHTML;
+
+                // Esta línea ahora encontrará la propiedad 'precioOriginal' que corregimos en data.js
+                if (producto.precioOriginal) {
+                    priceHTML = `
+                        <div class="price-container">
+                            <span class="new-price">$${producto.precio}</span>
+                            <span class="original-price">$${producto.precioOriginal}</span>
+                            <span class="oferta-tag">¡OFERTA!</span>
+                        </div>
+                    `;
+                } else {
+                    priceHTML = `<p class="price">$${producto.precio}</p>`;
+                }
+
                 const itemHTML = `
                     <div class="item" data-id="${producto.id}" data-category="${categoria}">
                         <img src="${producto.imagen}" alt="${producto.nombre}" />
                         <div class="item-info">
                             <h3>${producto.nombre}</h3>
                             <p>${producto.descripcion}</p>
-                            <p class="price">$${producto.precio}</p>
+                            ${priceHTML}
                         </div>
                     </div>
                 `;
+                // --- FIN DE LA LÓGICA CORRECTA ---
+
                 section.innerHTML += itemHTML;
             });
         }
