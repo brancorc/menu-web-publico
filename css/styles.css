@@ -130,6 +130,7 @@ body {
 
 /* Items de categoría */
 .category-section .item {
+    position: relative;
     display: flex;
     gap: 16px;
     margin-bottom: 24px;
@@ -146,6 +147,8 @@ body {
     transition: opacity 0.4s ease-out, transform 0.4s ease-out;
 
 }
+
+
 
 /* MODIFICADO: Movimos el :hover a una regla separada para que no interfiera */
 .category-section .item:hover {
@@ -717,15 +720,24 @@ body {
 }
 
 .oferta-tag {
-    background-color: var(--color-error); /* O un color rojo/naranja llamativo */
+    position: absolute;
+    z-index: 10;
+    
+    /* --- NUEVAS COORDENADAS --- */
+    top: 8px;   /* Más cerca del borde superior del card */
+    left: 8px;  /* Más cerca del borde izquierdo del card */
+
+    /* El resto del estilo de "pegatina" lo dejamos igual */
+    transform: rotate(-8deg);
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5); 
+    background-color: var(--color-error);
     color: white;
-    padding: 3px 8px;
+    padding: 5px 15px;
     font-size: 12px;
     font-weight: bold;
     border-radius: 8px;
-    margin-left: 10px;
-    vertical-align: middle; /* Para que se alinee bien con el título */
-    margin-top: 5px;/* <-- Pequeño margen para cuando baje de línea */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Estilo para los enlaces dentro de la sección de contacto del footer */

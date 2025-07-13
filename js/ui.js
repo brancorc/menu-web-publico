@@ -13,29 +13,32 @@ export const renderizarProductos = (productosPorCategoria) => {
         const section = document.createElement('main');
         section.id = categoria;
         section.className = 'category-section';
+
         if (productosPorCategoria[categoria].length === 0) {
             section.classList.add('hidden');
         } else {
             productosPorCategoria[categoria].forEach(producto => {
                 
-                // --- INICIO DE LA LÓGICA CORRECTA ---
+                // --- LÓGICA DE VUELTA AL ORIGINAL ---
                 let priceHTML;
+                let ofertaTagHTML = ''; 
 
-                // Esta línea ahora encontrará la propiedad 'precioOriginal' que corregimos en data.js
                 if (producto.precioOriginal) {
+                    ofertaTagHTML = '<span class="oferta-tag">¡OFERTA!</span>'; 
                     priceHTML = `
                         <div class="price-container">
                             <span class="new-price">$${producto.precio}</span>
                             <span class="original-price">$${producto.precioOriginal}</span>
-                            <span class="oferta-tag">¡OFERTA!</span>
                         </div>
                     `;
                 } else {
                     priceHTML = `<p class="price">$${producto.precio}</p>`;
                 }
 
+                // Construimos el HTML. La etiqueta de oferta es hermana de la imagen y la info.
                 const itemHTML = `
                     <div class="item" data-id="${producto.id}" data-category="${categoria}">
+                        ${ofertaTagHTML} 
                         <img src="${producto.imagen}" alt="${producto.nombre}" />
                         <div class="item-info">
                             <h3>${producto.nombre}</h3>
@@ -44,7 +47,7 @@ export const renderizarProductos = (productosPorCategoria) => {
                         </div>
                     </div>
                 `;
-                // --- FIN DE LA LÓGICA CORRECTA ---
+                // --- FIN DE LA LÓGICA ---
 
                 section.innerHTML += itemHTML;
             });
