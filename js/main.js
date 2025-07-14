@@ -1,19 +1,82 @@
 import productos from './data.js';
 import { getCarrito, agregarAlCarrito, actualizarCantidad, eliminarDelCarrito, limpiarCarrito } from './cart.js';
-import { renderizarProductos, renderizarCarrito, activarCategoria, abrirModal, cerrarModal, toggleCartPanel, mostrarToast } from './ui.js';
+import { renderizarProductos, renderizarCarrito, abrirModal, cerrarModal, toggleCartPanel, mostrarToast } from './ui.js';
 import { enviarPedidoWhatsApp } from './api.js';
+import { adicionales } from './data.js';
 
 let productoSeleccionado = null;
+let swiper;
+
+// En js/main.js, reemplaza tu addEventListener de 'DOMContentLoaded' completo por este:
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Renderizamos todo como siempre
     renderizarProductos(productos);
-    activarCategoria('pizzas');
     renderizarCarrito(getCarrito());
     setupEventListeners();
     checkStoreStatus();
+
+    // 2. Inicializamos Swiper
+    swiper = new Swiper('.swiper', {
+        spaceBetween: 20,
+        autoHeight: true,
+    });
+
+    // 3. FUNCIÓN CLAVE: Esta función se encarga de mostrar los items de la sección activa
+    const showActiveSlideItems = () => {
+        // Ocultamos TODOS los items de TODAS las secciones para resetear la animación
+        document.querySelectorAll('.swiper-slide .item').forEach(item => {
+            item.classList.remove('visible');
+        });
+
+        // Buscamos la sección que está activa en el carrusel
+        const activeSlide = swiper.slides[swiper.activeIndex];
+        if (!activeSlide) return; // Medida de seguridad
+
+        // Tomamos solo los items de esa sección activa y los hacemos visibles en cascada
+        const items = activeSlide.querySelectorAll('.item');
+        items.forEach((item, index) => {
+            setTimeout(() => {
+                item.classList.add('visible');
+            }, index * 75); // 75ms de delay entre cada item para el efecto
+        });
+    };
+    
+    // 4. EVENTO CLAVE: Sincronizamos todo cuando el usuario desliza el carrusel
+    swiper.on('slideChange', function () {
+        const activeSlide = swiper.slides[swiper.activeIndex];
+        if (!activeSlide) return;
+
+        // Sincronizamos el botón activo
+        const activeCategory = activeSlide.id;
+
+        // --- INICIA EL NUEVO BLOQUE CORREGIDO ---
+        // 1. Primero, quitamos la clase 'active' de TODOS los botones.
+        document.querySelectorAll('.categories button').forEach(button => {
+            button.classList.remove('active');
+        });
+
+        // 2. Después, buscamos específicamente el botón que SÍ debe estar activo y le añadimos la clase.
+        const activeButton = document.querySelector(`.categories button[data-category="${activeCategory}"]`);
+        if (activeButton) {
+            activeButton.classList.add('active');
+        }
+        
+        // Llamamos a la función para mostrar los items de la nueva sección activa
+        showActiveSlideItems();
+    });
+
+    // 5. PASO FINAL Y CRÍTICO:
+    // Forzamos a Swiper a que se actualice para que reconozca los productos que acabamos de renderizar.
+    swiper.update();
+    // Y activamos manualmente la animación para la primera sección que se ve al cargar la página.
+    showActiveSlideItems();
+    // Nos aseguramos de que el primer botón también esté activo.
+    document.querySelector('.categories button[data-category="pizzas"]').classList.add('active');
 });
 
-// En main.js
+// En js/main.js
+
 function setupEventListeners() {
     document.querySelector('.categories').addEventListener('click', handleCategoryClick);
     document.getElementById('product-sections-container').addEventListener('click', handleProductClick);
@@ -23,7 +86,10 @@ function setupEventListeners() {
     
     document.getElementById('cart-toggle').addEventListener('click', toggleCartPanel);
     document.getElementById('close-cart-btn').addEventListener('click', toggleCartPanel);
+
+    // <-- ¡ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ AQUÍ Y ESTÉ CORRECTA!
     document.getElementById('checkout-btn').addEventListener('click', () => abrirModal(document.getElementById('checkout-modal')));
+
     document.getElementById('cart-items').addEventListener('click', handleCartItemInteraction);
     
     const checkoutModal = document.getElementById('checkout-modal');
@@ -33,17 +99,24 @@ function setupEventListeners() {
     document.getElementById('search-form').addEventListener('submit', e => e.preventDefault());
     document.getElementById('search-input').addEventListener('input', handleSearch);
 
-    // --- ESTAS SON LAS ÚNICAS LÍNEAS QUE NECESITAS PARA LOS LISTENERS ---
-    // Listener para las opciones de entrega (más específico y seguro)
     document.getElementById('delivery-type-options').addEventListener('change', handleDeliveryTypeChange);
-
-    // Listener para las opciones de horario del pedido (más específico y seguro)
     document.getElementById('order-time-type-options').addEventListener('change', handleOrderTimeChange);
 }
 
 function handleCategoryClick(event) {
     if (event.target.tagName === 'BUTTON') {
-        activarCategoria(event.target.dataset.category);
+        const category = event.target.dataset.category;
+        
+        // Buscamos todas las secciones que son "slides"
+        const sections = Array.from(document.querySelectorAll('.category-section.swiper-slide'));
+        
+        // Encontramos el índice (la posición: 0, 1, 2...) de la sección a la que queremos ir
+        const categoryIndex = sections.findIndex(s => s.id === category);
+        
+        if (categoryIndex !== -1) {
+            // Le decimos a Swiper que se deslice a esa posición con una animación.
+            swiper.slideTo(categoryIndex);
+        }
     }
 }
 
@@ -63,12 +136,29 @@ function handleProductModalClick(event) {
     const modal = document.getElementById('product-modal');
     const cantidadInput = modal.querySelector('#cantidad');
     let cantidad = parseInt(cantidadInput.value);
+
     if (event.target.id === 'quantity-plus') cantidadInput.value = ++cantidad;
     if (event.target.id === 'quantity-minus' && cantidad > 1) cantidadInput.value = --cantidad;
+
     if (event.target.id === 'add-to-cart-btn') {
-        agregarAlCarrito(productoSeleccionado, cantidad);
+        const selecciones = []; // Dejamos la lógica por si la reutilizas, pero ahora no se usa para adicionales
+
+        // --- NUEVA LÓGICA PARA OBTENER ADICIONALES CON CANTIDAD ---
+        const adicionalesSeleccionados = [];
+        modal.querySelectorAll('.adicional-item').forEach(item => {
+            const cantidad = parseInt(item.querySelector('.adicional-cantidad').textContent);
+            if (cantidad > 0) {
+                const id = item.dataset.id;
+                // Buscamos el objeto completo del adicional y le añadimos la cantidad
+                const adicionalData = adicionales.find(ad => ad.id === id);
+                adicionalesSeleccionados.push({ ...adicionalData, cantidad });
+            }
+        });
+        
+        agregarAlCarrito(productoSeleccionado, cantidad, selecciones, adicionalesSeleccionados);
         cerrarModal(modal);
     }
+
     if (event.target.classList.contains('modal') || event.target.classList.contains('close')) {
         cerrarModal(modal);
     }
@@ -77,11 +167,26 @@ function handleProductModalClick(event) {
 function handleCartItemInteraction(event) {
     const itemEl = event.target.closest('.cart-item');
     if (!itemEl) return;
-    const productoId = itemEl.dataset.id;
-    const cantidadActual = parseInt(itemEl.querySelector('span').textContent);
-    if (event.target.classList.contains('cart-quantity-plus')) actualizarCantidad(productoId, cantidadActual + 1);
-    if (event.target.classList.contains('cart-quantity-minus')) actualizarCantidad(productoId, cantidadActual - 1);
-    if (event.target.classList.contains('cart-item-remove')) eliminarDelCarrito(productoId);
+
+    // AHORA el data-id es el uniqueId que necesitamos
+    const itemUniqueId = itemEl.dataset.id; 
+    
+    // La lógica de actualizar cantidad la delegamos al módulo del carrito
+    const itemEnCarrito = getCarrito().find(item => item.uniqueId === itemUniqueId);
+    if (!itemEnCarrito) return;
+    
+    let cantidadActual = itemEnCarrito.cantidad;
+
+    if (event.target.classList.contains('cart-quantity-plus')) {
+        actualizarCantidad(itemUniqueId, cantidadActual + 1);
+    }
+    if (event.target.classList.contains('cart-quantity-minus')) {
+        actualizarCantidad(itemUniqueId, cantidadActual - 1);
+    }
+    // La lógica de eliminar la delegamos al módulo del carrito
+    if (event.target.classList.contains('cart-item-remove')) {
+        eliminarDelCarrito(itemUniqueId);
+    }
 }
 
 // En main.js

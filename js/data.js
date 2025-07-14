@@ -1,6 +1,24 @@
 // Constante para el costo de envío. Si cambia, solo lo modificas aquí.
 export const COSTO_ENVIO = 1500; 
 
+export const adicionales = [
+  { id: "extra-muzzarella", nombre: "Extra Muzzarella", precio: 800 },
+  { id: "extra-jamon", nombre: "Extra Jamon", precio: 800 },
+  { id: "extra-roquefort", nombre: "Extra Roquefort", precio: 800 },
+  { id: "extra-cheddar", nombre: "Extra Cheddar", precio: 800 },
+  { id: "extra-huevo-a-caballo", nombre: "Extra Huevo A Caballo", precio: 800 }, 
+  { id: "extra-huevo-duro", nombre: "Extra Huevo Duro", precio: 800 },
+  { id: "extra-salame", nombre: "Extra Salame", precio: 800 },
+  { id: "extra-albahaca", nombre: "Extra Albahaca", precio: 800 },
+  { id: "extra-tomate-cherry", nombre: "Extra Tomate Cherry", precio: 800 },
+  { id: "extra-morron", nombre: "Extra Morron", precio: 800 },
+  { id: "extra-aceitunas", nombre: "Extra Aceitunas", precio: 800 },
+  { id: "extra-pepperoni", nombre: "Extra Pepperoni", precio: 800 },
+  { id: "extra-panceta", nombre: "Extra Panceta", precio: 800 },
+  { id: "extra-salsa-golf", nombre: "Extra Salsa Golf", precio: 800 },
+];
+
+
 // Este archivo contiene únicamente los datos de los productos.
 const productos = {
   pizzas: [
@@ -10,77 +28,88 @@ const productos = {
     nombre: "Pide Muzzarella",
     descripcion: "Masa crocante, salsa casera y muzzarella al punto justo.",
     precio: 3800,
-    imagen: "img/pides/muzza.png"
+    imagen: "img/pides/muzza.png",
+    permiteAdicionales: true,
   },
   {
     id: "pide-jamon",
     nombre: "Pide Jamón",
     descripcion: "Muzzarella fundida y jamón sobre masa fina.",
     precio: 4200,
-    imagen: "img/pides/jamon.jpg"
+    imagen: "img/pides/jamon.jpg",
+    permiteAdicionales: true,
   },
   {
     id: "pide-roque",
     nombre: "Pide Roquefort",
     descripcion: "Roquefort intenso, muzzarella suave y masa crocante.",
     precio: 4200,
-    imagen: "img/pides/roque.jpg"
+    imagen: "img/pides/roque.jpg",
+    permiteAdicionales: true,
   },
   {
     id: "pide-salame",
     nombre: "Pide Salame",
     descripcion: "Rodajas de salame y muzzarella sobre base fina.",
     precio: 4500,
-    imagen: "img/pides/Salame.png"
+    imagen: "img/pides/Salame.png",
+    permiteAdicionales: true,
   },
   {
     id: "pide-napo",
     nombre: "Pide Napolitana",
     descripcion: "Muzzarella, tomate cherry fresco y albahaca en masa fina.",
     precio: 4500,
-    imagen: "img/pides/napo.jpg"
+    imagen: "img/pides/napo.jpg",
+    permiteAdicionales: true,
   },
   {
     id: "pide-2-quesos",
     nombre: "Pide 2 Quesos",
     descripcion: "Dúo perfecto: muzzarella y cheddar sobre masa crujiente.",
     precio: 4500,
-    imagen: "img/pides/2 quesos.png"
+    imagen: "img/pides/2 quesos.png",
+    permiteAdicionales: true,
   },
   {
     id: "pide-roque-jamon",
     nombre: "Pide Roque y Jamón",
     descripcion: "Roquefort, jamón y muzzarella fundidos en cada bocado.",
     precio: 4500,
-    imagen: "img/pides/roque y jamon.png"
+    imagen: "img/pides/roque y jamon.png",
+    permiteAdicionales: true,
   },
   {
     id: "pide-especial",
     nombre: "Pide Especial",
     descripcion: "Muzzarella, huevo, jamon, morrón y aceitunas sobre masa fina.",
     precio: 4500,
-    imagen: "img/pides/especial.png"
+    imagen: "img/pides/especial.png",
+    permiteAdicionales: true,
   },
   {
     id: "pide-pepperoni",
     nombre: "Pide Pepperoni",
     descripcion: "Muzzarella y pepperoni picante sobre masa crocante.",
     precio: 4500,
-    imagen: "img/pides/pepperoni.png"
+    imagen: "img/pides/pepperoni.png",
+    permiteAdicionales: true,
   },
   {
     id: "pide-3quesos",
     nombre: "Pide 3 Quesos",
     descripcion: "Muzzarella, cheddar y roquefort, la combinación ideal.",
     precio: 5000,
-    imagen: "img/pides/3 quesos.png"
+    imagen: "img/pides/3 quesos.png",
+    permiteAdicionales: true,
   },
   {
     id: "pide-cheddar_panceta",
     nombre: "Pide Cheddar y Panceta",
     descripcion: "Cheddar fundido y panceta crocante en cada bocado.",
     precio: 5500,
-    imagen: "img/pides/cheddar y panceta.jpg"
+    imagen: "img/pides/cheddar y panceta.jpg",
+    permiteAdicionales: true,
   }
 
 
@@ -92,7 +121,17 @@ const productos = {
       descripcion: "2 pides de jamon + 2 Gaseosas a elección 500ml",
       precio: 10500,
       precioOriginal: 12400,
-      imagen: "img/combos/1.png"
+      imagen: "img/combos/1.png",
+      opciones: [
+        {
+          titulo: "Elegí tu 1ra Gaseosa",
+          items: ["Coca-Cola 500ml", "Fanta 500ml", "Sprite 500ml"]
+        },
+        {
+          titulo: "Elegí tu 2da Gaseosa",
+          items: ["Coca-Cola 500ml", "Fanta 500ml", "Sprite 500ml"]
+        }
+      ]
     },
 
     {
@@ -101,7 +140,17 @@ const productos = {
       descripcion: "2 pides de jamon + 2 Cervezas a elección 473ml",
       precio: 11500,
       precioOriginal: 13400,
-      imagen: "img/combos/2.png"
+      imagen: "img/combos/2.png",
+      opciones: [
+        {
+          titulo: "Elegí tu 1ra Cerveza",
+          items: ["Quilmes 473ml", "Brahma 473ml", "Schneider 473ml"]
+        },
+        {
+          titulo: "Elegí tu 2da Cerveza",
+          items: ["Quilmes 473ml", "Brahma 473ml", "Schneider 473ml"]
+        }
+      ]
     },
 
     {
@@ -110,7 +159,17 @@ const productos = {
       descripcion: "2 Carlitos jamon y queso + 2 Gaseosas a elección 500ml",
       precio: 13500,
       precioOriginal: 16000,
-      imagen: "img/combos/3.jpg"
+      imagen: "img/combos/3.jpg",
+      opciones: [
+        {
+          titulo: "Elegí tu 1ra Gaseosa",
+          items: ["Coca-Cola 500ml", "Fanta 500ml", "Sprite 500ml"]
+        },
+        {
+          titulo: "Elegí tu 2da Gaseosa",
+          items: ["Coca-Cola 500ml", "Fanta 500ml", "Sprite 500ml"]
+        }
+      ]
     },
 
     {
@@ -119,7 +178,17 @@ const productos = {
       descripcion: "2 Carlitos jamon y queso + 2 Cervezas a elección 473ml",
       precio: 14500,
       precioOriginal: 17000,
-      imagen: "img/combos/4.jpg"
+      imagen: "img/combos/4.jpg",
+      opciones: [
+        {
+          titulo: "Elegí tu 1ra Cerveza",
+          items: ["Quilmes 473ml", "Brahma 473ml", "Schneider 473ml"]
+        },
+        {
+          titulo: "Elegí tu 2da Cerveza",
+          items: ["Quilmes 473ml", "Brahma 473ml", "Schneider 473ml"]
+        }
+      ]
     },
 
   ],
@@ -129,7 +198,8 @@ const productos = {
     nombre: "Carlito Jamón y Queso",
     descripcion: "El clasico de siempre: jamón de primera calidad y mucho queso. Con salsa golf.",
     precio: 6000,
-    imagen: "img/carlitos/jamon y queso.jpg"
+    imagen: "img/carlitos/jamon y queso.jpg",
+    permiteAdicionales: true
   },
 
   {
@@ -137,7 +207,8 @@ const productos = {
     nombre: "Carlito Especial",
     descripcion: "El clasico reinventado: Jamón, queso, huevo, morrón, aceitunas y salsa golf. Una bomba.",
     precio: 7500,
-    imagen: "img/carlitos/especial.jpg"
+    imagen: "img/carlitos/especial.jpg",
+    permiteAdicionales: true
   }
 
   ],
@@ -148,7 +219,8 @@ const productos = {
     nombre: "Tostado Jamón y Queso",
     descripcion: "El clasico de siempre: jamón de primera calidad y mucho queso. Con mayonesa.",
     precio: 6000,
-    imagen: "img/carlitos/jamon y queso.jpg"
+    imagen: "img/carlitos/jamon y queso.jpg",
+    permiteAdicionales: true
   },
 
   {
@@ -156,7 +228,8 @@ const productos = {
     nombre: "Tostado Especial",
     descripcion: "El clasico reinventado: Jamón, queso, huevo, morrón, aceitunas y mayonesa. Una bomba.",
     precio: 7500,
-    imagen: "img/carlitos/especial.jpg"
+    imagen: "img/carlitos/especial.jpg",
+    permiteAdicionales: true
   }
 
   ],

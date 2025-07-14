@@ -88,7 +88,25 @@ body {
     scrollbar-width: none;
     -ms-overflow-style: none;
     padding: 0 16px;
+    position: relative;
 }
+
+.categories-container {
+    position: relative;
+}
+
+.categories-container::after {
+    content: '';
+    position: absolute;
+    right: -16px;
+    top: 0;
+    bottom: 0;
+    width: 50px;
+    background: linear-gradient(to right, rgba(30, 30, 30, 0), var(--color-fondo) 80%);
+    pointer-events: none;
+    z-index: 2;
+}
+
 .categories::-webkit-scrollbar {
     display: none;
 }
@@ -753,4 +771,131 @@ body {
 /* Efecto hover para que cambie de color al pasar el ratón por encima */
 .footer-contact a:hover {
     color: var(--color-claro); /* Usa tu variable de color para resaltar */
+}
+
+/* --- Estilos para las opciones del modal --- */
+#modal-options-container {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+}
+
+.modal-opcion h4 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    color: var(--color-claro);
+}
+
+.modal-opcion-select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--color-oscuro);
+    background-color: var(--color-boton-inactivo);
+    color: var(--color-texto);
+    font-size: 16px;
+}
+
+/* --- REEMPLAZA TUS ESTILOS DE ADICIONALES POR ESTOS --- */
+
+/* Contenedor principal de la sección de adicionales */
+.modal-adicionales-wrapper {
+    border-top: 1px solid var(--color-boton-inactivo);
+    padding-top: 15px;
+}
+
+/* Botón para mostrar/ocultar la lista */
+#toggle-adicionales-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    font-weight: bold;
+    background-color: var(--color-boton-inactivo);
+    color: var(--color-claro);
+    border: 1px solid var(--color-oscuro);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+#toggle-adicionales-btn:hover {
+    background-color: var(--color-claro);
+    color: var(--color-oscuro);
+}
+
+/* Contenedor de la lista de adicionales (oculto por defecto) */
+#adicionales-list-container {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 200px; /* Limita la altura a 200px (puedes ajustar este valor) */
+    overflow-y: auto;  /* Muestra una barra de scroll vertical si el contenido se pasa */
+    padding-right: 10px; /* Espacio para que la barra de scroll no se pegue al texto */
+}
+
+/* Cada fila de un adicional */
+.adicional-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.adicional-nombre {
+    font-size: 15px;
+}
+
+/* Selector de cantidad (+ / 1 / -) */
+.adicional-quantity-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.adicional-quantity-btn {
+    background-color: var(--color-claro);
+    color: var(--color-fondo);
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1;
+}
+
+.adicional-cantidad {
+    font-size: 18px;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+}
+
+/* --- Estilos Opcionales para la Barra de Scroll --- */
+
+/* La barra de scroll en sí */
+#adicionales-list-container::-webkit-scrollbar {
+    width: 8px; /* Ancho de la barra */
+}
+
+/* El "camino" o "riel" por donde se mueve la barra */
+#adicionales-list-container::-webkit-scrollbar-track {
+    background: var(--color-boton-inactivo); /* Color del fondo del riel */
+    border-radius: 4px;
+}
+
+/* El "mango" o la parte de la barra que se arrastra */
+#adicionales-list-container::-webkit-scrollbar-thumb {
+    background-color: var(--color-oscuro); /* Color del mango */
+    border-radius: 4px;
+    border: 2px solid var(--color-boton-inactivo); /* Crea un borde del color del fondo */
+}
+
+#adicionales-list-container::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-claro); /* Cambia de color al pasar el ratón */
 }

@@ -8,6 +8,8 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="icon" type="image/png" href="img/fotoportada.png">
     <meta name="description" content="Descubrí los mejores pizzas turcas, empanadas y carlitos de Rosario. Hacé tu pedido online de forma rápida y fácil para delivery o retiro. ¡Te esperamos en Monãt!">
+    <!-- Link a Swiper's CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
 </head>
 
@@ -34,20 +36,25 @@
         </form>
     </header>
 
-    <nav class="categories">
-        <button class="active" data-category="pizzas">Pizzas Individuales</button>
-        <button data-category="combos">Promociones</button>
-        <button data-category="carlitos">Carlitos</button>
-        <button data-category="tostados">Tostados</button>
-        <!--<button data-category="empanadas">Empanadas</button> -->
-        <button data-category="bebidas">Bebidas</button>
-        <!--<button data-category="empanadas">Nuestros horarios</button> -->
-        <!--<button data-category="empanadas">¿Donde estamos?</button> -->
-        <!--<button data-category="empanadas">Zona de envios</button> --> <!-- ¡AÑADE ESTO! -->
+    <div class="categories-container">
+        <nav class="categories">
+            <button class="active" data-category="pizzas">Pizzas Individuales</button>
+            <button data-category="combos">Promociones</button>
+            <button data-category="carlitos">Carlitos</button>
+            <button data-category="tostados">Tostados</button>
+            <!--<button data-category="empanadas">Empanadas</button> -->
+            <button data-category="bebidas">Bebidas</button>
+            <!--<button data-category="empanadas">Nuestros horarios</button> -->
+            <!--<button data-category="empanadas">¿Donde estamos?</button> -->
+            <!--<button data-category="empanadas">Zona de envios</button> --> <!-- ¡AÑADE ESTO! -->
+        </nav>
+    </div>
 
-    </nav>
-
-    <main id="product-sections-container"><div id="search-no-results" class="no-results-message hidden"></div></main>
+    <main id="product-sections-container" class="swiper">
+        <div class="swiper-wrapper">
+            <div id="search-no-results" class="no-results-message hidden"></div>
+        </div>
+    </main>
 
     <div id="product-modal" class="modal">
         <div class="modal-content">
@@ -56,6 +63,7 @@
             <h3 id="modal-title"></h3>
             <p id="modal-description"></p>
             <p id="modal-price" class="price"></p>
+            <div id="modal-options-container"></div>
             <div class="quantity-container">
                 <label for="cantidad">Cantidad:</label>
                 <button class="quantity-btn" id="quantity-minus">-</button>
@@ -177,6 +185,9 @@
     
     <div id="toast-container"></div>
     
+    <!-- JS de Swiper -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>  
+
     <script src="js/main.js" type="module" defer></script>
 
     <footer class="site-footer">
