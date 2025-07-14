@@ -141,20 +141,26 @@ function handleProductModalClick(event) {
     if (event.target.id === 'quantity-minus' && cantidad > 1) cantidadInput.value = --cantidad;
 
     if (event.target.id === 'add-to-cart-btn') {
-        const selecciones = []; // Dejamos la lógica por si la reutilizas, pero ahora no se usa para adicionales
+        // --- ¡AQUÍ ESTÁ LA LÓGICA CORREGIDA! ---
 
-        // --- NUEVA LÓGICA PARA OBTENER ADICIONALES CON CANTIDAD ---
+        // 1. Recolectamos las selecciones de los combos (gaseosas, cervezas, etc.)
+        const selectores = modal.querySelectorAll('.modal-opcion-select');
+        const selecciones = Array.from(selectores).map(select => select.value);
+
+        // 2. Recolectamos los adicionales con cantidad (extra queso, etc.)
         const adicionalesSeleccionados = [];
         modal.querySelectorAll('.adicional-item').forEach(item => {
-            const cantidad = parseInt(item.querySelector('.adicional-cantidad').textContent);
-            if (cantidad > 0) {
+            const cantidadAdicional = parseInt(item.querySelector('.adicional-cantidad').textContent);
+            if (cantidadAdicional > 0) {
                 const id = item.dataset.id;
-                // Buscamos el objeto completo del adicional y le añadimos la cantidad
                 const adicionalData = adicionales.find(ad => ad.id === id);
-                adicionalesSeleccionados.push({ ...adicionalData, cantidad });
+                if (adicionalData) {
+                    adicionalesSeleccionados.push({ ...adicionalData, cantidad: cantidadAdicional });
+                }
             }
         });
         
+        // 3. Pasamos todo a la función del carrito
         agregarAlCarrito(productoSeleccionado, cantidad, selecciones, adicionalesSeleccionados);
         cerrarModal(modal);
     }

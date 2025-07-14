@@ -13,12 +13,11 @@ const guardarCarrito = () => {
 
 // La función ahora acepta un cuarto parámetro opcional: adicionalesSeleccionados
 export const agregarAlCarrito = (producto, cantidad, selecciones = [], adicionalesSeleccionados = []) => {
-    // Calculamos el precio total del producto con la suma de (precio adicional * cantidad adicional)
     const precioConAdicionales = producto.precio + adicionalesSeleccionados.reduce((sum, ad) => sum + (ad.precio * ad.cantidad), 0);
 
-    // Creamos un ID único que considera las cantidades de los adicionales
     const adicionalesString = adicionalesSeleccionados.map(a => `${a.id}:${a.cantidad}`).sort().join(',');
-    const itemUniqueId = producto.id + JSON.stringify(selecciones) + adicionalesString;
+    // El ID único ahora también debe incluir las selecciones del combo para ser verdaderamente único
+    const itemUniqueId = producto.id + JSON.stringify(selecciones.sort()) + adicionalesString;
     
     const itemExistente = carrito.find(item => item.uniqueId === itemUniqueId);
 
@@ -27,11 +26,13 @@ export const agregarAlCarrito = (producto, cantidad, selecciones = [], adicional
     } else {
         let nombreMostrado = producto.nombre;
         
-        if (selecciones.length > 0) {
+        // --- ¡AQUÍ ESTÁ LA LÓGICA CORREGIDA! ---
+        // Construimos el string "(Coca-Cola, Sprite)" para los combos
+        if (selecciones.length > 0 && selecciones.every(s => s)) { // Nos aseguramos de que no sean vacíos
             nombreMostrado += ` (${selecciones.join(', ')})`;
         }
 
-        // Creamos el texto "(con 2x Extra Muzza, 1x Jamón)"
+        // Construimos el string "(con 2x Extra Muzza)" para los adicionales
         if (adicionalesSeleccionados.length > 0) {
             const nombresAdicionales = adicionalesSeleccionados.map(ad => `${ad.cantidad}x ${ad.nombre}`).join(', ');
             nombreMostrado += ` (con ${nombresAdicionales})`;
@@ -40,9 +41,10 @@ export const agregarAlCarrito = (producto, cantidad, selecciones = [], adicional
         carrito.push({
             ...producto,
             uniqueId: itemUniqueId,
-            nombre: nombreMostrado,
+            nombre: nombreMostrado, // Guardamos el nombre completamente construido
             cantidad,
             precio: precioConAdicionales,
+            selecciones,
             adicionales: adicionalesSeleccionados
         });
     }
