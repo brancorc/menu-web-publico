@@ -82,17 +82,23 @@ export const renderizarCarrito = (carrito, tipoEntrega = 'pickup') => {
 };
 
 export const abrirModal = (modal, producto) => {
-    if (!producto) return modal.classList.add('open'); // Permite abrir el modal de checkout sin producto
+    // Si no hay producto, es el modal de checkout, lo abrimos y terminamos.
+    if (!producto) {
+        modal.classList.add('open');
+        return;
+    }
 
     const modalPriceEl = modal.querySelector('#modal-price');
     const optionsContainer = modal.querySelector('#modal-options-container');
     
+    // Reseteamos el contenido y precio
     optionsContainer.innerHTML = '';
     modal.querySelector('#modal-img').src = producto.imagen;
     modal.querySelector('#modal-title').textContent = producto.nombre;
     modal.querySelector('#modal-description').textContent = producto.descripcion;
     modal.querySelector('#cantidad').value = 1;
     
+    // Función para actualizar el precio del modal (ya la teníamos y está bien)
     const actualizarPrecioModal = () => {
         let precioTotalAdicionales = 0;
         optionsContainer.querySelectorAll('.adicional-item').forEach(item => {
@@ -103,6 +109,34 @@ export const abrirModal = (modal, producto) => {
         modalPriceEl.textContent = `$${producto.precio + precioTotalAdicionales}`;
     };
 
+    // --- ¡¡AQUÍ FUSIONAMOS AMBAS LÓGICAS!! ---
+
+    // 1. LÓGICA PARA COMBOS (LA QUE SE HABÍA PERDIDO)
+    if (producto.opciones && producto.opciones.length > 0) {
+        producto.opciones.forEach(opcion => {
+            const opcionWrapper = document.createElement('div');
+            opcionWrapper.className = 'modal-opcion';
+
+            const titulo = document.createElement('h4');
+            titulo.textContent = opcion.titulo;
+            opcionWrapper.appendChild(titulo);
+
+            const select = document.createElement('select');
+            select.className = 'modal-opcion-select';
+
+            opcion.items.forEach(item => {
+                const optionEl = document.createElement('option');
+                optionEl.value = item;
+                optionEl.textContent = item;
+                select.appendChild(optionEl);
+            });
+
+            opcionWrapper.appendChild(select);
+            optionsContainer.appendChild(opcionWrapper);
+        });
+    }
+
+    // 2. LÓGICA PARA ADICIONALES (LA QUE YA FUNCIONABA)
     if (producto.permiteAdicionales) {
         const wrapper = document.createElement('div');
         wrapper.className = 'modal-adicionales-wrapper';
@@ -139,7 +173,7 @@ export const abrirModal = (modal, producto) => {
         });
     }
     
-    actualizarPrecioModal();
+    actualizarPrecioModal(); // Ponemos el precio base al abrir
     modal.classList.add('open');
 };
 
