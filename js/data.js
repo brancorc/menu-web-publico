@@ -2,20 +2,20 @@
 export const COSTO_ENVIO = 1500; 
 
 export const adicionales = [
-  { id: "extra-muzzarella", nombre: "Extra Muzzarella", precio: 800 },
-  { id: "extra-jamon", nombre: "Extra Jamon", precio: 800 },
-  { id: "extra-roquefort", nombre: "Extra Roquefort", precio: 800 },
-  { id: "extra-cheddar", nombre: "Extra Cheddar", precio: 800 },
+  { id: "extra-muzzarella", nombre: "Extra Muzzarella", precio: 1200 },
+  { id: "extra-jamon", nombre: "Extra Jamon", precio: 1000 },
+  { id: "extra-roquefort", nombre: "Extra Roquefort", precio: 1500 },
+  { id: "extra-cheddar", nombre: "Extra Cheddar", precio: 1500 },
   { id: "extra-huevo-a-caballo", nombre: "Extra Huevo A Caballo", precio: 800 }, 
   { id: "extra-huevo-duro", nombre: "Extra Huevo Duro", precio: 800 },
-  { id: "extra-salame", nombre: "Extra Salame", precio: 800 },
-  { id: "extra-albahaca", nombre: "Extra Albahaca", precio: 800 },
+  { id: "extra-salame", nombre: "Extra Salame", precio: 1200 },
+  { id: "extra-albahaca", nombre: "Extra Albahaca", precio: 600 },
   { id: "extra-tomate-cherry", nombre: "Extra Tomate Cherry", precio: 800 },
   { id: "extra-morron", nombre: "Extra Morron", precio: 800 },
   { id: "extra-aceitunas", nombre: "Extra Aceitunas", precio: 800 },
-  { id: "extra-pepperoni", nombre: "Extra Pepperoni", precio: 800 },
-  { id: "extra-panceta", nombre: "Extra Panceta", precio: 800 },
-  { id: "extra-salsa-golf", nombre: "Extra Salsa Golf", precio: 800 },
+  { id: "extra-pepperoni", nombre: "Extra Pepperoni", precio: 2000 },
+  { id: "extra-panceta", nombre: "Extra Panceta", precio: 1500 },
+  { id: "extra-salsa-golf", nombre: "Extra Salsa Golf", precio: 600 },
 ];
 
 
