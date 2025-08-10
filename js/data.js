@@ -43,7 +43,7 @@ const productos = {
     id: "pide-roque",
     nombre: "Pide Roquefort",
     descripcion: "Roquefort intenso, muzzarella suave y masa crocante.",
-    precio: 4200,
+    precio: 5000,
     imagen: "img/pides/roque.jpg",
     permiteAdicionales: true,
   },
@@ -75,7 +75,7 @@ const productos = {
     id: "pide-roque-jamon",
     nombre: "Pide Roque y Jamón",
     descripcion: "Roquefort, jamón y muzzarella fundidos en cada bocado.",
-    precio: 4500,
+    precio: 6000,
     imagen: "img/pides/roque y jamon.png",
     permiteAdicionales: true,
   },
@@ -240,7 +240,7 @@ const productos = {
     nombre: "Coca-Cola 500ml",
     descripcion: "Gaseosa Coca-Cola de 500ml",
     precio: 2000,
-    imagen: "img/bebidas/cocacola500.jpg"
+    imagen: "img/bebidas/cocacola500.png"
   },
 
   {
