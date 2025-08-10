@@ -40,14 +40,6 @@ const productos = {
     permiteAdicionales: true,
   },
   {
-    id: "pide-roque",
-    nombre: "Pide Roquefort",
-    descripcion: "Roquefort intenso, muzzarella suave y masa crocante.",
-    precio: 5000,
-    imagen: "img/pides/roque.jpg",
-    permiteAdicionales: true,
-  },
-  {
     id: "pide-salame",
     nombre: "Pide Salame",
     descripcion: "Rodajas de salame y muzzarella sobre base fina.",
@@ -72,14 +64,6 @@ const productos = {
     permiteAdicionales: true,
   },
   {
-    id: "pide-roque-jamon",
-    nombre: "Pide Roque y Jamón",
-    descripcion: "Roquefort, jamón y muzzarella fundidos en cada bocado.",
-    precio: 6000,
-    imagen: "img/pides/roque y jamon.png",
-    permiteAdicionales: true,
-  },
-  {
     id: "pide-especial",
     nombre: "Pide Especial",
     descripcion: "Muzzarella, huevo, jamon, morrón y aceitunas sobre masa fina.",
@@ -95,6 +79,16 @@ const productos = {
     imagen: "img/pides/pepperoni.png",
     permiteAdicionales: true,
   },
+
+  {
+    id: "pide-roque",
+    nombre: "Pide Roquefort",
+    descripcion: "Roquefort intenso, muzzarella suave y masa crocante.",
+    precio: 5000,
+    imagen: "img/pides/roque.jpg",
+    permiteAdicionales: true,
+  },
+
   {
     id: "pide-3quesos",
     nombre: "Pide 3 Quesos",
@@ -110,8 +104,16 @@ const productos = {
     precio: 5500,
     imagen: "img/pides/cheddar y panceta.jpg",
     permiteAdicionales: true,
-  }
+  },
 
+  {
+    id: "pide-roque-jamon",
+    nombre: "Pide Roque y Jamón",
+    descripcion: "Roquefort, jamón y muzzarella fundidos en cada bocado.",
+    precio: 6000,
+    imagen: "img/pides/roque y jamon.png",
+    permiteAdicionales: true,
+  }
 
   ],
   combos: [
