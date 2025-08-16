@@ -31,11 +31,21 @@ const productos = {
     imagen: "img/pides/muzza.png",
     permiteAdicionales: true,
   },
+
+  {
+    id: "pide-doble-muzza",
+    nombre: "Pide Doble Muzza",
+    descripcion: "Doble porción de muzzarella sobre masa fina y crujiente.",
+    precio: 4500,
+    imagen: "img/pides/doblemuzza.png",
+    permiteAdicionales: true,
+  },
+
   {
     id: "pide-jamon",
     nombre: "Pide Jamón",
     descripcion: "Muzzarella fundida y jamón sobre masa fina.",
-    precio: 4200,
+    precio: 4500,
     imagen: "img/pides/jamon.jpg",
     permiteAdicionales: true,
   },
@@ -107,11 +117,39 @@ const productos = {
   },
 
   {
+    id: "pide-almendra-y-miel",
+    nombre: "Pide Almendra Y Miel",
+    descripcion: "Para los amantes de lo agridulce: Muzzarella, almendras tostadas y un toque de miel.",
+    precio: 5500,
+    imagen: "img/pides/almendraymiel.jpg",
+    permiteAdicionales: true,
+  },
+
+
+  {
     id: "pide-roque-jamon",
     nombre: "Pide Roque y Jamón",
     descripcion: "Roquefort, jamón y muzzarella fundidos en cada bocado.",
     precio: 6000,
-    imagen: "img/pides/roque y jamon.png",
+    imagen: "img/pides/roqueyjamon.jpg",
+    permiteAdicionales: true,
+  },
+
+  {
+    id: "pide-anchoas",
+    nombre: "Pide Anchoas",
+    descripcion: "Muzzarella y filetes de anchoas.",
+    precio: 6000,
+    imagen: "img/pides/anchoas.jpg",
+    permiteAdicionales: true,
+  },
+
+  {
+    id: "pide-aceitunas-y-anchoas",
+    nombre: "Pide Aceitunas y Anchoas",
+    descripcion: "Muzzarella, aceitunas verdes y filetes de anchoas.",
+    precio: 6500,
+    imagen: "img/pides/anchoas.jpg",
     permiteAdicionales: true,
   }
 
