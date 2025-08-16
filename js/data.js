@@ -37,7 +37,7 @@ const productos = {
     nombre: "Pide Doble Muzza",
     descripcion: "Doble porción de muzzarella sobre masa fina y crujiente.",
     precio: 4500,
-    imagen: "img/pides/doblemuzza.png",
+    imagen: "img/pides/doblemuzza.jpg",
     permiteAdicionales: true,
   },
 
@@ -160,7 +160,7 @@ const productos = {
       nombre: "Combo Pides + Gaseosas",
       descripcion: "2 pides de jamon + 2 Gaseosas a elección 500ml",
       precio: 10500,
-      precioOriginal: 12400,
+      precioOriginal: 12700,
       imagen: "img/combos/1.png",
       opciones: [
         {
@@ -179,7 +179,7 @@ const productos = {
       nombre: "Combo Pides + Cervezas",
       descripcion: "2 pides de jamon + 2 Cervezas a elección 473ml",
       precio: 11500,
-      precioOriginal: 13400,
+      precioOriginal: 13700,
       imagen: "img/combos/2.png",
       opciones: [
         {
