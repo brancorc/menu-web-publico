@@ -149,7 +149,7 @@ const productos = {
     nombre: "Pide Aceitunas y Anchoas",
     descripcion: "Muzzarella, aceitunas verdes y filetes de anchoas.",
     precio: 6500,
-    imagen: "img/pides/anchoas.jpg",
+    imagen: "img/pides/anchoas_y_aceitunas.jpg",
     permiteAdicionales: true,
   }
 
@@ -242,6 +242,15 @@ const productos = {
     permiteAdicionales: true
   },
 
+      {
+    id: "carlito-salame",
+    nombre: "Carlito Salame",
+    descripcion: "Pan suave y dorado, con muzzarella fundida y rodajas de salame. Con salsa golf.",
+    precio: 7000,
+    imagen: "img/carlitos/salame.jpg",
+    permiteAdicionales: true
+  },
+
   {
     id: "carlito-especial",
     nombre: "Carlito Especial",
@@ -260,6 +269,15 @@ const productos = {
     descripcion: "El clasico de siempre: jamón de primera calidad y mucho queso. Con mayonesa.",
     precio: 6000,
     imagen: "img/carlitos/jamon y queso.jpg",
+    permiteAdicionales: true
+  },
+
+      {
+    id: "Tostado-salame",
+    nombre: "Tostado Salame",
+    descripcion: "Pan suave y dorado, con muzzarella fundida y rodajas de salame. Con Mayonesa",
+    precio: 7000,
+    imagen: "img/carlitos/salame.jpg",
     permiteAdicionales: true
   },
 
