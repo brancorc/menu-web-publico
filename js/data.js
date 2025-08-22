@@ -27,17 +27,8 @@ const productos = {
     id: "pide-muzzarella",
     nombre: "Pide Muzzarella",
     descripcion: "Masa crocante, salsa casera y muzzarella al punto justo.",
-    precio: 3800,
+    precio: 4000,
     imagen: "img/pides/muzza.png",
-    permiteAdicionales: true,
-  },
-
-  {
-    id: "pide-doble-muzza",
-    nombre: "Pide Doble Muzza",
-    descripcion: "Doble porción de muzzarella sobre masa fina y crujiente.",
-    precio: 4500,
-    imagen: "img/pides/doblemuzza.jpg",
     permiteAdicionales: true,
   },
 
@@ -66,27 +57,29 @@ const productos = {
     permiteAdicionales: true,
   },
   {
-    id: "pide-2-quesos",
-    nombre: "Pide 2 Quesos",
-    descripcion: "Dúo perfecto: muzzarella y cheddar sobre masa crujiente.",
-    precio: 4500,
-    imagen: "img/pides/2 quesos.png",
-    permiteAdicionales: true,
-  },
-  {
-    id: "pide-especial",
-    nombre: "Pide Especial",
-    descripcion: "Muzzarella, huevo, jamon, morrón y aceitunas sobre masa fina.",
-    precio: 4500,
-    imagen: "img/pides/especial.png",
-    permiteAdicionales: true,
-  },
-  {
     id: "pide-pepperoni",
     nombre: "Pide Pepperoni",
     descripcion: "Muzzarella y pepperoni picante sobre masa crocante.",
     precio: 4500,
     imagen: "img/pides/pepperoni.png",
+    permiteAdicionales: true,
+  },
+
+  {
+    id: "pide-doble-muzza",
+    nombre: "Pide Doble Muzza",
+    descripcion: "Doble porción de muzzarella sobre masa fina y crujiente.",
+    precio: 5000,
+    imagen: "img/pides/doblemuzza.jpg",
+    permiteAdicionales: true,
+  },
+
+  {
+    id: "pide-2-quesos",
+    nombre: "Pide 2 Quesos",
+    descripcion: "Dúo perfecto: muzzarella y cheddar sobre masa crujiente.",
+    precio: 5000,
+    imagen: "img/pides/2 quesos.png",
     permiteAdicionales: true,
   },
 
@@ -100,19 +93,20 @@ const productos = {
   },
 
   {
+    id: "pide-especial",
+    nombre: "Pide Especial",
+    descripcion: "Muzzarella, huevo, jamon, morrón y aceitunas sobre masa fina.",
+    precio: 5500,
+    imagen: "img/pides/especial.png",
+    permiteAdicionales: true,
+  },
+
+  {
     id: "pide-3quesos",
     nombre: "Pide 3 Quesos",
     descripcion: "Muzzarella, cheddar y roquefort, la combinación ideal.",
-    precio: 5000,
-    imagen: "img/pides/3 quesos.png",
-    permiteAdicionales: true,
-  },
-  {
-    id: "pide-cheddar_panceta",
-    nombre: "Pide Cheddar y Panceta",
-    descripcion: "Cheddar fundido y panceta crocante en cada bocado.",
     precio: 5500,
-    imagen: "img/pides/cheddar y panceta.jpg",
+    imagen: "img/pides/3 quesos.png",
     permiteAdicionales: true,
   },
 
@@ -125,6 +119,14 @@ const productos = {
     permiteAdicionales: true,
   },
 
+  {
+    id: "pide-cheddar_panceta",
+    nombre: "Pide Cheddar y Panceta",
+    descripcion: "Cheddar fundido y panceta crocante en cada bocado.",
+    precio: 6000,
+    imagen: "img/pides/cheddar y panceta.jpg",
+    permiteAdicionales: true,
+  },
 
   {
     id: "pide-roque-jamon",
