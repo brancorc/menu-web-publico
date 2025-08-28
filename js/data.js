@@ -200,7 +200,7 @@ const productos = {
       nombre: "Combo Carlitos + Gaseosas",
       descripcion: "2 Carlitos jamon y queso + 2 Gaseosas a elección 500ml",
       precio: 13500,
-      precioOriginal: 16000,
+      precioOriginal: 18000,
       imagen: "img/combos/3.jpg",
       opciones: [
         {
@@ -219,7 +219,7 @@ const productos = {
       nombre: "Combo Carlitos + Cervezas",
       descripcion: "2 Carlitos jamon y queso + 2 Cervezas a elección 473ml",
       precio: 14500,
-      precioOriginal: 17000,
+      precioOriginal: 19000,
       imagen: "img/combos/4.jpg",
       opciones: [
         {
@@ -239,7 +239,7 @@ const productos = {
     id: "carlito-jyq",
     nombre: "Carlito Jamón y Queso",
     descripcion: "El clasico de siempre: jamón de primera calidad y mucho queso. Con salsa golf.",
-    precio: 6000,
+    precio: 7000,
     imagen: "img/carlitos/jamon y queso.jpg",
     permiteAdicionales: true
   },
@@ -248,7 +248,7 @@ const productos = {
     id: "carlito-salame",
     nombre: "Carlito Salame",
     descripcion: "Pan suave y dorado, con muzzarella fundida y rodajas de salame. Con salsa golf.",
-    precio: 7000,
+    precio: 8000,
     imagen: "img/carlitos/salame.jpg",
     permiteAdicionales: true
   },
@@ -257,7 +257,7 @@ const productos = {
     id: "carlito-especial",
     nombre: "Carlito Especial",
     descripcion: "El clasico reinventado: Jamón, queso, huevo, morrón, aceitunas y salsa golf. Una bomba.",
-    precio: 7500,
+    precio: 8500,
     imagen: "img/carlitos/especial.jpg",
     permiteAdicionales: true
   }
