@@ -269,7 +269,7 @@ const productos = {
     id: "tostado-jyq",
     nombre: "Tostado Jamón y Queso",
     descripcion: "El clasico de siempre: jamón de primera calidad y mucho queso. Con mayonesa.",
-    precio: 6000,
+    precio: 7000,
     imagen: "img/carlitos/jamon y queso.jpg",
     permiteAdicionales: true
   },
@@ -278,7 +278,7 @@ const productos = {
     id: "Tostado-salame",
     nombre: "Tostado Salame",
     descripcion: "Pan suave y dorado, con muzzarella fundida y rodajas de salame. Con Mayonesa",
-    precio: 7000,
+    precio: 8000,
     imagen: "img/carlitos/salame.jpg",
     permiteAdicionales: true
   },
@@ -287,7 +287,7 @@ const productos = {
     id: "tostado-especial",
     nombre: "Tostado Especial",
     descripcion: "El clasico reinventado: Jamón, queso, huevo, morrón, aceitunas y mayonesa. Una bomba.",
-    precio: 7500,
+    precio: 8500,
     imagen: "img/carlitos/especial.jpg",
     permiteAdicionales: true
   }
