@@ -60,7 +60,7 @@ const productos = {
     id: "pide-pepperoni",
     nombre: "Pide Pepperoni",
     descripcion: "Muzzarella y pepperoni picante sobre masa crocante.",
-    precio: 4500,
+    precio: 5000,
     imagen: "img/pides/pepperoni.png",
     permiteAdicionales: true,
   },
