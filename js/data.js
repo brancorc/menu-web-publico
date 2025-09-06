@@ -159,11 +159,11 @@ const productos = {
   combos: [
     {
       id: "combo-1",
-      nombre: "Combo Pides + Gaseosas",
-      descripcion: "2 pides de jamon + 2 Gaseosas a elección 500ml",
-      precio: 10500,
-      precioOriginal: 12700,
-      imagen: "img/combos/1.png",
+      nombre: "Combo Especial",
+      descripcion: "2 Carlitos Especiales + 2 Gaseosas a elección 500ml",
+      precio: 18000,
+      precioOriginal: 21000,
+      imagen: "img/combos/combo_especial.jpg",
       opciones: [
         {
           titulo: "Elegí tu 1ra Gaseosa",
@@ -178,59 +178,11 @@ const productos = {
 
     {
       id: "combo-2",
-      nombre: "Combo Pides + Cervezas",
-      descripcion: "2 pides de jamon + 2 Cervezas a elección 473ml",
-      precio: 11500,
-      precioOriginal: 13700,
-      imagen: "img/combos/2.png",
-      opciones: [
-        {
-          titulo: "Elegí tu 1ra Cerveza",
-          items: ["Quilmes 473ml", "Brahma 473ml", "Schneider 473ml"]
-        },
-        {
-          titulo: "Elegí tu 2da Cerveza",
-          items: ["Quilmes 473ml", "Brahma 473ml", "Schneider 473ml"]
-        }
-      ]
-    },
-
-    {
-      id: "combo-3",
-      nombre: "Combo Carlitos + Gaseosas",
-      descripcion: "2 Carlitos jamon y queso + 2 Gaseosas a elección 500ml",
-      precio: 13500,
-      precioOriginal: 18000,
-      imagen: "img/combos/3.jpg",
-      opciones: [
-        {
-          titulo: "Elegí tu 1ra Gaseosa",
-          items: ["Coca-Cola 500ml", "Fanta 500ml", "Sprite 500ml"]
-        },
-        {
-          titulo: "Elegí tu 2da Gaseosa",
-          items: ["Coca-Cola 500ml", "Fanta 500ml", "Sprite 500ml"]
-        }
-      ]
-    },
-
-    {
-      id: "combo-4",
-      nombre: "Combo Carlitos + Cervezas",
-      descripcion: "2 Carlitos jamon y queso + 2 Cervezas a elección 473ml",
-      precio: 14500,
-      precioOriginal: 19000,
-      imagen: "img/combos/4.jpg",
-      opciones: [
-        {
-          titulo: "Elegí tu 1ra Cerveza",
-          items: ["Quilmes 473ml", "Brahma 473ml", "Schneider 473ml"]
-        },
-        {
-          titulo: "Elegí tu 2da Cerveza",
-          items: ["Quilmes 473ml", "Brahma 473ml", "Schneider 473ml"]
-        }
-      ]
+      nombre: "Combo Juntada",
+      descripcion: "2 Carlitos Especiales + 2 Pides Napolitanas",
+      precio: 23000,
+      precioOriginal: 26000,
+      imagen: "img/combos/combo_juntada.jpg",
     },
 
   ],
