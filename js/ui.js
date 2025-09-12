@@ -15,7 +15,6 @@ export const renderizarProductos = (productosPorCategoria) => {
     const categoriesContainer = document.querySelector('.categories');
     categoriesContainer.innerHTML = '';
 
-    // [MODIFICADO] Eliminamos el .sort(). Ahora renderizamos en el orden que nos llega.
     const categoriasEnOrden = Object.keys(productosPorCategoria);
 
     categoriasEnOrden.forEach(categoria => {
@@ -42,10 +41,13 @@ export const renderizarProductos = (productosPorCategoria) => {
                 priceHTML = `<p class="price">$${producto.precio_final.toLocaleString('es-AR')}</p>`;
             }
 
+            // [MODIFICADO] Usamos la imagen_url de la API, o un placeholder si no existe.
+            const imageUrl = producto.imagen_url || 'img/fotoportada.png';
+
             section.innerHTML += `
                 <div class="item" data-id="${producto.id}" data-category="${producto.categoria}">
                     ${ofertaTagHTML}
-                    <img src="img/fotoportada.png" alt="${producto.nombre}" />
+                    <img src="${imageUrl}" alt="${producto.nombre}" />
                     <div class="item-info">
                         <h3>${producto.nombre}</h3>
                         <p>${producto.descripcion || ''}</p>
@@ -64,15 +66,17 @@ export const renderizarCarrito = (carrito, tipoEntrega = 'pickup') => {
     if (existingShippingRow) existingShippingRow.remove();
 
     if (carrito.length === 0) {
-        cartItemsContainer.innerHTML `<p class="cart-empty-message">Tu carrito está vacío.</p>`;
+        cartItemsContainer.innerHTML = `<p class="cart-empty-message">Tu carrito está vacío.</p>`;
         checkoutBtn.disabled = true;
     } else {
         checkoutBtn.disabled = false;
         carrito.forEach(item => {
             const itemId = item.uniqueId; 
+            // [MODIFICADO] Usamos la imagen del item en el carrito, o un placeholder.
+            const itemImageUrl = item.imagen_url || 'img/fotoportada.png';
             cartItemsContainer.innerHTML += `
                 <div class="cart-item" data-id="${itemId}">
-                    <img src="img/fotoportada.png" alt="${item.nombre}">
+                    <img src="${itemImageUrl}" alt="${item.nombre}">
                     <div class="cart-item-info"><h4>${item.nombre}</h4><p class="price">$${item.precio}</p></div>
                     <div class="cart-item-quantity"><button class="quantity-btn cart-quantity-minus">-</button><span>${item.cantidad}</span><button class="quantity-btn cart-quantity-plus">+</button></div>
                     <button class="cart-item-remove">×</button>
@@ -106,7 +110,8 @@ export const abrirModal = (modal, producto) => {
     const optionsContainer = modal.querySelector('#modal-options-container');
     
     optionsContainer.innerHTML = '';
-    modal.querySelector('#modal-img').src = 'img/fotoportada.png';
+    // [MODIFICADO] Usamos la imagen_url de la API para el modal, o un placeholder.
+    modal.querySelector('#modal-img').src = producto.imagen_url || 'img/fotoportada.png';
     modal.querySelector('#modal-title').textContent = producto.nombre;
     modal.querySelector('#modal-description').textContent = producto.descripcion || '';
     modal.querySelector('#cantidad').value = 1;
