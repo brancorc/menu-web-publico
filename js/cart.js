@@ -3,49 +3,37 @@ import { renderizarCarrito, mostrarToast } from './ui.js';
 let carrito = JSON.parse(localStorage.getItem('monatCarrito')) || [];
 
 const guardarCarrito = () => {
-
     localStorage.setItem('monatCarrito', JSON.stringify(carrito));
-
     const tipoEntregaActual = document.querySelector('input[name="delivery-type"]:checked')?.value;
-    
     renderizarCarrito(carrito, tipoEntregaActual);
 };
 
-// La función ahora acepta un cuarto parámetro opcional: adicionalesSeleccionados
+// [MODIFICADO] La función ahora usa la estructura de datos de la API de Comanda Central
 export const agregarAlCarrito = (producto, cantidad, selecciones = [], adicionalesSeleccionados = []) => {
-    const precioConAdicionales = producto.precio + adicionalesSeleccionados.reduce((sum, ad) => sum + (ad.precio * ad.cantidad), 0);
+    
+    // Por ahora, los adicionales no se gestionan desde Comanda Central, así que esta lógica se simplifica.
+    // El precio ya viene calculado desde el backend en `producto.precio_final`.
+    const precioUnitario = producto.precio_final;
 
-    const adicionalesString = adicionalesSeleccionados.map(a => `${a.id}:${a.cantidad}`).sort().join(',');
-    // El ID único ahora también debe incluir las selecciones del combo para ser verdaderamente único
-    const itemUniqueId = producto.id + JSON.stringify(selecciones.sort()) + adicionalesString;
+    // El ID único se simplifica, ya que no hay combos ni adicionales por el momento.
+    const itemUniqueId = producto.id.toString();
     
     const itemExistente = carrito.find(item => item.uniqueId === itemUniqueId);
 
     if (itemExistente) {
         itemExistente.cantidad += cantidad;
     } else {
-        let nombreMostrado = producto.nombre;
-        
-        // --- ¡AQUÍ ESTÁ LA LÓGICA CORREGIDA! ---
-        // Construimos el string "(Coca-Cola, Sprite)" para los combos
-        if (selecciones.length > 0 && selecciones.every(s => s)) { // Nos aseguramos de que no sean vacíos
-            nombreMostrado += ` (${selecciones.join(', ')})`;
-        }
-
-        // Construimos el string "(con 2x Extra Muzza)" para los adicionales
-        if (adicionalesSeleccionados.length > 0) {
-            const nombresAdicionales = adicionalesSeleccionados.map(ad => `${ad.cantidad}x ${ad.nombre}`).join(', ');
-            nombreMostrado += ` (con ${nombresAdicionales})`;
-        }
-
+        // Creamos un objeto para el carrito usando los campos de la API
         carrito.push({
-            ...producto,
+            id: producto.id,
             uniqueId: itemUniqueId,
-            nombre: nombreMostrado, // Guardamos el nombre completamente construido
+            nombre: producto.nombre,
             cantidad,
-            precio: precioConAdicionales,
-            selecciones,
-            adicionales: adicionalesSeleccionados
+            precio: precioUnitario,
+            // Guardamos el precio original por si lo necesitamos mostrar en el futuro
+            precioOriginal: producto.precio_original, 
+            // La imagen es un placeholder por ahora
+            imagen: "img/fotoportada.png"
         });
     }
     
@@ -60,12 +48,11 @@ export const agregarAlCarrito = (producto, cantidad, selecciones = [], adicional
 };
 
 export const actualizarCantidad = (itemUniqueId, nuevaCantidad) => {
-    const itemEnCarrito = carrito.find(item => item.uniqueId === itemUniqueId); // <-- Buscar por uniqueId
+    const itemEnCarrito = carrito.find(item => item.uniqueId === itemUniqueId);
     if (itemEnCarrito) {
         if (nuevaCantidad > 0) {
             itemEnCarrito.cantidad = nuevaCantidad;
         } else {
-            // Si la cantidad llega a 0, lo eliminamos
             eliminarDelCarrito(itemUniqueId, false); 
         }
     }
@@ -73,9 +60,9 @@ export const actualizarCantidad = (itemUniqueId, nuevaCantidad) => {
 };
 
 export const eliminarDelCarrito = (itemUniqueId, mostrarNotificacion = true) => {
-    const producto = carrito.find(p => p.uniqueId === itemUniqueId); // <-- Buscar por uniqueId
+    const producto = carrito.find(p => p.uniqueId === itemUniqueId);
     if (producto) {
-        carrito = carrito.filter(item => item.uniqueId !== itemUniqueId); // <-- Filtrar por uniqueId
+        carrito = carrito.filter(item => item.uniqueId !== itemUniqueId);
         guardarCarrito();
         if (mostrarNotificacion) {
             mostrarToast(`${producto.nombre} eliminado del carrito`);

@@ -1,9 +1,13 @@
-import { COSTO_ENVIO, adicionales } from './data.js';
+// [ELIMINADO] Ya no importamos datos estáticos. El costo de envío se manejará de otra forma.
+// import { COSTO_ENVIO, adicionales } from './data.js';
 
 const cartItemsContainer = document.getElementById('cart-items');
 const cartTotalPriceEl = document.getElementById('cart-total-price');
 const cartItemCountEl = document.getElementById('cart-item-count');
 const checkoutBtn = document.getElementById('checkout-btn');
+// [NUEVO] Hardcodeamos el costo de envío aquí temporalmente.
+const COSTO_ENVIO = 1500; 
+
 
 export const renderizarProductos = (productosPorCategoria) => {
     const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
@@ -13,31 +17,53 @@ export const renderizarProductos = (productosPorCategoria) => {
     }
     swiperWrapper.innerHTML = '';
 
-    for (const categoria in productosPorCategoria) {
+    // [NUEVO] Creamos un listado de categorías para los botones de navegación
+    const categoriesContainer = document.querySelector('.categories');
+    categoriesContainer.innerHTML = ''; // Limpiamos los botones existentes
+
+    // Ordenamos las categorías alfabéticamente
+    const categoriasOrdenadas = Object.keys(productosPorCategoria).sort();
+
+    categoriasOrdenadas.forEach(categoria => {
+        // [NUEVO] Creamos dinámicamente los botones de categorías
+        const button = document.createElement('button');
+        button.dataset.category = categoria;
+        button.textContent = categoria;
+        categoriesContainer.appendChild(button);
+
         const section = document.createElement('main');
         section.id = categoria;
         section.className = 'category-section swiper-slide';
+        
         if (productosPorCategoria[categoria].length === 0) {
             section.classList.add('hidden');
         }
 
         productosPorCategoria[categoria].forEach(producto => {
             let priceHTML, ofertaTagHTML = '';
-            if (producto.precioOriginal) {
-                ofertaTagHTML = '<span class="oferta-tag">¡OFERTA!</span>';
-                priceHTML = `<div class="price-container"><span class="new-price">$${producto.precio}</span><span class="original-price">$${producto.precioOriginal}</span></div>`;
+            
+            // [MODIFICADO] Usamos la nueva estructura de datos de la API
+            if (producto.descuento_activo_porcentaje > 0) {
+                ofertaTagHTML = `<span class="oferta-tag">¡${producto.descuento_activo_porcentaje}% OFF!</span>`;
+                priceHTML = `<div class="price-container"><span class="new-price">$${producto.precio_final.toLocaleString('es-AR')}</span><span class="original-price">$${producto.precio_original.toLocaleString('es-AR')}</span></div>`;
             } else {
-                priceHTML = `<p class="price">$${producto.precio}</p>`;
+                priceHTML = `<p class="price">$${producto.precio_final.toLocaleString('es-AR')}</p>`;
             }
+
+            // [MODIFICADO] Usamos los campos de la API. La imagen es un placeholder por ahora.
             section.innerHTML += `
-                <div class="item" data-id="${producto.id}" data-category="${categoria}">
+                <div class="item" data-id="${producto.id}" data-category="${producto.categoria}">
                     ${ofertaTagHTML}
-                    <img src="${producto.imagen}" alt="${producto.nombre}" />
-                    <div class="item-info"><h3>${producto.nombre}</h3><p>${producto.descripcion}</p>${priceHTML}</div>
+                    <img src="img/fotoportada.png" alt="${producto.nombre}" />
+                    <div class="item-info">
+                        <h3>${producto.nombre}</h3>
+                        <p>${producto.descripcion || ''}</p>
+                        ${priceHTML}
+                    </div>
                 </div>`;
         });
         swiperWrapper.appendChild(section);
-    }
+    });
 };
 
 export const renderizarCarrito = (carrito, tipoEntrega = 'pickup') => {
@@ -52,12 +78,10 @@ export const renderizarCarrito = (carrito, tipoEntrega = 'pickup') => {
     } else {
         checkoutBtn.disabled = false;
         carrito.forEach(item => {
-            // --- ¡¡ESTA ES LA CORRECCIÓN CLAVE!! ---
-            // Usamos item.uniqueId para identificar de forma única cada elemento en el carrito.
             const itemId = item.uniqueId; 
             cartItemsContainer.innerHTML += `
                 <div class="cart-item" data-id="${itemId}">
-                    <img src="${item.imagen}" alt="${item.nombre}">
+                    <img src="img/fotoportada.png" alt="${item.nombre}">
                     <div class="cart-item-info"><h4>${item.nombre}</h4><p class="price">$${item.precio}</p></div>
                     <div class="cart-item-quantity"><button class="quantity-btn cart-quantity-minus">-</button><span>${item.cantidad}</span><button class="quantity-btn cart-quantity-plus">+</button></div>
                     <button class="cart-item-remove">×</button>
@@ -75,14 +99,13 @@ export const renderizarCarrito = (carrito, tipoEntrega = 'pickup') => {
         cartFooter.insertBefore(shippingRow, cartFooter.querySelector('.cart-total'));
     }
 
-    cartTotalPriceEl.textContent = `$${total}`;
+    cartTotalPriceEl.textContent = `$${total.toLocaleString('es-AR')}`;
     const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
     cartItemCountEl.textContent = totalItems;
     cartItemCountEl.classList.toggle('hidden', totalItems === 0);
 };
 
 export const abrirModal = (modal, producto) => {
-    // Si no hay producto, es el modal de checkout, lo abrimos y terminamos.
     if (!producto) {
         modal.classList.add('open');
         return;
@@ -91,89 +114,19 @@ export const abrirModal = (modal, producto) => {
     const modalPriceEl = modal.querySelector('#modal-price');
     const optionsContainer = modal.querySelector('#modal-options-container');
     
-    // Reseteamos el contenido y precio
     optionsContainer.innerHTML = '';
-    modal.querySelector('#modal-img').src = producto.imagen;
+    // [MODIFICADO] Usamos los campos de la API. La imagen es un placeholder.
+    modal.querySelector('#modal-img').src = 'img/fotoportada.png';
     modal.querySelector('#modal-title').textContent = producto.nombre;
-    modal.querySelector('#modal-description').textContent = producto.descripcion;
+    modal.querySelector('#modal-description').textContent = producto.descripcion || '';
     modal.querySelector('#cantidad').value = 1;
     
-    // Función para actualizar el precio del modal (ya la teníamos y está bien)
-    const actualizarPrecioModal = () => {
-        let precioTotalAdicionales = 0;
-        optionsContainer.querySelectorAll('.adicional-item').forEach(item => {
-            const cantidad = parseInt(item.querySelector('.adicional-cantidad').textContent);
-            const precioUnitario = parseInt(item.dataset.precio);
-            precioTotalAdicionales += cantidad * precioUnitario;
-        });
-        modalPriceEl.textContent = `$${producto.precio + precioTotalAdicionales}`;
-    };
+    // [MODIFICADO] Mostramos el precio final, que ya incluye descuentos.
+    modalPriceEl.textContent = `$${producto.precio_final.toLocaleString('es-AR')}`;
 
-    // --- ¡¡AQUÍ FUSIONAMOS AMBAS LÓGICAS!! ---
+    // La lógica de adicionales y combos se omite por ahora, ya que no viene de la API.
+    // Si en el futuro Comanda Central gestiona esto, la lógica se añadiría aquí.
 
-    // 1. LÓGICA PARA COMBOS (LA QUE SE HABÍA PERDIDO)
-    if (producto.opciones && producto.opciones.length > 0) {
-        producto.opciones.forEach(opcion => {
-            const opcionWrapper = document.createElement('div');
-            opcionWrapper.className = 'modal-opcion';
-
-            const titulo = document.createElement('h4');
-            titulo.textContent = opcion.titulo;
-            opcionWrapper.appendChild(titulo);
-
-            const select = document.createElement('select');
-            select.className = 'modal-opcion-select';
-
-            opcion.items.forEach(item => {
-                const optionEl = document.createElement('option');
-                optionEl.value = item;
-                optionEl.textContent = item;
-                select.appendChild(optionEl);
-            });
-
-            opcionWrapper.appendChild(select);
-            optionsContainer.appendChild(opcionWrapper);
-        });
-    }
-
-    // 2. LÓGICA PARA ADICIONALES (LA QUE YA FUNCIONABA)
-    if (producto.permiteAdicionales) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'modal-adicionales-wrapper';
-        wrapper.innerHTML = `<button id="toggle-adicionales-btn">Agregar Adicionales</button>`;
-        const listContainer = document.createElement('div');
-        listContainer.id = 'adicionales-list-container';
-        listContainer.className = 'hidden';
-
-        adicionales.forEach(adicional => {
-            listContainer.innerHTML += `
-                <div class="adicional-item" data-id="${adicional.id}" data-precio="${adicional.precio}">
-                    <span class="adicional-nombre">${adicional.nombre} (+$${adicional.precio})</span>
-                    <div class="adicional-quantity-selector">
-                        <button class="adicional-quantity-btn" data-action="minus">-</button>
-                        <span class="adicional-cantidad">0</span>
-                        <button class="adicional-quantity-btn" data-action="plus">+</button>
-                    </div>
-                </div>`;
-        });
-        wrapper.appendChild(listContainer);
-        optionsContainer.appendChild(wrapper);
-
-        wrapper.addEventListener('click', (e) => {
-            if (e.target.id === 'toggle-adicionales-btn') listContainer.classList.toggle('hidden');
-            if (e.target.classList.contains('adicional-quantity-btn')) {
-                const action = e.target.dataset.action;
-                const cantidadSpan = e.target.parentElement.querySelector('.adicional-cantidad');
-                let cantidadActual = parseInt(cantidadSpan.textContent);
-                if (action === 'plus') cantidadActual++;
-                else if (action === 'minus' && cantidadActual > 0) cantidadActual--;
-                cantidadSpan.textContent = cantidadActual;
-                actualizarPrecioModal();
-            }
-        });
-    }
-    
-    actualizarPrecioModal(); // Ponemos el precio base al abrir
     modal.classList.add('open');
 };
 
