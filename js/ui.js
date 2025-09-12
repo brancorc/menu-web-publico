@@ -1,13 +1,8 @@
-// [ELIMINADO] Ya no importamos datos estáticos. El costo de envío se manejará de otra forma.
-// import { COSTO_ENVIO, adicionales } from './data.js';
-
 const cartItemsContainer = document.getElementById('cart-items');
 const cartTotalPriceEl = document.getElementById('cart-total-price');
 const cartItemCountEl = document.getElementById('cart-item-count');
 const checkoutBtn = document.getElementById('checkout-btn');
-// [NUEVO] Hardcodeamos el costo de envío aquí temporalmente.
 const COSTO_ENVIO = 1500; 
-
 
 export const renderizarProductos = (productosPorCategoria) => {
     const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
@@ -17,15 +12,13 @@ export const renderizarProductos = (productosPorCategoria) => {
     }
     swiperWrapper.innerHTML = '';
 
-    // [NUEVO] Creamos un listado de categorías para los botones de navegación
     const categoriesContainer = document.querySelector('.categories');
-    categoriesContainer.innerHTML = ''; // Limpiamos los botones existentes
+    categoriesContainer.innerHTML = '';
 
-    // Ordenamos las categorías alfabéticamente
-    const categoriasOrdenadas = Object.keys(productosPorCategoria).sort();
+    // [MODIFICADO] Eliminamos el .sort(). Ahora renderizamos en el orden que nos llega.
+    const categoriasEnOrden = Object.keys(productosPorCategoria);
 
-    categoriasOrdenadas.forEach(categoria => {
-        // [NUEVO] Creamos dinámicamente los botones de categorías
+    categoriasEnOrden.forEach(categoria => {
         const button = document.createElement('button');
         button.dataset.category = categoria;
         button.textContent = categoria;
@@ -42,7 +35,6 @@ export const renderizarProductos = (productosPorCategoria) => {
         productosPorCategoria[categoria].forEach(producto => {
             let priceHTML, ofertaTagHTML = '';
             
-            // [MODIFICADO] Usamos la nueva estructura de datos de la API
             if (producto.descuento_activo_porcentaje > 0) {
                 ofertaTagHTML = `<span class="oferta-tag">¡${producto.descuento_activo_porcentaje}% OFF!</span>`;
                 priceHTML = `<div class="price-container"><span class="new-price">$${producto.precio_final.toLocaleString('es-AR')}</span><span class="original-price">$${producto.precio_original.toLocaleString('es-AR')}</span></div>`;
@@ -50,7 +42,6 @@ export const renderizarProductos = (productosPorCategoria) => {
                 priceHTML = `<p class="price">$${producto.precio_final.toLocaleString('es-AR')}</p>`;
             }
 
-            // [MODIFICADO] Usamos los campos de la API. La imagen es un placeholder por ahora.
             section.innerHTML += `
                 <div class="item" data-id="${producto.id}" data-category="${producto.categoria}">
                     ${ofertaTagHTML}
@@ -73,7 +64,7 @@ export const renderizarCarrito = (carrito, tipoEntrega = 'pickup') => {
     if (existingShippingRow) existingShippingRow.remove();
 
     if (carrito.length === 0) {
-        cartItemsContainer.innerHTML = `<p class="cart-empty-message">Tu carrito está vacío.</p>`;
+        cartItemsContainer.innerHTML `<p class="cart-empty-message">Tu carrito está vacío.</p>`;
         checkoutBtn.disabled = true;
     } else {
         checkoutBtn.disabled = false;
@@ -115,17 +106,11 @@ export const abrirModal = (modal, producto) => {
     const optionsContainer = modal.querySelector('#modal-options-container');
     
     optionsContainer.innerHTML = '';
-    // [MODIFICADO] Usamos los campos de la API. La imagen es un placeholder.
     modal.querySelector('#modal-img').src = 'img/fotoportada.png';
     modal.querySelector('#modal-title').textContent = producto.nombre;
     modal.querySelector('#modal-description').textContent = producto.descripcion || '';
     modal.querySelector('#cantidad').value = 1;
-    
-    // [MODIFICADO] Mostramos el precio final, que ya incluye descuentos.
     modalPriceEl.textContent = `$${producto.precio_final.toLocaleString('es-AR')}`;
-
-    // La lógica de adicionales y combos se omite por ahora, ya que no viene de la API.
-    // Si en el futuro Comanda Central gestiona esto, la lógica se añadiría aquí.
 
     modal.classList.add('open');
 };

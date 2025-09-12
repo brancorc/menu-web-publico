@@ -2,23 +2,22 @@ import { getCarrito, agregarAlCarrito, actualizarCantidad, eliminarDelCarrito, l
 import { renderizarProductos, renderizarCarrito, abrirModal, cerrarModal, toggleCartPanel, mostrarToast } from './ui.js';
 import { enviarPedidoWhatsApp } from './api.js';
 
-// Estado global para almacenar los productos de la API
+// --- ESTADO GLOBAL ---
 let allProducts = [];
 let productosPorCategoria = {};
 let productoSeleccionado = null;
 let swiper;
 
-// Función para hacer peticiones a la API de Comanda Central
-async function apiFetch(endpoint) {
-    // --- ACCIÓN REQUERIDA ---
-    // REEMPLAZA ESTA URL POR LA URL REAL DE TU BACKEND EN RENDER
-    const API_URL = 'https://comanda-central-backend.onrender.com';
+// [ELIMINADO] El array de orden manual ya no es necesario.
+// const ordenCategorias = [ ... ];
 
+// --- LÓGICA PRINCIPAL ---
+
+async function apiFetch(endpoint) {
+    const API_URL = 'https://comanda-central-backend.onrender.com';
     try {
         const response = await fetch(`${API_URL}${endpoint}`);
-        if (!response.ok) {
-            throw new Error(`Error de red: ${response.statusText}`);
-        }
+        if (!response.ok) throw new Error(`Error de red: ${response.statusText}`);
         return await response.json();
     } catch (error) {
         console.error("Error al cargar datos desde la API:", error);
@@ -31,11 +30,11 @@ async function apiFetch(endpoint) {
 document.addEventListener('DOMContentLoaded', async () => {
     
     allProducts = await apiFetch('/api/productos?estado=activos');
+    if (allProducts.length === 0) return;
 
-    if (allProducts.length === 0) {
-        return;
-    }
-
+    // [MODIFICADO] Lógica de agrupación simplificada.
+    // El backend ya nos envía los productos ordenados por el 'orden' de la categoría,
+    // por lo que simplemente los agrupamos. El orden se mantendrá.
     productosPorCategoria = allProducts.reduce((acc, product) => {
         if (product.categoria === 'Preparaciones') return acc;
         const category = product.categoria || 'Varios';
@@ -77,9 +76,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     swiper.update();
     showActiveSlideItems();
     
-    const primeraCategoriaConProductos = Object.keys(productosPorCategoria)[0];
-    if (primeraCategoriaConProductos) {
-         document.querySelector(`.categories button[data-category="${primeraCategoriaConProductos}"]`)?.classList.add('active');
+    // [MODIFICADO] Activamos la primera categoría que llega de la API, que ya viene ordenada.
+    const categoriaPorDefecto = Object.keys(productosPorCategoria)[0];
+    if (categoriaPorDefecto) {
+         document.querySelector(`.categories button[data-category="${categoriaPorDefecto}"]`)?.classList.add('active');
     }
 });
 
@@ -294,7 +294,7 @@ function handleSearch(event) {
         );
     }
     
-    renderizarProductos(productosFiltrados);
+    renderizarProductos(productosPorCategoria);
     swiper.update();
     swiper.slideTo(0, 0);
     
