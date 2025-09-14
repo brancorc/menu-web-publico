@@ -1,19 +1,21 @@
-import { COSTO_ENVIO } from './data.js';
+// [MODIFICADO] Ya no importamos COSTO_ENVIO. Se recibirá como parámetro.
 
-export const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega) => {
+export const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio) => {
     const tuNumero = '5493412625341'; 
 
     const detallePedido = carrito.map(item => 
-        `- ${item.cantidad}x ${item.nombre} ($${item.precio * item.cantidad})`
+        // Usamos toLocaleString para formatear los números correctamente
+        `- ${item.cantidad}x ${item.nombre} ($${(item.precio * item.cantidad).toLocaleString('es-AR')})`
     ).join('\n');
 
     let subtotal = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
     let total = subtotal;
     let detalleEnvio = '';
 
+    // [MODIFICADO] Usamos el costo de envío que recibimos como parámetro dinámico
     if (tipoEntrega === 'delivery' && carrito.length > 0) {
-        total += COSTO_ENVIO;
-        detalleEnvio = `\n*Costo de Envío:* $${COSTO_ENVIO}`;
+        total += costoEnvio;
+        detalleEnvio = `\n*Costo de Envío:* $${costoEnvio.toLocaleString('es-AR')}`;
     }
 
     const mensaje = `
@@ -34,7 +36,7 @@ ${datosCliente.notas || 'Ninguna'}
 ${detallePedido}
 ${detalleEnvio}
 
-*TOTAL: $${total}*
+*TOTAL: $${total.toLocaleString('es-AR')}*
     `;
 
     const url = `https://api.whatsapp.com/send?phone=${tuNumero}&text=${encodeURIComponent(mensaje.trim())}`;

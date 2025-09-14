@@ -1,11 +1,9 @@
-// [MODIFICADO] Importamos la lógica de comportamiento desde nuestro nuevo data.js
 import { productBehaviors, adicionales } from './data.js';
 
 const cartItemsContainer = document.getElementById('cart-items');
 const cartTotalPriceEl = document.getElementById('cart-total-price');
 const cartItemCountEl = document.getElementById('cart-item-count');
 const checkoutBtn = document.getElementById('checkout-btn');
-// [ELIMINADO] La constante COSTO_ENVIO ya no vivirá aquí.
 
 export const renderizarProductos = (productosPorCategoria) => {
     const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
@@ -61,7 +59,6 @@ export const renderizarProductos = (productosPorCategoria) => {
     });
 };
 
-// [MODIFICADO] La función ahora recibe el costo de envío dinámicamente
 export const renderizarCarrito = (carrito, tipoEntrega = 'pickup', costoEnvio = 0) => {
     const cartFooter = document.querySelector('.cart-footer');
     cartItemsContainer.innerHTML = '';
@@ -75,12 +72,11 @@ export const renderizarCarrito = (carrito, tipoEntrega = 'pickup', costoEnvio = 
         checkoutBtn.disabled = false;
         carrito.forEach(item => {
             const itemId = item.uniqueId; 
-            // [CORREGIDO] Usamos la imagen del item guardada en el carrito
             const itemImageUrl = item.imagen_url || 'img/fotoportada.png';
             cartItemsContainer.innerHTML += `
                 <div class="cart-item" data-id="${itemId}">
                     <img src="${itemImageUrl}" alt="${item.nombre}">
-                    <div class="cart-item-info"><h4>${item.nombre}</h4><p class="price">$${item.precio}</p></div>
+                    <div class="cart-item-info"><h4>${item.nombre}</h4><p class="price">$${item.precio.toLocaleString('es-AR')}</p></div>
                     <div class="cart-item-quantity"><button class="quantity-btn cart-quantity-minus">-</button><span>${item.cantidad}</span><button class="quantity-btn cart-quantity-plus">+</button></div>
                     <button class="cart-item-remove">×</button>
                 </div>`;
@@ -103,7 +99,6 @@ export const renderizarCarrito = (carrito, tipoEntrega = 'pickup', costoEnvio = 
     cartItemCountEl.classList.toggle('hidden', totalItems === 0);
 };
 
-// [MODIFICADO] La función ahora es mucho más inteligente y lee el mapa de comportamiento
 export const abrirModal = (modal, producto) => {
     if (!producto) {
         modal.classList.add('open');
@@ -119,7 +114,6 @@ export const abrirModal = (modal, producto) => {
     modal.querySelector('#modal-description').textContent = producto.descripcion || '';
     modal.querySelector('#cantidad').value = 1;
     
-    // El precio base es siempre el precio final del producto
     let precioBase = producto.precio_final;
 
     const actualizarPrecioModal = () => {
@@ -132,10 +126,8 @@ export const abrirModal = (modal, producto) => {
         modalPriceEl.textContent = `$${(precioBase + precioTotalAdicionales).toLocaleString('es-AR')}`;
     };
 
-    // Buscamos el comportamiento del producto actual en nuestro mapa
     const behavior = productBehaviors[producto.id] || {};
 
-    // 1. LÓGICA PARA COMBOS (si existen en el mapa)
     if (behavior.opciones && behavior.opciones.length > 0) {
         behavior.opciones.forEach(opcion => {
             const opcionWrapper = document.createElement('div');
@@ -151,7 +143,6 @@ export const abrirModal = (modal, producto) => {
         });
     }
 
-    // 2. LÓGICA PARA ADICIONALES (si existen en el mapa)
     if (behavior.permiteAdicionales) {
         const wrapper = document.createElement('div');
         wrapper.className = 'modal-adicionales-wrapper';

@@ -1,19 +1,19 @@
 import { getCarrito, agregarAlCarrito, actualizarCantidad, eliminarDelCarrito, limpiarCarrito } from './cart.js';
 import { renderizarProductos, renderizarCarrito, abrirModal, cerrarModal, toggleCartPanel, mostrarToast } from './ui.js';
 import { enviarPedidoWhatsApp } from './api.js';
-// [NUEVO] Importamos el mapa de comportamiento de nuestro data.js modular
 import { productBehaviors, adicionales } from './data.js';
 
 // --- ESTADO GLOBAL ---
 let allProducts = [];
 let productosPorCategoria = {};
 let productoSeleccionado = null;
-let shippingCost = 0; // [NUEVO] Para el costo de envío dinámico
+let shippingCost = 0;
 let swiper;
 
 // --- LÓGICA PRINCIPAL ---
 
 async function apiFetch(endpoint) {
+    // Apuntamos al backend de producción
     const API_URL = 'https://comanda-central-backend.onrender.com';
     try {
         const response = await fetch(`${API_URL}${endpoint}`);
@@ -23,22 +23,22 @@ async function apiFetch(endpoint) {
         console.error("Error al cargar datos desde la API:", error);
         const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
         swiperWrapper.innerHTML = `<div class="no-results-message">No se pudo cargar el menú. Por favor, intenta de nuevo más tarde.</div>`;
-        return null; // Devolvemos null para manejar el error
+        return null;
     }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
     
-    // [MODIFICADO] Hacemos peticiones en paralelo para productos y ajustes
     const [productsData, settingsData] = await Promise.all([
         apiFetch('/api/productos?estado=activos'),
-        apiFetch('/api/settings/business') // Endpoint público para ajustes
+        // Usamos el endpoint público que creamos en Comanda Central
+        apiFetch('/api/settings/business') 
     ]);
 
-    if (!productsData || !settingsData) return; // Si alguna petición falló, no continuamos
+    if (!productsData || !settingsData) return;
 
     allProducts = productsData;
-    shippingCost = parseFloat(settingsData.costo_envio_predeterminado); // Guardamos el costo de envío dinámico
+    shippingCost = parseFloat(settingsData.costo_envio_predeterminado);
 
     productosPorCategoria = allProducts.reduce((acc, product) => {
         if (product.categoria === 'Preparaciones') return acc;
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, {});
 
     renderizarProductos(productosPorCategoria);
-    renderizarCarrito(getCarrito(), 'pickup', shippingCost); // Pasamos el costo de envío
+    renderizarCarrito(getCarrito(), 'pickup', shippingCost);
     setupEventListeners();
     checkStoreStatus();
 
@@ -90,24 +90,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 function setupEventListeners() {
     document.querySelector('.categories').addEventListener('click', handleCategoryClick);
     document.getElementById('product-sections-container').addEventListener('click', handleProductClick);
-    
     const productModal = document.getElementById('product-modal');
     productModal.addEventListener('click', handleProductModalClick);
-    
     document.getElementById('cart-toggle').addEventListener('click', toggleCartPanel);
     document.getElementById('close-cart-btn').addEventListener('click', toggleCartPanel);
-
     document.getElementById('checkout-btn').addEventListener('click', () => abrirModal(document.getElementById('checkout-modal')));
-
     document.getElementById('cart-items').addEventListener('click', handleCartItemInteraction);
-    
     const checkoutModal = document.getElementById('checkout-modal');
     checkoutModal.querySelector('.close').addEventListener('click', () => cerrarModal(checkoutModal));
     document.getElementById('checkout-form').addEventListener('submit', handleCheckout);
-    
     document.getElementById('search-form').addEventListener('submit', e => e.preventDefault());
     document.getElementById('search-input').addEventListener('input', handleSearch);
-
     document.getElementById('delivery-type-options').addEventListener('change', handleDeliveryTypeChange);
     document.getElementById('order-time-type-options').addEventListener('change', handleOrderTimeChange);
 }
@@ -117,7 +110,6 @@ function handleCategoryClick(event) {
         const category = event.target.dataset.category;
         const sections = Array.from(document.querySelectorAll('.category-section.swiper-slide'));
         const categoryIndex = sections.findIndex(s => s.id === category);
-        
         if (categoryIndex !== -1) {
             swiper.slideTo(categoryIndex);
         }
@@ -130,7 +122,6 @@ function handleProductClick(event) {
         const productoId = parseInt(item.dataset.id, 10);
         productoSeleccionado = allProducts.find(p => p.id === productoId);
         if (productoSeleccionado) {
-            // [NUEVO] Buscamos su comportamiento en nuestro mapa
             const behavior = productBehaviors[productoSeleccionado.id] || {};
             abrirModal(document.getElementById('product-modal'), { ...productoSeleccionado, ...behavior });
         }
@@ -146,10 +137,8 @@ function handleProductModalClick(event) {
     if (event.target.id === 'quantity-minus' && cantidad > 1) cantidadInput.value = --cantidad;
 
     if (event.target.id === 'add-to-cart-btn') {
-        // [MODIFICADO] Reactivamos la lógica para recolectar opciones y adicionales
         const selectores = modal.querySelectorAll('.modal-opcion-select');
         const selecciones = Array.from(selectores).map(select => select.value);
-
         const adicionalesSeleccionados = [];
         modal.querySelectorAll('.adicional-item').forEach(item => {
             const cantidadAdicional = parseInt(item.querySelector('.adicional-cantidad').textContent);
@@ -161,7 +150,6 @@ function handleProductModalClick(event) {
                 }
             }
         });
-        
         agregarAlCarrito(productoSeleccionado, cantidad, selecciones, adicionalesSeleccionados);
         cerrarModal(modal);
     }
@@ -264,9 +252,10 @@ function handleCheckout(event) {
         pago: document.getElementById('payment-method').value,
         notas: document.getElementById('order-notes').value
     };
+    // [CORREGIDO] Pasamos la variable global `shippingCost` a la función de la API
     enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType, shippingCost);
     cerrarModal(document.getElementById('checkout-modal'));
-    limpiarCarrito();
+    limpiarCarrito(shippingCost); // Pasamos el costo para que el renderizado del carrito vacío sea correcto
     mostrarToast("¡Pedido enviado! Gracias por tu compra.");
     const form = document.getElementById('checkout-form');
     form.reset();
@@ -284,7 +273,7 @@ function handleSearch(event) {
             p.nombre.toLowerCase().includes(termino) || (p.descripcion && p.descripcion.toLowerCase().includes(termino))
         );
     }
-    renderizarProductos(productosFiltrados);
+    renderizarProductos(productosPorCategoria);
     swiper.update();
     swiper.slideTo(0, 0);
     setTimeout(() => {
