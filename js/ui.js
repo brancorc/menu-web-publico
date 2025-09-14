@@ -1,8 +1,11 @@
+// [MODIFICADO] Importamos la lógica de comportamiento desde nuestro nuevo data.js
+import { productBehaviors, adicionales } from './data.js';
+
 const cartItemsContainer = document.getElementById('cart-items');
 const cartTotalPriceEl = document.getElementById('cart-total-price');
 const cartItemCountEl = document.getElementById('cart-item-count');
 const checkoutBtn = document.getElementById('checkout-btn');
-const COSTO_ENVIO = 1500; 
+// [ELIMINADO] La constante COSTO_ENVIO ya no vivirá aquí.
 
 export const renderizarProductos = (productosPorCategoria) => {
     const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
@@ -41,7 +44,6 @@ export const renderizarProductos = (productosPorCategoria) => {
                 priceHTML = `<p class="price">$${producto.precio_final.toLocaleString('es-AR')}</p>`;
             }
 
-            // [MODIFICADO] Usamos la imagen_url de la API, o un placeholder si no existe.
             const imageUrl = producto.imagen_url || 'img/fotoportada.png';
 
             section.innerHTML += `
@@ -59,7 +61,8 @@ export const renderizarProductos = (productosPorCategoria) => {
     });
 };
 
-export const renderizarCarrito = (carrito, tipoEntrega = 'pickup') => {
+// [MODIFICADO] La función ahora recibe el costo de envío dinámicamente
+export const renderizarCarrito = (carrito, tipoEntrega = 'pickup', costoEnvio = 0) => {
     const cartFooter = document.querySelector('.cart-footer');
     cartItemsContainer.innerHTML = '';
     const existingShippingRow = cartFooter.querySelector('.cart-shipping');
@@ -72,7 +75,7 @@ export const renderizarCarrito = (carrito, tipoEntrega = 'pickup') => {
         checkoutBtn.disabled = false;
         carrito.forEach(item => {
             const itemId = item.uniqueId; 
-            // [MODIFICADO] Usamos la imagen del item en el carrito, o un placeholder.
+            // [CORREGIDO] Usamos la imagen del item guardada en el carrito
             const itemImageUrl = item.imagen_url || 'img/fotoportada.png';
             cartItemsContainer.innerHTML += `
                 <div class="cart-item" data-id="${itemId}">
@@ -87,10 +90,10 @@ export const renderizarCarrito = (carrito, tipoEntrega = 'pickup') => {
     let subtotal = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
     let total = subtotal;
     if (tipoEntrega === 'delivery' && carrito.length > 0) {
-        total += COSTO_ENVIO;
+        total += costoEnvio;
         const shippingRow = document.createElement('div');
         shippingRow.className = 'cart-total cart-shipping';
-        shippingRow.innerHTML = `<span>Envío:</span><span>$${COSTO_ENVIO}</span>`;
+        shippingRow.innerHTML = `<span>Envío:</span><span>$${costoEnvio.toLocaleString('es-AR')}</span>`;
         cartFooter.insertBefore(shippingRow, cartFooter.querySelector('.cart-total'));
     }
 
@@ -100,6 +103,7 @@ export const renderizarCarrito = (carrito, tipoEntrega = 'pickup') => {
     cartItemCountEl.classList.toggle('hidden', totalItems === 0);
 };
 
+// [MODIFICADO] La función ahora es mucho más inteligente y lee el mapa de comportamiento
 export const abrirModal = (modal, producto) => {
     if (!producto) {
         modal.classList.add('open');
@@ -110,13 +114,81 @@ export const abrirModal = (modal, producto) => {
     const optionsContainer = modal.querySelector('#modal-options-container');
     
     optionsContainer.innerHTML = '';
-    // [MODIFICADO] Usamos la imagen_url de la API para el modal, o un placeholder.
     modal.querySelector('#modal-img').src = producto.imagen_url || 'img/fotoportada.png';
     modal.querySelector('#modal-title').textContent = producto.nombre;
     modal.querySelector('#modal-description').textContent = producto.descripcion || '';
     modal.querySelector('#cantidad').value = 1;
-    modalPriceEl.textContent = `$${producto.precio_final.toLocaleString('es-AR')}`;
+    
+    // El precio base es siempre el precio final del producto
+    let precioBase = producto.precio_final;
 
+    const actualizarPrecioModal = () => {
+        let precioTotalAdicionales = 0;
+        optionsContainer.querySelectorAll('.adicional-item').forEach(item => {
+            const cantidad = parseInt(item.querySelector('.adicional-cantidad').textContent);
+            const precioUnitario = parseFloat(item.dataset.precio);
+            precioTotalAdicionales += cantidad * precioUnitario;
+        });
+        modalPriceEl.textContent = `$${(precioBase + precioTotalAdicionales).toLocaleString('es-AR')}`;
+    };
+
+    // Buscamos el comportamiento del producto actual en nuestro mapa
+    const behavior = productBehaviors[producto.id] || {};
+
+    // 1. LÓGICA PARA COMBOS (si existen en el mapa)
+    if (behavior.opciones && behavior.opciones.length > 0) {
+        behavior.opciones.forEach(opcion => {
+            const opcionWrapper = document.createElement('div');
+            opcionWrapper.className = 'modal-opcion';
+            opcionWrapper.innerHTML = `<h4>${opcion.titulo}</h4>`;
+            const select = document.createElement('select');
+            select.className = 'modal-opcion-select';
+            opcion.items.forEach(item => {
+                select.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+            opcionWrapper.appendChild(select);
+            optionsContainer.appendChild(opcionWrapper);
+        });
+    }
+
+    // 2. LÓGICA PARA ADICIONALES (si existen en el mapa)
+    if (behavior.permiteAdicionales) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'modal-adicionales-wrapper';
+        wrapper.innerHTML = `<button id="toggle-adicionales-btn">Agregar Adicionales</button>`;
+        const listContainer = document.createElement('div');
+        listContainer.id = 'adicionales-list-container';
+        listContainer.className = 'hidden';
+
+        adicionales.forEach(adicional => {
+            listContainer.innerHTML += `
+                <div class="adicional-item" data-id="${adicional.id}" data-precio="${adicional.precio}">
+                    <span class="adicional-nombre">${adicional.nombre} (+$${adicional.precio})</span>
+                    <div class="adicional-quantity-selector">
+                        <button class="adicional-quantity-btn" data-action="minus">-</button>
+                        <span class="adicional-cantidad">0</span>
+                        <button class="adicional-quantity-btn" data-action="plus">+</button>
+                    </div>
+                </div>`;
+        });
+        wrapper.appendChild(listContainer);
+        optionsContainer.appendChild(wrapper);
+
+        wrapper.addEventListener('click', (e) => {
+            if (e.target.id === 'toggle-adicionales-btn') listContainer.classList.toggle('hidden');
+            if (e.target.classList.contains('adicional-quantity-btn')) {
+                const action = e.target.dataset.action;
+                const cantidadSpan = e.target.parentElement.querySelector('.adicional-cantidad');
+                let cantidadActual = parseInt(cantidadSpan.textContent);
+                if (action === 'plus') cantidadActual++;
+                else if (action === 'minus' && cantidadActual > 0) cantidadActual--;
+                cantidadSpan.textContent = cantidadActual;
+                actualizarPrecioModal();
+            }
+        });
+    }
+    
+    actualizarPrecioModal();
     modal.classList.add('open');
 };
 

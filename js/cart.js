@@ -2,42 +2,58 @@ import { renderizarCarrito, mostrarToast } from './ui.js';
 
 let carrito = JSON.parse(localStorage.getItem('monatCarrito')) || [];
 
-const guardarCarrito = () => {
+// [MODIFICADO] La función ahora acepta el costo de envío para pasárselo a renderizarCarrito
+const guardarCarrito = (shippingCost) => {
     localStorage.setItem('monatCarrito', JSON.stringify(carrito));
     const tipoEntregaActual = document.querySelector('input[name="delivery-type"]:checked')?.value;
-    renderizarCarrito(carrito, tipoEntregaActual);
+    renderizarCarrito(carrito, tipoEntregaActual, shippingCost);
 };
 
-// [MODIFICADO] La función ahora usa la estructura de datos de la API de Comanda Central
+// [MODIFICADO] Se restaura la lógica completa para manejar opciones y adicionales
 export const agregarAlCarrito = (producto, cantidad, selecciones = [], adicionalesSeleccionados = []) => {
     
-    // Por ahora, los adicionales no se gestionan desde Comanda Central, así que esta lógica se simplifica.
-    // El precio ya viene calculado desde el backend en `producto.precio_final`.
-    const precioUnitario = producto.precio_final;
+    // Calculamos el precio total de los adicionales seleccionados
+    const precioAdicionales = adicionalesSeleccionados.reduce((sum, ad) => sum + (ad.precio * ad.cantidad), 0);
+    // El precio final del item es el precio del producto (que ya puede tener descuento) + el de los adicionales
+    const precioUnitarioFinal = producto.precio_final + precioAdicionales;
 
-    // El ID único se simplifica, ya que no hay combos ni adicionales por el momento.
-    const itemUniqueId = producto.id.toString();
+    // Creamos un string único para los adicionales para diferenciar items en el carrito
+    const adicionalesString = adicionalesSeleccionados.map(a => `${a.id}:${a.cantidad}`).sort().join(',');
+    // El ID único ahora también incluye las selecciones del combo para ser verdaderamente único
+    const itemUniqueId = producto.id.toString() + JSON.stringify(selecciones.sort()) + adicionalesString;
     
     const itemExistente = carrito.find(item => item.uniqueId === itemUniqueId);
 
     if (itemExistente) {
         itemExistente.cantidad += cantidad;
     } else {
-        // Creamos un objeto para el carrito usando los campos de la API
+        let nombreMostrado = producto.nombre;
+        
+        // Construimos el string "(Coca-Cola, Sprite)" para los combos
+        if (selecciones.length > 0 && selecciones.every(s => s)) {
+            nombreMostrado += ` (${selecciones.join(', ')})`;
+        }
+
+        // Construimos el string "(con 2x Extra Muzza)" para los adicionales
+        if (adicionalesSeleccionados.length > 0) {
+            const nombresAdicionales = adicionalesSeleccionados.map(ad => `${ad.cantidad}x ${ad.nombre}`).join(', ');
+            nombreMostrado += ` (con ${nombresAdicionales})`;
+        }
+
+        // Creamos un objeto para el carrito usando los campos de la API y los datos procesados
         carrito.push({
             id: producto.id,
             uniqueId: itemUniqueId,
-            nombre: producto.nombre,
+            nombre: nombreMostrado, // Guardamos el nombre completamente construido
             cantidad,
-            precio: precioUnitario,
-            // Guardamos el precio original por si lo necesitamos mostrar en el futuro
-            precioOriginal: producto.precio_original, 
-            // La imagen es un placeholder por ahora
-            imagen: "img/fotoportada.png"
+            precio: precioUnitarioFinal, // Guardamos el precio final con adicionales
+            imagen_url: producto.imagen_url, // Guardamos la URL de la imagen
+            selecciones,
+            adicionales: adicionalesSeleccionados
         });
     }
     
-    guardarCarrito();
+    guardarCarrito(); // No necesitamos pasar el costo de envío aquí, renderizarCarrito lo obtendrá
     mostrarToast(`${cantidad}x ${producto.nombre} agregado(s)`);
 
     const cartToggle = document.getElementById('cart-toggle');
