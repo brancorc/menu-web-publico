@@ -1,5 +1,3 @@
-// [ELIMINADO] Cortamos la última dependencia con el archivo de datos estáticos.
-
 const cartItemsContainer = document.getElementById('cart-items');
 const cartTotalPriceEl = document.getElementById('cart-total-price');
 const cartItemCountEl = document.getElementById('cart-item-count');
@@ -126,12 +124,27 @@ export const abrirModal = (modal, producto) => {
         modalPriceEl.textContent = `$${(precioBase + precioTotalAdicionales).toLocaleString('es-AR')}`;
     };
     
-    // LÓGICA PARA COMBOS (se implementará en el futuro)
+    // LÓGICA PARA COMBOS (lee el array de opciones que viene dentro del producto)
     if (producto.opciones && producto.opciones.length > 0) {
-        // ...
+        // [CORREGIDO] Se restaura la lógica que dibuja los menús desplegables.
+        producto.opciones.forEach(opcion => {
+            const opcionWrapper = document.createElement('div');
+            opcionWrapper.className = 'modal-opcion';
+            opcionWrapper.innerHTML = `<h4>${opcion.titulo}</h4>`;
+            const select = document.createElement('select');
+            select.className = 'modal-opcion-select';
+            // Nos aseguramos de que 'opcion.items' sea un array antes de iterar
+            if (Array.isArray(opcion.items)) {
+                opcion.items.forEach(item => {
+                    select.innerHTML += `<option value="${item}">${item}</option>`;
+                });
+            }
+            opcionWrapper.appendChild(select);
+            optionsContainer.appendChild(opcionWrapper);
+        });
     }
 
-    // LÓGICA PARA ADICIONALES (lee el array de adicionales que viene DENTRO del producto)
+    // LÓGICA PARA ADICIONALES (lee el array de adicionales que viene dentro del producto)
     if (producto.adicionales && producto.adicionales.length > 0) {
         const wrapper = document.createElement('div');
         wrapper.className = 'modal-adicionales-wrapper';
