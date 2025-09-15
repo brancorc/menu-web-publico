@@ -1,7 +1,8 @@
 import { getCarrito, agregarAlCarrito, actualizarCantidad, eliminarDelCarrito, limpiarCarrito } from './cart.js';
 import { renderizarProductos, renderizarCarrito, abrirModal, cerrarModal, toggleCartPanel, mostrarToast } from './ui.js';
 import { enviarPedidoWhatsApp } from './api.js';
-import { productBehaviors, adicionales } from './data.js';
+// [ELIMINADO] Ya no importamos nada de data.js
+// import { productBehaviors, adicionales } from './data.js';
 
 // --- ESTADO GLOBAL ---
 let allProducts = [];
@@ -13,7 +14,6 @@ let swiper;
 // --- LÓGICA PRINCIPAL ---
 
 async function apiFetch(endpoint) {
-    // Apuntamos al backend de producción
     const API_URL = 'https://comanda-central-backend.onrender.com';
     try {
         const response = await fetch(`${API_URL}${endpoint}`);
@@ -28,11 +28,9 @@ async function apiFetch(endpoint) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    
     const [productsData, settingsData] = await Promise.all([
         apiFetch('/api/productos?estado=activos'),
-        // Usamos el endpoint público que creamos en Comanda Central
-        apiFetch('/api/settings/business') 
+        apiFetch('/api/settings/business')
     ]);
 
     if (!productsData || !settingsData) return;
@@ -53,10 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
     checkStoreStatus();
 
-    swiper = new Swiper('.swiper', {
-        spaceBetween: 20,
-        autoHeight: true,
-    });
+    swiper = new Swiper('.swiper', { spaceBetween: 20, autoHeight: true });
 
     const showActiveSlideItems = () => {
         document.querySelectorAll('.swiper-slide .item').forEach(item => item.classList.remove('visible'));
@@ -122,8 +117,8 @@ function handleProductClick(event) {
         const productoId = parseInt(item.dataset.id, 10);
         productoSeleccionado = allProducts.find(p => p.id === productoId);
         if (productoSeleccionado) {
-            const behavior = productBehaviors[productoSeleccionado.id] || {};
-            abrirModal(document.getElementById('product-modal'), { ...productoSeleccionado, ...behavior });
+            // [MODIFICADO] Simplemente pasamos el producto de la API. ¡Ya contiene todo!
+            abrirModal(document.getElementById('product-modal'), productoSeleccionado);
         }
     }
 }
@@ -143,8 +138,9 @@ function handleProductModalClick(event) {
         modal.querySelectorAll('.adicional-item').forEach(item => {
             const cantidadAdicional = parseInt(item.querySelector('.adicional-cantidad').textContent);
             if (cantidadAdicional > 0) {
-                const id = item.dataset.id;
-                const adicionalData = adicionales.find(ad => ad.id === id);
+                const id = parseInt(item.dataset.id, 10);
+                // Buscamos el adicional en la lista que vino con el producto
+                const adicionalData = productoSeleccionado.adicionales.find(ad => ad.id === id);
                 if (adicionalData) {
                     adicionalesSeleccionados.push({ ...adicionalData, cantidad: cantidadAdicional });
                 }
@@ -252,10 +248,9 @@ function handleCheckout(event) {
         pago: document.getElementById('payment-method').value,
         notas: document.getElementById('order-notes').value
     };
-    // [CORREGIDO] Pasamos la variable global `shippingCost` a la función de la API
     enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType, shippingCost);
     cerrarModal(document.getElementById('checkout-modal'));
-    limpiarCarrito(shippingCost); // Pasamos el costo para que el renderizado del carrito vacío sea correcto
+    limpiarCarrito(shippingCost);
     mostrarToast("¡Pedido enviado! Gracias por tu compra.");
     const form = document.getElementById('checkout-form');
     form.reset();
@@ -273,7 +268,7 @@ function handleSearch(event) {
             p.nombre.toLowerCase().includes(termino) || (p.descripcion && p.descripcion.toLowerCase().includes(termino))
         );
     }
-    renderizarProductos(productosPorCategoria);
+    renderizarProductos(productosFiltrados);
     swiper.update();
     swiper.slideTo(0, 0);
     setTimeout(() => {
