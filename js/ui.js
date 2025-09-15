@@ -1,4 +1,5 @@
-import { productBehaviors, adicionales } from './data.js';
+// [ELIMINADO] Ya no importamos datos estáticos.
+// import { productBehaviors, adicionales } from './data.js';
 
 const cartItemsContainer = document.getElementById('cart-items');
 const cartTotalPriceEl = document.getElementById('cart-total-price');
@@ -126,24 +127,15 @@ export const abrirModal = (modal, producto) => {
         modalPriceEl.textContent = `$${(precioBase + precioTotalAdicionales).toLocaleString('es-AR')}`;
     };
 
-    const behavior = productBehaviors[producto.id] || {};
-
-    if (behavior.opciones && behavior.opciones.length > 0) {
-        behavior.opciones.forEach(opcion => {
-            const opcionWrapper = document.createElement('div');
-            opcionWrapper.className = 'modal-opcion';
-            opcionWrapper.innerHTML = `<h4>${opcion.titulo}</h4>`;
-            const select = document.createElement('select');
-            select.className = 'modal-opcion-select';
-            opcion.items.forEach(item => {
-                select.innerHTML += `<option value="${item}">${item}</option>`;
-            });
-            opcionWrapper.appendChild(select);
-            optionsContainer.appendChild(opcionWrapper);
-        });
+    // [MODIFICADO] La lógica ahora lee directamente del objeto 'producto' que viene de la API.
+    
+    // 1. LÓGICA PARA COMBOS (si el producto los tiene definidos)
+    if (producto.opciones && producto.opciones.length > 0) {
+        // ... La gestión de estas opciones (crearlas, modificarlas) se hará en un futuro módulo de combos en Comanda Centra
     }
 
-    if (behavior.permiteAdicionales) {
+    // 2. LÓGICA PARA ADICIONALES (si el producto los tiene asignados)
+    if (producto.adicionales && producto.adicionales.length > 0) {
         const wrapper = document.createElement('div');
         wrapper.className = 'modal-adicionales-wrapper';
         wrapper.innerHTML = `<button id="toggle-adicionales-btn">Agregar Adicionales</button>`;
@@ -151,10 +143,11 @@ export const abrirModal = (modal, producto) => {
         listContainer.id = 'adicionales-list-container';
         listContainer.className = 'hidden';
 
-        adicionales.forEach(adicional => {
+        // Iteramos sobre los adicionales que vienen DENTRO del objeto producto
+        producto.adicionales.forEach(adicional => {
             listContainer.innerHTML += `
                 <div class="adicional-item" data-id="${adicional.id}" data-precio="${adicional.precio}">
-                    <span class="adicional-nombre">${adicional.nombre} (+$${adicional.precio})</span>
+                    <span class="adicional-nombre">${adicional.nombre} (+$${parseFloat(adicional.precio).toLocaleString('es-AR')})</span>
                     <div class="adicional-quantity-selector">
                         <button class="adicional-quantity-btn" data-action="minus">-</button>
                         <span class="adicional-cantidad">0</span>

@@ -40,12 +40,15 @@ export const agregarAlCarrito = (producto, cantidad, selecciones = [], adicional
             cantidad,
             precio: precioUnitarioFinal,
             imagen_url: producto.imagen_url,
-            selecciones,
-            adicionales: adicionalesSeleccionados
+            // Guardamos una copia simple de los adicionales y selecciones para el mensaje de WhatsApp
+            adicionales: adicionalesSeleccionados,
+            selecciones: selecciones
         });
     }
     
-    guardarCarrito();
+    // [IMPORTANTE] No pasamos el costo de envío aquí, porque no lo tenemos.
+    // La función que llama a esta SÍ lo tiene y llamará a renderizarCarrito después.
+    guardarCarrito(); 
     mostrarToast(`${cantidad}x ${producto.nombre} agregado(s)`);
 
     const cartToggle = document.getElementById('cart-toggle');
