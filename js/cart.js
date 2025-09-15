@@ -2,16 +2,12 @@ import { renderizarCarrito, mostrarToast } from './ui.js';
 
 let carrito = JSON.parse(localStorage.getItem('monatCarrito')) || [];
 
-// La variable global de costo de envío vivirá en main.js
-// Esta función ahora solo guarda y renderiza
-const guardarCarrito = () => {
+// [MODIFICADO] La función ahora acepta el costo de envío para pasárselo a renderizarCarrito
+const guardarCarrito = (shippingCost = 0) => {
     localStorage.setItem('monatCarrito', JSON.stringify(carrito));
-    
-    // Para asegurar que el total se recalcule, necesitamos llamar a renderizarCarrito
-    // desde un lugar que SÍ conozca el costo de envío. Lo haremos desde main.js
-    // Por ahora, simplemente renderizamos el estado actual. El total se corregirá
-    // en la siguiente interacción del usuario (ej: cambiar tipo de envío).
-    renderizarCarrito(carrito); 
+    const tipoEntregaActual = document.querySelector('input[name="delivery-type"]:checked')?.value;
+    // Pasamos todos los datos necesarios para un renderizado correcto
+    renderizarCarrito(carrito, tipoEntregaActual, shippingCost);
 };
 
 export const agregarAlCarrito = (producto, cantidad, selecciones = [], adicionalesSeleccionados = []) => {
@@ -50,7 +46,10 @@ export const agregarAlCarrito = (producto, cantidad, selecciones = [], adicional
         });
     }
     
-    guardarCarrito();
+    // [IMPORTANTE] main.js se encargará de llamar a renderizarCarrito con el costo de envío correcto
+    // después de una interacción. Aquí solo guardamos.
+    localStorage.setItem('monatCarrito', JSON.stringify(carrito));
+    renderizarCarrito(carrito); // Hacemos un renderizado inicial simple
     mostrarToast(`${cantidad}x ${producto.nombre} agregado(s)`);
 
     const cartToggle = document.getElementById('cart-toggle');
@@ -83,9 +82,10 @@ export const eliminarDelCarrito = (itemUniqueId, mostrarNotificacion = true) => 
     }
 };
 
-export const limpiarCarrito = () => {
+// [MODIFICADO] La función ahora acepta el costo de envío
+export const limpiarCarrito = (shippingCost = 0) => {
     carrito = [];
-    guardarCarrito();
+    guardarCarrito(shippingCost);
 };
 
 export const getCarrito = () => carrito;
