@@ -1,4 +1,4 @@
-// [ELIMINADO] Ya no importamos datos estáticos.
+// [ELIMINADO] Cortamos la última dependencia con el archivo de datos estáticos.
 // import { productBehaviors, adicionales } from './data.js';
 
 const cartItemsContainer = document.getElementById('cart-items');
@@ -127,14 +127,14 @@ export const abrirModal = (modal, producto) => {
         modalPriceEl.textContent = `$${(precioBase + precioTotalAdicionales).toLocaleString('es-AR')}`;
     };
 
-    // [MODIFICADO] La lógica ahora lee directamente del objeto 'producto' que viene de la API.
+    // La lógica ahora lee directamente del objeto 'producto' que viene de la API.
     
-    // 1. LÓGICA PARA COMBOS (si el producto los tiene definidos)
+    // LÓGICA PARA COMBOS (se implementará en el futuro cuando se gestione desde Comanda Central)
     if (producto.opciones && producto.opciones.length > 0) {
-        // ... La gestión de estas opciones (crearlas, modificarlas) se hará en un futuro módulo de combos en Comanda Centra
+        // ...
     }
 
-    // 2. LÓGICA PARA ADICIONALES (si el producto los tiene asignados)
+    // LÓGICA PARA ADICIONALES (lee el array de adicionales que viene dentro del producto)
     if (producto.adicionales && producto.adicionales.length > 0) {
         const wrapper = document.createElement('div');
         wrapper.className = 'modal-adicionales-wrapper';
@@ -143,7 +143,6 @@ export const abrirModal = (modal, producto) => {
         listContainer.id = 'adicionales-list-container';
         listContainer.className = 'hidden';
 
-        // Iteramos sobre los adicionales que vienen DENTRO del objeto producto
         producto.adicionales.forEach(adicional => {
             listContainer.innerHTML += `
                 <div class="adicional-item" data-id="${adicional.id}" data-precio="${adicional.precio}">

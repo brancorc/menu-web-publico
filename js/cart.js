@@ -2,15 +2,20 @@ import { renderizarCarrito, mostrarToast } from './ui.js';
 
 let carrito = JSON.parse(localStorage.getItem('monatCarrito')) || [];
 
-// [MODIFICADO] Hacemos que shippingCost sea un parámetro opcional pero seguro
-const guardarCarrito = (shippingCost = 0) => {
+// La variable global de costo de envío vivirá en main.js
+// Esta función ahora solo guarda y renderiza
+const guardarCarrito = () => {
     localStorage.setItem('monatCarrito', JSON.stringify(carrito));
-    const tipoEntregaActual = document.querySelector('input[name="delivery-type"]:checked')?.value;
-    // Pasamos todos los datos necesarios para un renderizado correcto
-    renderizarCarrito(carrito, tipoEntregaActual, shippingCost);
+    
+    // Para asegurar que el total se recalcule, necesitamos llamar a renderizarCarrito
+    // desde un lugar que SÍ conozca el costo de envío. Lo haremos desde main.js
+    // Por ahora, simplemente renderizamos el estado actual. El total se corregirá
+    // en la siguiente interacción del usuario (ej: cambiar tipo de envío).
+    renderizarCarrito(carrito); 
 };
 
 export const agregarAlCarrito = (producto, cantidad, selecciones = [], adicionalesSeleccionados = []) => {
+    
     const precioAdicionales = adicionalesSeleccionados.reduce((sum, ad) => sum + (ad.precio * ad.cantidad), 0);
     const precioUnitarioFinal = producto.precio_final + precioAdicionales;
 
@@ -40,15 +45,12 @@ export const agregarAlCarrito = (producto, cantidad, selecciones = [], adicional
             cantidad,
             precio: precioUnitarioFinal,
             imagen_url: producto.imagen_url,
-            // Guardamos una copia simple de los adicionales y selecciones para el mensaje de WhatsApp
             adicionales: adicionalesSeleccionados,
             selecciones: selecciones
         });
     }
     
-    // [IMPORTANTE] No pasamos el costo de envío aquí, porque no lo tenemos.
-    // La función que llama a esta SÍ lo tiene y llamará a renderizarCarrito después.
-    guardarCarrito(); 
+    guardarCarrito();
     mostrarToast(`${cantidad}x ${producto.nombre} agregado(s)`);
 
     const cartToggle = document.getElementById('cart-toggle');
@@ -81,10 +83,9 @@ export const eliminarDelCarrito = (itemUniqueId, mostrarNotificacion = true) => 
     }
 };
 
-// [MODIFICADO] La función ahora acepta el costo de envío para pasarlo al guardar
-export const limpiarCarrito = (shippingCost = 0) => {
+export const limpiarCarrito = () => {
     carrito = [];
-    guardarCarrito(shippingCost);
+    guardarCarrito();
 };
 
 export const getCarrito = () => carrito;
