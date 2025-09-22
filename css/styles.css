@@ -1,9 +1,6 @@
 :root {
-    /* [MODIFICADO] Estos valores ahora serán los predeterminados. JS los sobrescribirá. */
     --color-fondo-dinamico: #1E1E1E;
     --color-acento-dinamico: #d16416;
-
-    /* El resto de tus variables */
     --color-claro: #F2D6A2;
     --color-oscuro: #8C4318;
     --color-texto: #F2F2F2;
@@ -15,14 +12,13 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
-    background-color: var(--color-fondo-dinamico); /* Usamos la variable */
+    background-color: var(--color-fondo-dinamico);
     color: var(--color-texto);
     padding: 16px;
 }
 
-/* Botón principal */
 .btn-primary {
-    background-color: var(--color-acento-dinamico); /* Usamos la variable */
+    background-color: var(--color-acento-dinamico);
     color: var(--color-texto);
     border: none;
     padding: 12px 24px;
@@ -34,11 +30,13 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
 }
+
 .btn-primary:hover:not(:disabled) {
     background-color: var(--color-claro);
     color: var(--color-fondo-dinamico);
     transform: translateY(-2px);
 }
+
 .btn-primary:disabled {
     background-color: #555;
     cursor: not-allowed;
@@ -49,31 +47,32 @@ body {
     display: none !important;
 }
 
-/* Header y logo */
 .header {
     text-align: center;
 }
+
 .logo {
     max-width: 200px;
     height: auto;
     margin-bottom: 24px;
 }
 
-/* Buscador */
 .search-form {
     position: relative;
     margin: 0 16px 24px 16px;
 }
+
 .search-form input {
     width: 100%;
     padding: 12px 16px 12px 40px;
     border-radius: 12px;
     border: 1px solid var(--color-boton-inactivo);
-    background-color: var(--color-fondo);
+    background-color: var(--color-fondo-dinamico);
     color: var(--color-texto);
     font-size: 16px;
     box-sizing: border-box;
 }
+
 .search-form i {
     position: absolute;
     left: 12px;
@@ -83,7 +82,6 @@ body {
     font-size: 20px;
 }
 
-/* Categorías */
 .categories {
     display: flex;
     gap: 12px;
@@ -106,7 +104,7 @@ body {
     top: 0;
     bottom: 0;
     width: 50px;
-    background: linear-gradient(to right, rgba(30, 30, 30, 0), var(--color-fondo) 80%);
+    background: linear-gradient(to right, rgba(30, 30, 30, 0), var(--color-fondo-dinamico) 80%);
     pointer-events: none;
     z-index: 2;
 }
@@ -114,6 +112,7 @@ body {
 .categories::-webkit-scrollbar {
     display: none;
 }
+
 .categories button {
     background-color: var(--color-oscuro);
     border: none;
@@ -128,17 +127,17 @@ body {
     transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
     flex-shrink: 0;
 }
+
+/* [CORRECCIÓN 1] Se restaura el color de texto oscuro para el estado activo/hover del botón */
 .categories button.active,
 .categories button:hover {
     background-color: var(--color-claro);
-    color: var(--color-fondo);
+    color: #1E1E1E; /* Forzamos un color oscuro para el texto */
     box-shadow: 0 6px 12px rgba(0,0,0,0.4);
-    transform: translateY(-3px);
     transform: translateY(-3px) scale(1.05); 
     font-weight: bold;
 }
 
-/* --- NUEVO: Animación para el botón del carrito --- */
 @keyframes cart-jiggle {
     0% { transform: scale(1); }
     30% { transform: scale(1.15) rotate(5deg); }
@@ -150,7 +149,6 @@ body {
     animation: cart-jiggle 0.5s ease-in-out;
 }
 
-/* Items de categoría */
 .category-section .item {
     position: relative;
     display: flex;
@@ -162,25 +160,18 @@ body {
     box-shadow: 0 2px 6px rgba(0,0,0,0.5);
     align-items: center;
     cursor: pointer;
-
-    /* --- NUEVO: Para la animación en cascada --- */
     opacity: 0;
-    transform: translateY(20px); /* Empieza 20px más abajo */
+    transform: translateY(20px);
     transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-
 }
 
-
-
-/* MODIFICADO: Movimos el :hover a una regla separada para que no interfiera */
 .category-section .item:hover {
     transform: scale(1.02) translateY(0);
 }
 
-/* --- NUEVO: Clase que activará la animación --- */
 .category-section .item.visible {
     opacity: 1;
-    transform: translateY(0); /* Vuelve a su posición original */
+    transform: translateY(0);
 }
 
 .category-section .item img {
@@ -190,54 +181,55 @@ body {
     border-radius: 10px;
     flex-shrink: 0;
 }
+
 .category-section .item-info {
     flex-grow: 1;
-    min-width: 0; /*Permite que el contenedor se encoja. */
-    display: flex; /* Nos aseguramos de que sea un contenedor flex... */
-    flex-direction: column; /* ...para que sus hijos (título, desc, precio) se apilen verticalmente. */
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
 }
+
 .category-section .item-info h3 {
     margin: 0 0 8px 0;
 }
+
 .category-section .item-info p {
     margin: 0 0 6px 0;
     color: #ccc;
 }
+
 .price {
     font-weight: 700;
     color: var(--color-claro);
     font-size: 18px;
 }
 
-/* Modal */
+/* [CORRECCIÓN 2] Se restaura el fondo semi-transparente para el modal genérico */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.7); /* Fondo oscuro fijo */
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1200;
     padding: 20px;
     box-sizing: border-box;
-
-    /* --- NUEVO: Para la animación --- */
     opacity: 0;
-    pointer-events: none; /* El modal no es clickeable cuando está oculto */
+    pointer-events: none;
     transition: opacity 0.4s ease-in-out;
 }
 
 .modal.open {
-    /* --- NUEVO: Clase que muestra el modal --- */
     opacity: 1;
-    pointer-events: auto; /* Hacemos que sea clickeable al abrirse */
+    pointer-events: auto;
 }
 
 .modal-content {
-    background-color: var(--color-fondo);
+    background-color: var(--color-fondo-dinamico); /* El contenido del modal sí usa el color dinámico */
     padding: 24px;
     border-radius: 16px;
     width: 100%;
@@ -245,17 +237,14 @@ body {
     text-align: center;
     position: relative;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-
-    /* --- NUEVO: Para la animación del contenido --- */
-    transform: scale(0.9); /* Empieza un 10% más pequeño */
+    transform: scale(0.9);
     opacity: 0;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Transición con efecto "rebote" */
-    transition-delay: 0.1s; /* Un pequeño retraso para que aparezca después del fondo */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition-delay: 0.1s;
 }
 
 .modal.open .modal-content {
-    /* --- NUEVO: Estilos del contenido cuando el modal está abierto --- */
-    transform: scale(1); /* Vuelve a su tamaño normal */
+    transform: scale(1);
     opacity: 1;
 }
 
@@ -268,6 +257,7 @@ body {
     color: var(--color-claro);
     line-height: 1;
 }
+
 .modal-content img {
     width: 100%;
     height: 220px;
@@ -276,7 +266,6 @@ body {
     margin-bottom: 16px;
 }
 
-/* Cantidad */
 .quantity-container {
     display: flex;
     align-items: center;
@@ -284,6 +273,7 @@ body {
     gap: 15px;
     margin: 20px 0;
 }
+
 .quantity-container input {
     width: 50px;
     padding: 8px;
@@ -297,14 +287,16 @@ body {
     -moz-appearance: textfield;
     appearance: none;
 }
+
 .quantity-container input::-webkit-outer-spin-button,
 .quantity-container input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+
 .quantity-btn {
     background-color: var(--color-claro);
-    color: var(--color-fondo);
+    color: var(--color-fondo-dinamico);
     border: none;
     width: 35px;
     height: 35px;
@@ -318,19 +310,20 @@ body {
     line-height: 1;
     transition: all 0.2s ease;
 }
+
 .quantity-btn:hover {
     background-color: var(--color-oscuro);
     color: var(--color-texto);
     transform: scale(1.1);
 }
 
-/* Formulario de checkout */
 #checkout-form {
     display: flex;
     flex-direction: column;
     gap: 16px;
     margin-top: 20px;
 }
+
 #checkout-form input,
 #checkout-form select,
 #checkout-form textarea {
@@ -338,17 +331,17 @@ body {
     padding: 12px;
     border-radius: 8px;
     border: 1px solid var(--color-boton-inactivo);
-    background-color: var(--color-fondo);
+    background-color: var(--color-fondo-dinamico);
     color: var(--color-texto);
     font-size: 16px;
     box-sizing: border-box;
 }
+
 #checkout-form textarea {
     min-height: 80px;
     resize: vertical;
 }
 
-/* Opciones de entrega */
 .delivery-options {
     display: flex;
     gap: 16px;
@@ -358,16 +351,14 @@ body {
     position: relative;
 }
 
-/* --- AÑADE ESTE BLOQUE NUEVO --- */
 .delivery-options::after {
     content: "";
     position: absolute;
-    top: 50%; /* Centra verticalmente */
-    left: 50%; /* Centra horizontalmente */
-    transform: translate(-50%, -50%); /* Ajuste fino para el centrado perfecto */
-    
-    width: 1px; /* Grosor de la línea */
-    height: 60%; /* Altura de la línea (ej. 60% de la altura del contenedor) */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1px;
+    height: 60%;
     background-color: var(--color-oscuro);
 }
 
@@ -381,22 +372,22 @@ body {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+
 .delivery-options input[type="radio"] {
     display: none;
 }
 
-/* NUEVA REGLA MÁS ROBUSTA */
 .delivery-options label.selected {
     background-color: var(--color-oscuro);
     color: var(--color-texto);
     font-weight: bold;
 }
 
-
 .delivery-options label:hover {
     background-color: var(--color-claro);
-    color: var(--color-fondo);
+    color: var(--color-fondo-dinamico);
 }
+
 .delivery-zone-link {
     display: flex;
     align-items: center;
@@ -407,11 +398,11 @@ body {
     font-size: 14px;
     margin-top: 10px;
 }
+
 .delivery-zone-link:hover {
     text-decoration: underline;
 }
 
-/* Carrito */
 .cart-panel {
     position: fixed;
     top: 0;
@@ -427,9 +418,11 @@ body {
     transform: translateX(100%);
     transition: transform 0.4s ease-in-out;
 }
+
 .cart-panel.open {
     transform: translateX(0);
 }
+
 .cart-header {
     display: flex;
     justify-content: space-between;
@@ -437,37 +430,45 @@ body {
     padding: 16px;
     border-bottom: 1px solid var(--color-boton-inactivo);
 }
+
 .cart-header h2 {
     margin: 0;
 }
+
 .cart-items {
     flex-grow: 1;
     overflow-y: auto;
     padding: 16px;
 }
+
 .cart-item {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 16px;
 }
+
 .cart-item img {
     width: 60px;
     height: 60px;
     object-fit: cover;
     border-radius: 8px;
 }
+
 .cart-item-info {
     flex-grow: 1;
 }
+
 .cart-item-info h4 {
     margin: 0 0 4px 0;
 }
+
 .cart-item-quantity {
     display: flex;
     align-items: center;
     gap: 8px;
 }
+
 .cart-item-remove {
     background: none;
     border: none;
@@ -475,35 +476,38 @@ body {
     font-size: 24px;
     cursor: pointer;
 }
+
 .cart-empty-message {
     text-align: center;
     padding: 40px;
     color: #888;
 }
+
 .cart-footer {
     padding: 16px;
     border-top: 1px solid var(--color-boton-inactivo);
     background-color: #181818;
 }
+
 .cart-total {
     display: flex;
     justify-content: space-between;
     font-size: 20px;
     margin-bottom: 16px;
 }
+
 .cart-shipping span {
     font-size: 16px;
     color: #ccc;
 }
 
-/* Botón flotante del carrito */
 .cart-toggle {
     position: fixed;
     bottom: 25px;
     right: 25px;
     width: 60px;
     height: 60px;
-    background-color: var(--color-oscuro);
+    background-color: var(--color-acento-dinamico);
     color: var(--color-texto);
     border-radius: 50%;
     display: flex;
@@ -515,9 +519,11 @@ body {
     z-index: 1050;
     transition: transform 0.2s ease;
 }
+
 .cart-toggle:hover {
     transform: scale(1.1);
 }
+
 .cart-item-count {
     position: absolute;
     top: -5px;
@@ -534,34 +540,30 @@ body {
     font-weight: bold;
 }
 
-/* Botón flotante de WhatsApp */
 .whatsapp-float {
     position: fixed;
     bottom: 25px;
-    left: 25px; /* <--- Cambiado de 'right' a 'left' */
+    left: 25px;
     width: 60px;
     height: 60px;
-    background-color: #25D366; /* Color oficial de WhatsApp */
-    color: #FFF; /* Color del icono */
+    background-color: #25D366;
+    color: #FFF;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    z-index: 1050; /* Mismo z-index que el carrito */
+    z-index: 1050;
     transition: transform 0.2s ease;
-    
-    /* --- NUEVO: Ajuste para el icono de BoxIcons --- */
-    text-decoration: none; /* Evitamos subrayado */
-    font-size: 35px; /* Controlamos el tamaño del icono con font-size */
+    text-decoration: none;
+    font-size: 35px;
 }
 
 .whatsapp-float:hover {
-    transform: scale(1.1); /* Mismo efecto hover que el carrito */
+    transform: scale(1.1);
 }
 
-/* Toasts */
 #toast-container {
     position: fixed;
     bottom: 20px;
@@ -573,6 +575,7 @@ body {
     align-items: center;
     gap: 10px;
 }
+
 .toast {
     background-color: var(--color-exito);
     color: white;
@@ -583,14 +586,11 @@ body {
     transform: translateY(20px);
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
+
 .toast.show {
     opacity: 1;
     transform: translateY(0);
 }
-
-/* styles.css */
-
-/* ... (puedes agregarlo cerca de los estilos de .delivery-options) */
 
 .order-time-options {
     text-align: center;
@@ -602,19 +602,18 @@ body {
     font-weight: 600;
 }
 
-/* Para asegurar que el select de la hora ocupe todo el ancho */
 #schedule-time-container select {
     width: 100%;
 }
 
-/* Estilos para el modal de tienda cerrada */
+/* [CORRECCIÓN 3] Se restaura el fondo semi-transparente para el modal de tienda cerrada */
 .store-status-modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.85);
+    background-color: rgba(0, 0, 0, 0.85); /* Fondo oscuro fijo */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -632,22 +631,19 @@ body {
 }
 
 .store-status-modal .modal-content {
-    background-color: var(--color-fondo);
+    background-color: var(--color-fondo-dinamico);
     padding: 24px;
     border-radius: 16px;
     width: 100%;
-    max-width: 400px; /* O el ancho que prefieras */
+    max-width: 400px;
     text-align: center;
-    position: relative; /* Importante para que no se "escape" */
+    position: relative;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    
-    /* Animación de entrada (opcional pero recomendado) */
     transform: scale(0.95);
     opacity: 0;
     animation: fadeInScaleUp 0.4s 0.1s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Keyframes para la animación (puedes pegarlo al final del CSS) */
 @keyframes fadeInScaleUp {
     to {
         transform: scale(1);
@@ -655,17 +651,13 @@ body {
     }
 }
 
-/* Pega esto al final de styles.css */
-
 .store-status-modal .modal-logo {
-    width: auto;           /* Anula el width: 100% */
-    max-width: 180px;      /* Controlamos el tamaño máximo */
-    height: auto;          /* ¡LA CLAVE! Anula el height: 220px y lo hace proporcional */
-    object-fit: contain;   /* Anula el object-fit: cover para que no se recorte */
-    margin-bottom: 20px;   /* Mantenemos el espacio inferior */
+    width: auto;
+    max-width: 180px;
+    height: auto;
+    object-fit: contain;
+    margin-bottom: 20px;
 }
-
-/* Reemplaza tus estilos de .site-footer en styles.css por estos */
 
 .site-footer {
     text-align: center;
@@ -676,17 +668,17 @@ body {
     font-size: 14px;
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Espacio entre la sección de contacto y la legal */
+    gap: 20px;
 }
 
 .footer-contact p {
     margin: 8px 0;
-    color: #ccc; /* Un poco más visible */
+    color: #ccc;
     font-size: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px; /* Espacio entre el icono y el texto */
+    gap: 8px;
 }
 
 .footer-legal p {
@@ -708,11 +700,6 @@ body {
     color: #666;
 }
 
-/* =================================
-   ESTILOS PARA PRECIOS DE OFERTA
-   ================================= */
-
-/* Contenedor para alinear los precios (nuevo y original) */
 .price-container {
     display: flex;
     align-items: baseline;
@@ -721,20 +708,17 @@ body {
     flex-wrap: wrap;
 }
 
-/* El 'div.item-info' que contiene los precios */
-.item-info .price-container + p, /* Para que no haya doble espacio si hay descripción */
+.item-info .price-container + p,
 .item-info .price {
-    margin-top: 6px; /* Asegura un espaciado consistente */
+    margin-top: 6px;
 }
 
-/* Estilo para el precio NUEVO (el de la oferta) */
 .new-price {
     font-weight: 700;
     color: var(--color-claro);
     font-size: 18px;
 }
 
-/* Estilo para el precio ORIGINAL (el que se tacha) */
 .original-price {
     font-size: 15px;
     color: #999;
@@ -744,12 +728,8 @@ body {
 .oferta-tag {
     position: absolute;
     z-index: 10;
-    
-    /* --- NUEVAS COORDENADAS --- */
-    top: 8px;   /* Más cerca del borde superior del card */
-    left: 8px;  /* Más cerca del borde izquierdo del card */
-
-    /* El resto del estilo de "pegatina" lo dejamos igual */
+    top: 8px;
+    left: 8px;
     transform: rotate(-8deg);
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5); 
     background-color: var(--color-error);
@@ -762,22 +742,19 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Estilo para los enlaces dentro de la sección de contacto del footer */
 .footer-contact a {
-    color: inherit; /* Hereda el color del texto del párrafo padre (#ccc) */
-    text-decoration: none; /* Quita el subrayado del enlace */
-    display: flex; /* Asegura que el ícono y el texto se alineen bien */
+    color: inherit;
+    text-decoration: none;
+    display: flex;
     align-items: center;
-    gap: 8px; /* Mantiene el mismo espacio que ya tenías */
-    transition: color 0.3s ease; /* Añade una transición suave para el hover */
+    gap: 8px;
+    transition: color 0.3s ease;
 }
 
-/* Efecto hover para que cambie de color al pasar el ratón por encima */
 .footer-contact a:hover {
-    color: var(--color-claro); /* Usa tu variable de color para resaltar */
+    color: var(--color-claro);
 }
 
-/* --- Estilos para las opciones del modal --- */
 #modal-options-container {
     margin: 20px 0;
     display: flex;
@@ -802,15 +779,11 @@ body {
     font-size: 16px;
 }
 
-/* --- REEMPLAZA TUS ESTILOS DE ADICIONALES POR ESTOS --- */
-
-/* Contenedor principal de la sección de adicionales */
 .modal-adicionales-wrapper {
     border-top: 1px solid var(--color-boton-inactivo);
     padding-top: 15px;
 }
 
-/* Botón para mostrar/ocultar la lista */
 #toggle-adicionales-btn {
     width: 100%;
     padding: 10px;
@@ -823,23 +796,22 @@ body {
     cursor: pointer;
     transition: background-color 0.3s;
 }
+
 #toggle-adicionales-btn:hover {
     background-color: var(--color-claro);
     color: var(--color-oscuro);
 }
 
-/* Contenedor de la lista de adicionales (oculto por defecto) */
 #adicionales-list-container {
     margin-top: 15px;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    max-height: 200px; /* Limita la altura a 200px (puedes ajustar este valor) */
-    overflow-y: auto;  /* Muestra una barra de scroll vertical si el contenido se pasa */
-    padding-right: 10px; /* Espacio para que la barra de scroll no se pegue al texto */
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 10px;
 }
 
-/* Cada fila de un adicional */
 .adicional-item {
     display: flex;
     justify-content: space-between;
@@ -850,7 +822,6 @@ body {
     font-size: 15px;
 }
 
-/* Selector de cantidad (+ / 1 / -) */
 .adicional-quantity-selector {
     display: flex;
     align-items: center;
@@ -859,7 +830,7 @@ body {
 
 .adicional-quantity-btn {
     background-color: var(--color-claro);
-    color: var(--color-fondo);
+    color: var(--color-fondo-dinamico);
     border: none;
     width: 28px;
     height: 28px;
@@ -880,26 +851,21 @@ body {
     text-align: center;
 }
 
-/* --- Estilos Opcionales para la Barra de Scroll --- */
-
-/* La barra de scroll en sí */
 #adicionales-list-container::-webkit-scrollbar {
-    width: 8px; /* Ancho de la barra */
+    width: 8px;
 }
 
-/* El "camino" o "riel" por donde se mueve la barra */
 #adicionales-list-container::-webkit-scrollbar-track {
-    background: var(--color-boton-inactivo); /* Color del fondo del riel */
+    background: var(--color-boton-inactivo);
     border-radius: 4px;
 }
 
-/* El "mango" o la parte de la barra que se arrastra */
 #adicionales-list-container::-webkit-scrollbar-thumb {
-    background-color: var(--color-oscuro); /* Color del mango */
+    background-color: var(--color-oscuro);
     border-radius: 4px;
-    border: 2px solid var(--color-boton-inactivo); /* Crea un borde del color del fondo */
+    border: 2px solid var(--color-boton-inactivo);
 }
 
 #adicionales-list-container::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-claro); /* Cambia de color al pasar el ratón */
+    background-color: var(--color-claro);
 }
