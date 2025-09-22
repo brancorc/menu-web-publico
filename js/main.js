@@ -341,4 +341,27 @@ ${detalleEnvio}
     const url = `https://api.whatsapp.com/send?phone=${numeroDestino}&text=${encodeURIComponent(mensaje.trim())}`;
     
     window.open(url, '_blank');
+
+    /**
+     * Escucha los cambios en localStorage y actualiza la UI en tiempo real.
+     */
+    window.addEventListener('storage', (event) => {
+        if (event.key.startsWith('preview_')) {
+            console.log(`Preview change detected: ${event.key}`);
+            // Creamos un objeto de settings temporal con los valores de la preview
+            const previewSettings = {
+                web_titulo_pagina: localStorage.getItem('preview_web_titulo_pagina'),
+                web_descripcion_seo: localStorage.getItem('preview_web_descripcion_seo'),
+                logo_url: localStorage.getItem('preview_logo_url'),
+                link_whatsapp: localStorage.getItem('preview_link_whatsapp'),
+                link_instagram: localStorage.getItem('preview_link_instagram'),
+                web_color_primario: localStorage.getItem('preview_web_color_primario'),
+                web_color_acento: localStorage.getItem('preview_web_color_acento'),
+            };
+            // Re-aplicamos la identidad visual con los datos temporales
+            aplicarIdentidadVisual(previewSettings);
+        }
+    });
+
+    
 };
