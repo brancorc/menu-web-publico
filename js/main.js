@@ -12,30 +12,29 @@ let swiper;
 // --- INICIALIZACIÓN PRINCIPAL ---
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // [MODIFICADO] Hacemos tres peticiones en paralelo para cargar todo.
-    const [productsData, settingsData, webData] = await Promise.all([
+    // [CORRECCIÓN] Hacemos dos peticiones en paralelo: una para los productos y otra para TODA la configuración.
+    const [productsData, siteSettings] = await Promise.all([
         apiFetch('/api/productos?estado=activos'),
-        apiFetch('/api/settings/business'), // Para el costo de envío
-        apiFetch('/api/web/public-settings')  // Nuevo endpoint público para la apariencia
+        apiFetch('/api/public/settings') // Este endpoint ahora devuelve todo: logo, links, colores, costo de envío.
     ]);
 
-    // Aplicamos la identidad visual INMEDIATAMENTE.
-    aplicarIdentidadVisual(webData, settingsData);
+    // Aplicamos la identidad visual INMEDIATAMENTE con el objeto completo de ajustes.
+    aplicarIdentidadVisual(siteSettings);
 
-    // Si los datos esenciales no cargan, detenemos la ejecución.
-    if (!productsData || !settingsData) {
+    if (!productsData || !siteSettings) {
          const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
          swiperWrapper.innerHTML = `<div class="no-results-message">No se pudo cargar el menú. Por favor, intenta de nuevo más tarde.</div>`;
          return;
     }
 
     allProducts = productsData;
-    shippingCost = parseFloat(settingsData.costo_envio_predeterminado);
+    shippingCost = parseFloat(siteSettings.costo_envio_predeterminado);
 
-    // [MODIFICADO] Actualizamos el costo de envío en el HTML
     const deliveryOptionLabel = document.querySelector('input[name="delivery-type"][value="delivery"]')?.parentElement;
     if (deliveryOptionLabel) {
-        deliveryOptionLabel.textContent = ` Envío a domicilio ($${shippingCost.toLocaleString('es-AR')})`;
+        // Extraemos el texto existente y le añadimos el costo dinámico.
+        const originalText = deliveryOptionLabel.textContent.split('(')[0].trim();
+        deliveryOptionLabel.innerHTML = `<input type="radio" name="delivery-type" value="delivery" required> ${originalText} ($${shippingCost.toLocaleString('es-AR')})`;
     }
 
     productosPorCategoria = allProducts.reduce((acc, product) => {
@@ -51,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
     checkStoreStatus();
 
-    // Inicialización de Swiper (sin cambios)
+    // El resto del archivo (inicialización de Swiper, etc.) no cambia.
     swiper = new Swiper('.swiper', { spaceBetween: 20, autoHeight: true });
     const showActiveSlideItems = () => {
         document.querySelectorAll('.swiper-slide .item').forEach(item => item.classList.remove('visible'));
@@ -78,10 +77,6 @@ document.addEventListener('DOMContentLoaded', async () => {
          document.querySelector(`.categories button[data-category="${categoriaPorDefecto}"]`)?.classList.add('active');
     }
 });
-
-
-// --- MANEJADORES DE EVENTOS (Event Handlers) ---
-// (El resto del archivo main.js no necesita cambios, solo pega las funciones desde aquí hacia abajo)
 
 function setupEventListeners() {
     document.querySelector('.categories').addEventListener('click', handleCategoryClick);

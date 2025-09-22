@@ -8,21 +8,21 @@ const checkoutBtn = document.getElementById('checkout-btn');
  * @param {Object} data - Datos de configuración de la web.
  * @param {Object} settings - Datos de configuración del negocio (logo, redes).
  */
-export const aplicarIdentidadVisual = (data, settings) => {
-    if (!data || !settings) return;
+export const aplicarIdentidadVisual = (settings) => {
+    if (!settings) return;
 
     // 1. Aplicar Textos y SEO
-    document.title = data.web_titulo_pagina || 'Menú Online';
+    document.title = settings.web_titulo_pagina || 'Menú Online';
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-        metaDescription.content = data.web_descripcion_seo || '';
+        metaDescription.content = settings.web_descripcion_seo || '';
     }
 
     // 2. Aplicar Logo
     const logoImg = document.querySelector('.header .logo');
     if (logoImg && settings.logo_url) {
         logoImg.src = settings.logo_url;
-        logoImg.alt = data.web_nombre_negocio || 'Logo del Negocio';
+        logoImg.alt = settings.web_nombre_negocio || 'Logo del Negocio';
     }
 
     // 3. Aplicar Links de Redes Sociales
@@ -34,16 +34,13 @@ export const aplicarIdentidadVisual = (data, settings) => {
     if (instagramLink && settings.link_instagram) {
         instagramLink.href = settings.link_instagram;
     }
-    // Podrías añadir un link para PedidosYa en el footer de manera similar si lo deseas.
-
-
+    
     // 4. Aplicar Colores Dinámicos
-    const colorPrimario = data.web_color_primario || '#1E1E1E';
-    const colorAcento = data.web_color_acento || '#d16416';
+    const colorPrimario = settings.web_color_primario || '#1E1E1E';
+    const colorAcento = settings.web_color_acento || '#d16416';
     document.documentElement.style.setProperty('--color-fondo-dinamico', colorPrimario);
     document.documentElement.style.setProperty('--color-acento-dinamico', colorAcento);
 };
-
 
 export const renderizarProductos = (productosPorCategoria) => {
     const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
