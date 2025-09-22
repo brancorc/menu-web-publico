@@ -1,8 +1,6 @@
 import { getCarrito, agregarAlCarrito, actualizarCantidad, eliminarDelCarrito, limpiarCarrito } from './cart.js';
-import { renderizarProductos, renderizarCarrito, abrirModal, cerrarModal, toggleCartPanel, mostrarToast } from './ui.js';
-import { enviarPedidoWhatsApp } from './api.js';
-// [ELIMINADO] Ya no importamos nada de data.js
-// import { productBehaviors, adicionales } from './data.js';
+import { renderizarProductos, renderizarCarrito, abrirModal, cerrarModal, toggleCartPanel, mostrarToast, aplicarIdentidadVisual } from './ui.js';
+import { apiFetch } from './api.js';
 
 // --- ESTADO GLOBAL ---
 let allProducts = [];
@@ -11,32 +9,34 @@ let productoSeleccionado = null;
 let shippingCost = 0;
 let swiper;
 
-// --- LÓGICA PRINCIPAL ---
-
-async function apiFetch(endpoint) {
-    const API_URL = 'https://comanda-central-backend.onrender.com';
-    try {
-        const response = await fetch(`${API_URL}${endpoint}`);
-        if (!response.ok) throw new Error(`Error de red: ${response.statusText}`);
-        return await response.json();
-    } catch (error) {
-        console.error("Error al cargar datos desde la API:", error);
-        const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
-        swiperWrapper.innerHTML = `<div class="no-results-message">No se pudo cargar el menú. Por favor, intenta de nuevo más tarde.</div>`;
-        return null;
-    }
-}
+// --- INICIALIZACIÓN PRINCIPAL ---
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const [productsData, settingsData] = await Promise.all([
+    // [MODIFICADO] Hacemos tres peticiones en paralelo para cargar todo.
+    const [productsData, settingsData, webData] = await Promise.all([
         apiFetch('/api/productos?estado=activos'),
-        apiFetch('/api/settings/business')
+        apiFetch('/api/settings/business'), // Para el costo de envío
+        apiFetch('/api/web/public-settings')  // Nuevo endpoint público para la apariencia
     ]);
 
-    if (!productsData || !settingsData) return;
+    // Aplicamos la identidad visual INMEDIATAMENTE.
+    aplicarIdentidadVisual(webData, settingsData);
+
+    // Si los datos esenciales no cargan, detenemos la ejecución.
+    if (!productsData || !settingsData) {
+         const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
+         swiperWrapper.innerHTML = `<div class="no-results-message">No se pudo cargar el menú. Por favor, intenta de nuevo más tarde.</div>`;
+         return;
+    }
 
     allProducts = productsData;
     shippingCost = parseFloat(settingsData.costo_envio_predeterminado);
+
+    // [MODIFICADO] Actualizamos el costo de envío en el HTML
+    const deliveryOptionLabel = document.querySelector('input[name="delivery-type"][value="delivery"]')?.parentElement;
+    if (deliveryOptionLabel) {
+        deliveryOptionLabel.textContent = ` Envío a domicilio ($${shippingCost.toLocaleString('es-AR')})`;
+    }
 
     productosPorCategoria = allProducts.reduce((acc, product) => {
         if (product.categoria === 'Preparaciones') return acc;
@@ -51,8 +51,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
     checkStoreStatus();
 
+    // Inicialización de Swiper (sin cambios)
     swiper = new Swiper('.swiper', { spaceBetween: 20, autoHeight: true });
-
     const showActiveSlideItems = () => {
         document.querySelectorAll('.swiper-slide .item').forEach(item => item.classList.remove('visible'));
         const activeSlide = swiper.slides[swiper.activeIndex];
@@ -62,7 +62,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             setTimeout(() => item.classList.add('visible'), index * 75);
         });
     };
-    
     swiper.on('slideChange', function () {
         const activeSlide = swiper.slides[swiper.activeIndex];
         if (!activeSlide) return;
@@ -72,15 +71,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (activeButton) activeButton.classList.add('active');
         showActiveSlideItems();
     });
-
     swiper.update();
     showActiveSlideItems();
-    
     const categoriaPorDefecto = Object.keys(productosPorCategoria)[0];
     if (categoriaPorDefecto) {
          document.querySelector(`.categories button[data-category="${categoriaPorDefecto}"]`)?.classList.add('active');
     }
 });
+
+
+// --- MANEJADORES DE EVENTOS (Event Handlers) ---
+// (El resto del archivo main.js no necesita cambios, solo pega las funciones desde aquí hacia abajo)
 
 function setupEventListeners() {
     document.querySelector('.categories').addEventListener('click', handleCategoryClick);
@@ -117,7 +118,6 @@ function handleProductClick(event) {
         const productoId = parseInt(item.dataset.id, 10);
         productoSeleccionado = allProducts.find(p => p.id === productoId);
         if (productoSeleccionado) {
-            // [MODIFICADO] Simplemente pasamos el producto de la API. ¡Ya contiene todo!
             abrirModal(document.getElementById('product-modal'), productoSeleccionado);
         }
     }
@@ -139,7 +139,6 @@ function handleProductModalClick(event) {
             const cantidadAdicional = parseInt(item.querySelector('.adicional-cantidad').textContent);
             if (cantidadAdicional > 0) {
                 const id = parseInt(item.dataset.id, 10);
-                // Buscamos el adicional en la lista que vino con el producto
                 const adicionalData = productoSeleccionado.adicionales.find(ad => ad.id === id);
                 if (adicionalData) {
                     adicionalesSeleccionados.push({ ...adicionalData, cantidad: cantidadAdicional });
@@ -299,3 +298,52 @@ function checkStoreStatus() {
         modal.classList.add('hidden');
     });
 }
+
+
+// [NUEVO] La lógica de WhatsApp ahora vive aquí.
+const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio) => {
+    // [IMPORTANTE] Necesitamos el número de la API, pero lo obtenemos de los settings.
+    // Por ahora, lo dejamos hardcodeado como respaldo.
+    let numeroDestino = '5493412625341'; 
+    
+    // Aquí podrías obtener el número de `settingsData` si lo pasas a esta función.
+    // Por simplicidad, lo mantenemos así.
+
+    const detallePedido = carrito.map(item => 
+        `- ${item.cantidad}x ${item.nombre} ($${(item.precio * item.cantidad).toLocaleString('es-AR')})`
+    ).join('\n');
+
+    let subtotal = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+    let total = subtotal;
+    let detalleEnvio = '';
+
+    if (tipoEntrega === 'delivery' && carrito.length > 0) {
+        total += costoEnvio;
+        detalleEnvio = `\n*Costo de Envío:* $${costoEnvio.toLocaleString('es-AR')}`;
+    }
+
+    const mensaje = `
+*¡Nuevo Pedido de Monãt!* 🎉
+
+*Datos del Cliente:*
+- *Nombre:* ${datosCliente.nombre}
+- *Tipo de Entrega:* ${datosCliente.tipoEntrega}
+- *Dirección:* ${datosCliente.direccion}
+- *Horario de Entrega:* ${datosCliente.horaPedido}
+- *Método de Pago:* ${datosCliente.pago}
+
+*Aclaraciones:*
+${datosCliente.notas || 'Ninguna'}
+
+-------------------------
+*Detalle del Pedido:*
+${detallePedido}
+${detalleEnvio}
+
+*TOTAL: $${total.toLocaleString('es-AR')}*
+    `;
+
+    const url = `https://api.whatsapp.com/send?phone=${numeroDestino}&text=${encodeURIComponent(mensaje.trim())}`;
+    
+    window.open(url, '_blank');
+};

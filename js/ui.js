@@ -3,6 +3,48 @@ const cartTotalPriceEl = document.getElementById('cart-total-price');
 const cartItemCountEl = document.getElementById('cart-item-count');
 const checkoutBtn = document.getElementById('checkout-btn');
 
+/**
+ * Aplica la identidad visual (logo, colores, textos) a la página.
+ * @param {Object} data - Datos de configuración de la web.
+ * @param {Object} settings - Datos de configuración del negocio (logo, redes).
+ */
+export const aplicarIdentidadVisual = (data, settings) => {
+    if (!data || !settings) return;
+
+    // 1. Aplicar Textos y SEO
+    document.title = data.web_titulo_pagina || 'Menú Online';
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+        metaDescription.content = data.web_descripcion_seo || '';
+    }
+
+    // 2. Aplicar Logo
+    const logoImg = document.querySelector('.header .logo');
+    if (logoImg && settings.logo_url) {
+        logoImg.src = settings.logo_url;
+        logoImg.alt = data.web_nombre_negocio || 'Logo del Negocio';
+    }
+
+    // 3. Aplicar Links de Redes Sociales
+    const whatsappLink = document.querySelector('.whatsapp-float');
+    if (whatsappLink && settings.link_whatsapp) {
+        whatsappLink.href = settings.link_whatsapp;
+    }
+    const instagramLink = document.querySelector('.footer-contact a[href*="instagram.com"]');
+    if (instagramLink && settings.link_instagram) {
+        instagramLink.href = settings.link_instagram;
+    }
+    // Podrías añadir un link para PedidosYa en el footer de manera similar si lo deseas.
+
+
+    // 4. Aplicar Colores Dinámicos
+    const colorPrimario = data.web_color_primario || '#1E1E1E';
+    const colorAcento = data.web_color_acento || '#d16416';
+    document.documentElement.style.setProperty('--color-fondo-dinamico', colorPrimario);
+    document.documentElement.style.setProperty('--color-acento-dinamico', colorAcento);
+};
+
+
 export const renderizarProductos = (productosPorCategoria) => {
     const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
     if (!swiperWrapper) {
@@ -124,16 +166,13 @@ export const abrirModal = (modal, producto) => {
         modalPriceEl.textContent = `$${(precioBase + precioTotalAdicionales).toLocaleString('es-AR')}`;
     };
     
-    // LÓGICA PARA COMBOS (lee el array de opciones que viene dentro del producto)
     if (producto.opciones && producto.opciones.length > 0) {
-        // [CORREGIDO] Se restaura la lógica que dibuja los menús desplegables.
         producto.opciones.forEach(opcion => {
             const opcionWrapper = document.createElement('div');
             opcionWrapper.className = 'modal-opcion';
             opcionWrapper.innerHTML = `<h4>${opcion.titulo}</h4>`;
             const select = document.createElement('select');
             select.className = 'modal-opcion-select';
-            // Nos aseguramos de que 'opcion.items' sea un array antes de iterar
             if (Array.isArray(opcion.items)) {
                 opcion.items.forEach(item => {
                     select.innerHTML += `<option value="${item}">${item}</option>`;
@@ -144,7 +183,6 @@ export const abrirModal = (modal, producto) => {
         });
     }
 
-    // LÓGICA PARA ADICIONALES (lee el array de adicionales que viene dentro del producto)
     if (producto.adicionales && producto.adicionales.length > 0) {
         const wrapper = document.createElement('div');
         wrapper.className = 'modal-adicionales-wrapper';
@@ -186,9 +224,7 @@ export const abrirModal = (modal, producto) => {
 };
 
 export const cerrarModal = (modal) => modal.classList.remove('open');
-
 export const toggleCartPanel = () => document.getElementById('cart-panel').classList.toggle('open');
-
 export const mostrarToast = (mensaje) => {
     const toastContainer = document.getElementById('toast-container');
     const toast = document.createElement('div');

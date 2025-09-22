@@ -1,7 +1,11 @@
 :root {
+    /* [MODIFICADO] Estos valores ahora serán los predeterminados. JS los sobrescribirá. */
+    --color-fondo-dinamico: #1E1E1E;
+    --color-acento-dinamico: #d16416;
+
+    /* El resto de tus variables */
     --color-claro: #F2D6A2;
     --color-oscuro: #8C4318;
-    --color-fondo: #1E1E1E;
     --color-texto: #F2F2F2;
     --color-boton-inactivo: #3A2A1E;
     --color-exito: #4CAF50;
@@ -11,14 +15,14 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
-    background-color: var(--color-fondo);
+    background-color: var(--color-fondo-dinamico); /* Usamos la variable */
     color: var(--color-texto);
     padding: 16px;
 }
 
 /* Botón principal */
 .btn-primary {
-    background-color: var(--color-oscuro);
+    background-color: var(--color-acento-dinamico); /* Usamos la variable */
     color: var(--color-texto);
     border: none;
     padding: 12px 24px;
@@ -32,7 +36,7 @@ body {
 }
 .btn-primary:hover:not(:disabled) {
     background-color: var(--color-claro);
-    color: var(--color-fondo);
+    color: var(--color-fondo-dinamico);
     transform: translateY(-2px);
 }
 .btn-primary:disabled {
