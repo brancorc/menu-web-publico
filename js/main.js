@@ -8,6 +8,7 @@ let productosPorCategoria = {};
 let productoSeleccionado = null;
 let shippingCost = 0;
 let swiper;
+let siteSettings; // Variable global para almacenar la configuración del sitio.
 
 // --- FUNCIONES DE INICIALIZACIÓN ---
 
@@ -26,10 +27,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    const [menuData, siteSettings] = await Promise.all([
+    const [menuData, settingsData] = await Promise.all([
         apiFetch(`/api/public/menu-data/${slug}`),
         apiFetch(`/api/public/settings/${slug}`)
     ]);
+    
+    siteSettings = settingsData; // Asignamos a la variable global.
 
     if (!siteSettings) {
          document.body.innerHTML = '<h1 style="color:white; text-align:center; padding-top: 50px;">Error al cargar la configuración del negocio.</h1>';
@@ -52,7 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     allProducts = menuData.productos;
-
     productosPorCategoria = menuData.categorias.reduce((acc, categoria) => {
         acc[categoria] = [];
         return acc;
@@ -95,15 +97,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelector(`.categories button[data-category="${menuData.categorias[0]}"]`)?.classList.add('active');
     }
 
-    // [CORRECCIÓN] El listener para la vista previa en vivo se coloca aquí, en el alcance global del DOMContentLoaded.
+    // Listener para la vista previa en vivo
     window.addEventListener('storage', (event) => {
         if (event.key.startsWith('preview_')) {
-            console.log(`Preview change detected: ${event.key} = ${event.newValue}`);
             const previewSettings = {
                 web_titulo_pagina: localStorage.getItem('preview_web_titulo_pagina'),
                 web_descripcion_seo: localStorage.getItem('preview_web_descripcion_seo'),
                 logo_url: localStorage.getItem('preview_logo_url'),
-                link_whatsapp: localStorage.getItem('preview_link_whatsapp'),
+                telefono_whatsapp: localStorage.getItem('preview_telefono_whatsapp'),
                 link_instagram: localStorage.getItem('preview_link_instagram'),
                 link_pedidosya: localStorage.getItem('preview_link_pedidosya'),
                 web_nombre_negocio: localStorage.getItem('preview_web_nombre_negocio'),
@@ -114,6 +115,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 });
+
+// --- MANEJADORES DE EVENTOS Y OTRAS FUNCIONES ---
 
 function setupEventListeners() {
     document.querySelector('.categories').addEventListener('click', handleCategoryClick);
@@ -279,7 +282,9 @@ function handleCheckout(event) {
         pago: document.getElementById('payment-method').value,
         notas: document.getElementById('order-notes').value
     };
-    enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType, shippingCost, siteSettings.telefono_whatsapp);
+    
+    enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType, shippingCost);
+    
     cerrarModal(document.getElementById('checkout-modal'));
     limpiarCarrito(shippingCost);
     mostrarToast("¡Pedido enviado! Gracias por tu compra.");
@@ -299,7 +304,7 @@ function handleSearch(event) {
             p.nombre.toLowerCase().includes(termino) || (p.descripcion && p.descripcion.toLowerCase().includes(termino))
         );
     }
-    renderizarProductos(productosFiltrados);
+    renderizarProductos(productosFiltrados, Object.keys(productosFiltrados));
     swiper.update();
     swiper.slideTo(0, 0);
     setTimeout(() => {
@@ -331,17 +336,8 @@ function checkStoreStatus() {
     });
 }
 
-/**
- * Construye y abre un link de WhatsApp con los detalles del pedido.
- * @param {Object} datosCliente - Datos del formulario del cliente.
- * @param {Array} carrito - El array de items en el carrito.
- * @param {string} tipoEntrega - 'delivery' o 'pickup'.
- * @param {number} costoEnvio - El costo de envío aplicable.
- * @param {string} numeroDestino - El número de WhatsApp del negocio (obtenido de la API).
- * @param {string} nombreNegocio - El nombre del negocio (obtenido de la API).
- */
-const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio, numeroDestino, nombreNegocio) => {
-    // Validación: Si no hay número de destino, no se puede continuar.
+const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio) => {
+    const numeroDestino = siteSettings ? siteSettings.telefono_whatsapp : null;
     if (!numeroDestino) {
         console.error("Número de WhatsApp de destino no configurado.");
         alert("No se pudo enviar el pedido. El negocio no ha configurado un número de WhatsApp.");
@@ -361,8 +357,9 @@ const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio, nu
         detalleEnvio = `\n*Costo de Envío:* $${costoEnvio.toLocaleString('es-AR')}`;
     }
 
+    const nombreNegocio = siteSettings ? siteSettings.web_nombre_negocio : 'tu negocio';
     const mensaje = `
-*¡Nuevo Pedido para ${nombreNegocio || 'tu negocio'}!* 🎉
+*¡Nuevo Pedido para ${nombreNegocio}!* 🎉
 
 *Datos del Cliente:*
 - *Nombre:* ${datosCliente.nombre}
@@ -382,8 +379,6 @@ ${detalleEnvio}
 *TOTAL: $${total.toLocaleString('es-AR')}*
     `;
 
-    // Se construye la URL dinámicamente con el número recibido.
     const url = `https://wa.me/${numeroDestino}?text=${encodeURIComponent(mensaje.trim())}`;
-    
     window.open(url, '_blank');
 };
