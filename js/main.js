@@ -348,7 +348,7 @@ const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio) =>
     }
 
     const mensaje = `
-*¡Nuevo Pedido de Monãt!* 🎉
+*¡Nuevo Pedido!* 🎉
 
 *Datos del Cliente:*
 - *Nombre:* ${datosCliente.nombre}
