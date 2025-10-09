@@ -9,48 +9,66 @@ let productoSeleccionado = null;
 let shippingCost = 0;
 let swiper;
 
-// --- INICIALIZACIÓN PRINCIPAL ---
+// --- FUNCIONES DE INICIALIZACIÓN ---
+
+function getBusinessSlug() {
+    const pathParts = window.location.pathname.split('/').filter(part => part);
+    if (pathParts.length === 0) {
+        return 'monat'; 
+    }
+    return pathParts[0];
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // [CORRECCIÓN] Hacemos dos peticiones en paralelo: una para los productos y otra para TODA la configuración.
-    const [productsData, siteSettings] = await Promise.all([
-        apiFetch('/api/productos?estado=activos'),
-        apiFetch('/api/public/settings') // Este endpoint ahora devuelve todo: logo, links, colores, costo de envío.
-    ]);
-
-    // Aplicamos la identidad visual INMEDIATAMENTE con el objeto completo de ajustes.
-    aplicarIdentidadVisual(siteSettings);
-
-    if (!productsData || !siteSettings) {
-         const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
-         swiperWrapper.innerHTML = `<div class="no-results-message">No se pudo cargar el menú. Por favor, intenta de nuevo más tarde.</div>`;
-         return;
+    const slug = getBusinessSlug();
+    if (!slug) {
+        document.body.innerHTML = '<h1 style="color:white; text-align:center; padding-top: 50px;">Negocio no encontrado.</h1>';
+        return;
     }
 
-    allProducts = productsData;
+    const [menuData, siteSettings] = await Promise.all([
+        apiFetch(`/api/public/menu-data/${slug}`),
+        apiFetch(`/api/public/settings/${slug}`)
+    ]);
+
+    if (!siteSettings) {
+         document.body.innerHTML = '<h1 style="color:white; text-align:center; padding-top: 50px;">Error al cargar la configuración del negocio.</h1>';
+        return;
+    }
+
+    aplicarIdentidadVisual(siteSettings);
     shippingCost = parseFloat(siteSettings.costo_envio_predeterminado);
 
     const deliveryOptionLabel = document.querySelector('input[name="delivery-type"][value="delivery"]')?.parentElement;
     if (deliveryOptionLabel) {
-        // Extraemos el texto existente y le añadimos el costo dinámico.
         const originalText = deliveryOptionLabel.textContent.split('(')[0].trim();
         deliveryOptionLabel.innerHTML = `<input type="radio" name="delivery-type" value="delivery" required> ${originalText} ($${shippingCost.toLocaleString('es-AR')})`;
     }
 
-    productosPorCategoria = allProducts.reduce((acc, product) => {
-        if (product.categoria === 'Preparaciones') return acc;
-        const category = product.categoria || 'Varios';
-        if (!acc[category]) acc[category] = [];
-        acc[category].push(product);
+    if (!menuData) {
+        const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
+        swiperWrapper.innerHTML = `<div class="no-results-message">No se pudo cargar el menú. Por favor, intenta de nuevo más tarde.</div>`;
+        return;
+    }
+
+    allProducts = menuData.productos;
+
+    productosPorCategoria = menuData.categorias.reduce((acc, categoria) => {
+        acc[categoria] = [];
         return acc;
     }, {});
 
-    renderizarProductos(productosPorCategoria);
+    allProducts.forEach(product => {
+        if (productosPorCategoria[product.categoria]) {
+            productosPorCategoria[product.categoria].push(product);
+        }
+    });
+
+    renderizarProductos(productosPorCategoria, menuData.categorias);
     renderizarCarrito(getCarrito(), 'pickup', shippingCost);
     setupEventListeners();
     checkStoreStatus();
 
-    // El resto del archivo (inicialización de Swiper, etc.) no cambia.
     swiper = new Swiper('.swiper', { spaceBetween: 20, autoHeight: true });
     const showActiveSlideItems = () => {
         document.querySelectorAll('.swiper-slide .item').forEach(item => item.classList.remove('visible'));
@@ -72,10 +90,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     swiper.update();
     showActiveSlideItems();
-    const categoriaPorDefecto = Object.keys(productosPorCategoria)[0];
-    if (categoriaPorDefecto) {
-         document.querySelector(`.categories button[data-category="${categoriaPorDefecto}"]`)?.classList.add('active');
+    
+    if (menuData.categorias.length > 0) {
+        document.querySelector(`.categories button[data-category="${menuData.categorias[0]}"]`)?.classList.add('active');
     }
+
+    // [CORRECCIÓN] El listener para la vista previa en vivo se coloca aquí, en el alcance global del DOMContentLoaded.
+    window.addEventListener('storage', (event) => {
+        if (event.key.startsWith('preview_')) {
+            console.log(`Preview change detected: ${event.key} = ${event.newValue}`);
+            const previewSettings = {
+                web_titulo_pagina: localStorage.getItem('preview_web_titulo_pagina'),
+                web_descripcion_seo: localStorage.getItem('preview_web_descripcion_seo'),
+                logo_url: localStorage.getItem('preview_logo_url'),
+                link_whatsapp: localStorage.getItem('preview_link_whatsapp'),
+                link_instagram: localStorage.getItem('preview_link_instagram'),
+                link_pedidosya: localStorage.getItem('preview_link_pedidosya'),
+                web_nombre_negocio: localStorage.getItem('preview_web_nombre_negocio'),
+                web_color_primario: localStorage.getItem('preview_web_color_primario'),
+                web_color_acento: localStorage.getItem('preview_web_color_acento'),
+            };
+            aplicarIdentidadVisual(previewSettings);
+        }
+    });
 });
 
 function setupEventListeners() {
@@ -294,16 +331,9 @@ function checkStoreStatus() {
     });
 }
 
-
-// [NUEVO] La lógica de WhatsApp ahora vive aquí.
 const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio) => {
-    // [IMPORTANTE] Necesitamos el número de la API, pero lo obtenemos de los settings.
-    // Por ahora, lo dejamos hardcodeado como respaldo.
     let numeroDestino = '5493412625341'; 
     
-    // Aquí podrías obtener el número de `settingsData` si lo pasas a esta función.
-    // Por simplicidad, lo mantenemos así.
-
     const detallePedido = carrito.map(item => 
         `- ${item.cantidad}x ${item.nombre} ($${(item.precio * item.cantidad).toLocaleString('es-AR')})`
     ).join('\n');
@@ -341,27 +371,4 @@ ${detalleEnvio}
     const url = `https://api.whatsapp.com/send?phone=${numeroDestino}&text=${encodeURIComponent(mensaje.trim())}`;
     
     window.open(url, '_blank');
-
-    /**
-     * Escucha los cambios en localStorage y actualiza la UI en tiempo real.
-     */
-    window.addEventListener('storage', (event) => {
-        if (event.key.startsWith('preview_')) {
-            console.log(`Preview change detected: ${event.key}`);
-            // Creamos un objeto de settings temporal con los valores de la preview
-            const previewSettings = {
-                web_titulo_pagina: localStorage.getItem('preview_web_titulo_pagina'),
-                web_descripcion_seo: localStorage.getItem('preview_web_descripcion_seo'),
-                logo_url: localStorage.getItem('preview_logo_url'),
-                link_whatsapp: localStorage.getItem('preview_link_whatsapp'),
-                link_instagram: localStorage.getItem('preview_link_instagram'),
-                web_color_primario: localStorage.getItem('preview_web_color_primario'),
-                web_color_acento: localStorage.getItem('preview_web_color_acento'),
-            };
-            // Re-aplicamos la identidad visual con los datos temporales
-            aplicarIdentidadVisual(previewSettings);
-        }
-    });
-
-    
 };
