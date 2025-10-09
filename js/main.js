@@ -279,7 +279,7 @@ function handleCheckout(event) {
         pago: document.getElementById('payment-method').value,
         notas: document.getElementById('order-notes').value
     };
-    enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType, shippingCost);
+    enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType, shippingCost, siteSettings.telefono_whatsapp);
     cerrarModal(document.getElementById('checkout-modal'));
     limpiarCarrito(shippingCost);
     mostrarToast("¡Pedido enviado! Gracias por tu compra.");
@@ -331,9 +331,23 @@ function checkStoreStatus() {
     });
 }
 
-const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio) => {
-    let numeroDestino = '5493412625341'; 
-    
+/**
+ * Construye y abre un link de WhatsApp con los detalles del pedido.
+ * @param {Object} datosCliente - Datos del formulario del cliente.
+ * @param {Array} carrito - El array de items en el carrito.
+ * @param {string} tipoEntrega - 'delivery' o 'pickup'.
+ * @param {number} costoEnvio - El costo de envío aplicable.
+ * @param {string} numeroDestino - El número de WhatsApp del negocio (obtenido de la API).
+ * @param {string} nombreNegocio - El nombre del negocio (obtenido de la API).
+ */
+const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio, numeroDestino, nombreNegocio) => {
+    // Validación: Si no hay número de destino, no se puede continuar.
+    if (!numeroDestino) {
+        console.error("Número de WhatsApp de destino no configurado.");
+        alert("No se pudo enviar el pedido. El negocio no ha configurado un número de WhatsApp.");
+        return;
+    }
+
     const detallePedido = carrito.map(item => 
         `- ${item.cantidad}x ${item.nombre} ($${(item.precio * item.cantidad).toLocaleString('es-AR')})`
     ).join('\n');
@@ -348,7 +362,7 @@ const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio) =>
     }
 
     const mensaje = `
-*¡Nuevo Pedido!* 🎉
+*¡Nuevo Pedido para ${nombreNegocio || 'tu negocio'}!* 🎉
 
 *Datos del Cliente:*
 - *Nombre:* ${datosCliente.nombre}
@@ -368,7 +382,8 @@ ${detalleEnvio}
 *TOTAL: $${total.toLocaleString('es-AR')}*
     `;
 
-    const url = `https://api.whatsapp.com/send?phone=${numeroDestino}&text=${encodeURIComponent(mensaje.trim())}`;
+    // Se construye la URL dinámicamente con el número recibido.
+    const url = `https://wa.me/${numeroDestino}?text=${encodeURIComponent(mensaje.trim())}`;
     
     window.open(url, '_blank');
 };

@@ -27,8 +27,8 @@ export const aplicarIdentidadVisual = (settings) => {
 
     // 3. Aplicar Links de Redes Sociales
     const whatsappLink = document.querySelector('.whatsapp-float');
-    if (whatsappLink && settings.link_whatsapp) {
-        whatsappLink.href = settings.link_whatsapp;
+    if (whatsappLink && settings.telefono_whatsapp) {
+        whatsappLink.href = settings.telefono_whatsapp;
     }
     const instagramLink = document.querySelector('.footer-contact a[href*="instagram.com"]');
     if (instagramLink && settings.link_instagram) {
