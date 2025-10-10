@@ -101,32 +101,74 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 /**
- * Permite el desplazamiento horizontal de un elemento usando la rueda del mouse.
+ * Habilita el desplazamiento por arrastre del mouse en un elemento,
+ * distinguiendo entre un clic y un arrastre para no anular los clics en los hijos.
  * @param {HTMLElement} element - El elemento que se quiere hacer desplazable.
  */
-function enableHorizontalScroll(element) {
+function makeDraggable(element) {
     if (!element) return;
 
-    element.addEventListener('wheel', (event) => {
-        // Si no hay scroll horizontal posible, no hacemos nada.
-        if (element.scrollWidth <= element.clientWidth) {
-            return;
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+    let hasDragged = false; // Flag para detectar si el mouse se movió significativamente
+
+    element.addEventListener('mousedown', (e) => {
+        // Solo inicia el proceso si el clic es con el botón izquierdo
+        if (e.button !== 0) return;
+        isDown = true;
+        hasDragged = false;
+        element.style.cursor = 'grabbing';
+        startX = e.pageX - element.offsetLeft;
+        scrollLeft = element.scrollLeft;
+    });
+
+    element.addEventListener('mouseleave', () => {
+        isDown = false;
+        element.style.cursor = 'grab';
+    });
+
+    element.addEventListener('mouseup', () => {
+        isDown = false;
+        element.style.cursor = 'grab';
+    });
+
+    element.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - element.offsetLeft;
+        const walk = x - startX;
+        
+        // Solo si el movimiento supera un pequeño umbral, se considera un arrastre.
+        if (Math.abs(walk) > 5) {
+            hasDragged = true;
         }
         
-        // Prevenimos el scroll vertical de la página
-        event.preventDefault();
-
-        // Aplicamos el delta del scroll de la rueda al scroll horizontal del elemento
-        element.scrollLeft += event.deltaY;
+        element.scrollLeft = scrollLeft - walk;
     });
+
+    // Añadimos un listener a los elementos hijos (los botones de categoría)
+    // para prevenir la navegación si hubo un arrastre.
+    const children = element.querySelectorAll('button');
+    children.forEach(child => {
+        child.addEventListener('click', (e) => {
+            if (hasDragged) {
+                e.preventDefault(); // Cancela el evento de clic si se arrastró
+                e.stopPropagation(); // Detiene la propagación del evento
+            }
+        });
+    });
+
+    element.style.cursor = 'grab';
 }
+
 
 
 function setupEventListeners() {
     const categoriesContainer = document.querySelector('.categories');
     
     // Habilita el scroll horizontal con la rueda del mouse en el contenedor de categorías.
-    enableHorizontalScroll(categoriesContainer);
+    makeDraggable(categoriesContainer);
 
     // Asigna los listeners de eventos.
     categoriesContainer.addEventListener('click', handleCategoryClick);
