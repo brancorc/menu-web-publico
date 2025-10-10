@@ -10,7 +10,6 @@
     <meta name="description" content="Descubrí los mejores pizzas turcas, empanadas y carlitos de Rosario. Hacé tu pedido online de forma rápida y fácil para delivery o retiro. ¡Te esperamos en Monãt!">
     <!-- Link a Swiper's CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-
 </head>
 
 <!-- Google tag (gtag.js) -->
@@ -19,14 +18,14 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-DPFEPF7JZN');
 </script>
 
 <body>
 
     <header class="header">
-        <a href="#"><img src="img/logo_claro.png" alt="Monãt" class="logo" /></a>
+        <div class="header-background"></div>
+        <a href="#" class="logo-link"><img src="img/logo_claro.png" alt="Monãt" class="logo" /></a>
 
         <h1 style="display: none;">Pides a Domicilio en Rosario - Monãt</h1> 
         
@@ -38,15 +37,26 @@
 
     <div class="categories-container">
         <nav class="categories">
-            <button class="active" data-category="pizzas">Pizzas Individuales</button>
-            <button data-category="combos">Promociones</button>
-            <button data-category="carlitos">Carlitos</button>
-            <button data-category="tostados">Tostados</button>
-            <!--<button data-category="empanadas">Empanadas</button> -->
-            <button data-category="bebidas">Bebidas</button>
-            <!--<button data-category="empanadas">Nuestros horarios</button> -->
-            <!--<button data-category="empanadas">¿Donde estamos?</button> -->
-            <!--<button data-category="empanadas">Zona de envios</button> --> <!-- ¡AÑADE ESTO! -->
+            <button class="active" data-category="pizzas">
+                <i class='bx bx-dish'></i>
+                <span>Pizzas Individuales</span>
+            </button>
+            <button data-category="combos">
+                <i class='bx bx-gift'></i>
+                <span>Promociones</span>
+            </button>
+            <button data-category="carlitos">
+                <i class='bx bx-food-menu'></i>
+                <span>Carlitos</span>
+            </button>
+            <button data-category="tostados">
+                <i class='bx bx-purchase-tag'></i>
+                <span>Tostados</span>
+            </button>
+            <button data-category="bebidas">
+                <i class='bx bx-drink'></i>
+                <span>Bebidas</span>
+            </button>
         </nav>
     </div>
 
@@ -70,93 +80,127 @@
                 <input type="number" id="cantidad" value="1" min="1" readonly />
                 <button class="quantity-btn" id="quantity-plus">+</button>
             </div>
-            <button id="add-to-cart-btn" class="btn-primary">Agregar al carrito</button>
+            <button id="add-to-cart-btn" class="btn-primary">
+                <i class='bx bx-cart-add'></i>
+                <span>Agregar al carrito</span>
+            </button>
         </div>
     </div>
     
     <div id="checkout-modal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content checkout-modal-content">
             <span class="close" data-modal-close="checkout-modal">×</span>
-            <h3>Completá tus datos para el pedido</h3>
+            <h3><i class='bx bx-receipt'></i> Completá tus datos para el pedido</h3>
             <form id="checkout-form">
-                <input type="text" id="client-name" placeholder="Tu Nombre" required>
-                <!-- <input type="tel" id="client-phone" placeholder="Tu Teléfono (ej: 2991234567)" required> -->
-
-                <!-- NUEVO: Selector de tipo de entrega -->
-                <div class="delivery-options" id="delivery-type-options">
-                    <label>
-                        <input type="radio" name="delivery-type" value="pickup" required> Retiro en el local (Laprida 3266)
-                    </label>
-                    <label>
-                        <input type="radio" name="delivery-type" value="delivery" required> Envío a domicilio ($1500)
-                    </label>
+                <div class="form-group">
+                    <label for="client-name"><i class='bx bx-user'></i> Tu nombre</label>
+                    <input type="text" id="client-name" placeholder="Ingresá tu nombre completo" required>
                 </div>
 
-                <!-- NUEVO: Contenedor para campos de envío -->
-                <div id="delivery-info" class="hidden">
-                    <input type="text" id="client-address" placeholder="Tu Dirección">
-                    <a href="img/zona_envios.png" target="_blank" class="delivery-zone-link">
-                        <i class='bx bx-map-alt'></i> Ver nuestra zona de envíos ⚠️❗
-                    </a>
-                </div>
-
-                <!-- index.html (dentro de #checkout-form) -->
-
-                <!-- ... justo después del div #delivery-info -->
-
-                <!-- NUEVO: Selector de horario del pedido -->
-                <div class="order-time-options">
-                    <h4>¿Cuándo querés tu pedido?</h4>
-                    <div id="order-time-type-options" class="delivery-options"> <!-- Reutilizamos el estilo -->
+                <div class="form-group">
+                    <label><i class='bx bx-store'></i> Tipo de entrega</label>
+                    <div class="delivery-options" id="delivery-type-options">
                         <label>
-                            <input type="radio" name="order-time-type" value="asap" required> Lo antes posible
+                            <input type="radio" name="delivery-type" value="pickup" required>
+                            <div class="option-content">
+                                <i class='bx bx-walk'></i>
+                                <span>Retiro en local</span>
+                                <small>Laprida 3266</small>
+                            </div>
                         </label>
                         <label>
-                            <input type="radio" name="order-time-type" value="schedule" required> Programar hora
+                            <input type="radio" name="delivery-type" value="delivery" required>
+                            <div class="option-content">
+                                <i class='bx bx-cycling'></i>
+                                <span>Envío a domicilio</span>
+                                <small>$1500</small>
+                            </div>
                         </label>
                     </div>
                 </div>
 
-                <!-- NUEVO: Contenedor para el selector de hora (oculto por defecto) -->
+                <div id="delivery-info" class="hidden">
+                    <div class="form-group">
+                        <label for="client-address"><i class='bx bx-map'></i> Tu dirección</label>
+                        <input type="text" id="client-address" placeholder="Calle, número, piso, depto...">
+                    </div>
+                    <a href="img/zona_envios.png" target="_blank" class="delivery-zone-link">
+                        <i class='bx bx-map-alt'></i> Ver nuestra zona de envíos
+                    </a>
+                </div>
+
+                <div class="form-group">
+                    <label><i class='bx bx-time-five'></i> ¿Cuándo querés tu pedido?</label>
+                    <div class="order-time-options">
+                        <div id="order-time-type-options" class="delivery-options">
+                            <label>
+                                <input type="radio" name="order-time-type" value="asap" required>
+                                <div class="option-content">
+                                    <i class='bx bx-run'></i>
+                                    <span>Lo antes posible</span>
+                                </div>
+                            </label>
+                            <label>
+                                <input type="radio" name="order-time-type" value="schedule" required>
+                                <div class="option-content">
+                                    <i class='bx bx-calendar'></i>
+                                    <span>Programar hora</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="schedule-time-container" class="hidden">
-                    <select id="order-time-select">
-                        <option value="" disabled selected>Seleccioná un horario</option>
-                        <!-- Los horarios se podrían generar con JS, pero para empezar los ponemos aquí -->
-                         <option value="19:45">19:45 hs</option>
-                        <option value="20:00">20:00 hs</option>
-                        <option value="20:15">20:15 hs</option>
-                        <option value="20:30">20:30 hs</option>
-                        <option value="20:45">20:45 hs</option>
-                        <option value="21:00">21:00 hs</option>
-                        <option value="21:15">21:15 hs</option>
-                        <option value="21:30">21:30 hs</option>
-                        <option value="21:45">21:45 hs</option>
-                        <option value="22:00">22:00 hs</option>
-                        <option value="22:15">22:15 hs</option>
-                        <option value="22:30">22:30 hs</option>
-                        <option value="22:45">22:45 hs</option>
-                        <option value="23:00">23:00 hs</option>
-                        <option value="23:15">23:15 hs</option>
-                        <option value="23:30">23:30 hs</option>
-                        <option value="23:45">23:45 hs</option>
+                    <div class="form-group">
+                        <label for="order-time-select"><i class='bx bx-alarm'></i> Seleccioná un horario</label>
+                        <select id="order-time-select">
+                            <option value="" disabled selected>Elegí el horario</option>
+                            <option value="19:45">19:45 hs</option>
+                            <option value="20:00">20:00 hs</option>
+                            <option value="20:15">20:15 hs</option>
+                            <option value="20:30">20:30 hs</option>
+                            <option value="20:45">20:45 hs</option>
+                            <option value="21:00">21:00 hs</option>
+                            <option value="21:15">21:15 hs</option>
+                            <option value="21:30">21:30 hs</option>
+                            <option value="21:45">21:45 hs</option>
+                            <option value="22:00">22:00 hs</option>
+                            <option value="22:15">22:15 hs</option>
+                            <option value="22:30">22:30 hs</option>
+                            <option value="22:45">22:45 hs</option>
+                            <option value="23:00">23:00 hs</option>
+                            <option value="23:15">23:15 hs</option>
+                            <option value="23:30">23:30 hs</option>
+                            <option value="23:45">23:45 hs</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="payment-method"><i class='bx bx-money'></i> Método de pago</label>
+                    <select id="payment-method">
+                        <option value="Efectivo">Pagar con Efectivo</option>
+                        <option value="MercadoPago">Pagar con Transferencia</option>
                     </select>
                 </div>
 
-                <!-- El <select id="payment-method"> y el resto del form siguen aquí abajo -->
+                <div class="form-group">
+                    <label for="order-notes"><i class='bx bx-note'></i> Aclaraciones (opcional)</label>
+                    <textarea id="order-notes" placeholder="Ej: piso 2B, timbre no funciona, bebidas del combo..."></textarea>
+                </div>
 
-                <select id="payment-method">
-                    <option value="Efectivo">Pagar con Efectivo</option>
-                    <option value="MercadoPago">Pagar con Transferencia</option>
-                </select>
-                <textarea id="order-notes" placeholder="Aclaraciones (ej: piso 2B, timbre no funciona, bebidas del combo...)"></textarea>
-                <button type="submit" class="btn-primary">Confirmar y Enviar Pedido por WhatsApp</button>
+                <button type="submit" class="btn-primary btn-submit">
+                    <i class='bx bxl-whatsapp'></i>
+                    <span>Confirmar y Enviar Pedido</span>
+                </button>
             </form>
         </div>
     </div>
 
     <aside id="cart-panel" class="cart-panel">
         <div class="cart-header">
-            <h2>Tu Pedido</h2>
+            <h2><i class='bx bx-cart'></i> Tu Pedido</h2>
             <button id="close-cart-btn" class="close">×</button>
         </div>
         <div id="cart-items" class="cart-items"></div>
@@ -165,19 +209,17 @@
                 <strong>Total:</strong>
                 <span id="cart-total-price">$0</span>
             </div>
-            <button id="checkout-btn" class="btn-primary" disabled>Finalizar Pedido</button>
+            <button id="checkout-btn" class="btn-primary" disabled>
+                <i class='bx bx-check-circle'></i>
+                <span>Finalizar Pedido</span>
+            </button>
         </div>
     </aside>
-
-
-    <!-- Boton flotante carrito -->  
 
     <div id="cart-toggle" class="cart-toggle" role="button" aria-label="Abrir carrito de compras">
         <i class='bx bxs-cart'></i>
         <span id="cart-item-count" class="cart-item-count hidden">0</span>
     </div>
-
-    <!-- Botón Flotante de WhatsApp -->
 
     <a href="https://wa.me/5493412625341?text=Hola!%20Quisiera%20hacer%20una%20consulta." class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Enviar mensaje por WhatsApp">
         <i class='bx bxl-whatsapp'></i>
@@ -185,15 +227,13 @@
     
     <div id="toast-container"></div>
     
-    <!-- JS de Swiper -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>  
-
     <script src="js/main.js" type="module" defer></script>
 
     <footer class="site-footer">
         <div class="footer-content">
-            <!-- Nueva sección con información de contacto -->
             <div class="footer-contact">
+                <h3>Contacto</h3>
                 <p>
                     <a href="https://www.instagram.com/monat.pides" target="_blank" rel="noopener noreferrer">
                         <i class='bx bxl-instagram'></i>
@@ -204,9 +244,8 @@
                 <p><i class='bx bxs-phone'></i> 341 262 5341</p>
             </div>
 
-            <!-- Información legal y copyright -->
             <div class="footer-legal">
-                <br><p>© 2025 Monãt. Todos los derechos reservados.</p>
+                <p>© 2025 Monãt. Todos los derechos reservados.</p>
                 <p>Branco Blunda - CUIT 20-12345678-9</p>
                 <nav class="footer-links">
                     <a href="terminos.html">Términos y Condiciones</a>
