@@ -10,6 +10,10 @@
     <meta name="description" content="Descubrí los mejores pizzas turcas, empanadas y carlitos de Rosario. Hacé tu pedido online de forma rápida y fácil para delivery o retiro. ¡Te esperamos en Monãt!">
     <!-- Link a Swiper's CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <!-- Google tag (gtag.js) -->
@@ -22,38 +26,46 @@
 </script>
 
 <body>
+    <!-- Decorative Background Elements -->
+    <div class="background-decoration">
+        <div class="decoration-circle decoration-circle-1"></div>
+        <div class="decoration-circle decoration-circle-2"></div>
+        <div class="decoration-circle decoration-circle-3"></div>
+    </div>
 
     <header class="header">
-        <div class="header-background"></div>
-        <a href="#" class="logo-link"><img src="img/logo_claro.png" alt="Monãt" class="logo" /></a>
-
-        <h1 style="display: none;">Pides a Domicilio en Rosario - Monãt</h1> 
-        
-        <form class="search-form" id="search-form">
-            <input type="search" id="search-input" placeholder="Buscar pides, bebidas, combos...">
-            <i class='bx bx-search'></i>
-        </form>
+        <div class="header-content">
+            <a href="#" class="logo-link">
+                <img src="img/logo_claro.png" alt="Monãt" class="logo" />
+            </a>
+            <h1 style="display: none;">Pides a Domicilio en Rosario - Monãt</h1> 
+            
+            <form class="search-form" id="search-form">
+                <i class='bx bx-search search-icon'></i>
+                <input type="search" id="search-input" placeholder="Buscar pides, bebidas, combos...">
+            </form>
+        </div>
     </header>
 
     <div class="categories-container">
         <nav class="categories">
-            <button class="active" data-category="pizzas">
-                <i class='bx bx-dish'></i>
+            <button class="category-btn active" data-category="pizzas">
+                <i class='bx bx-pizza'></i>
                 <span>Pizzas Individuales</span>
             </button>
-            <button data-category="combos">
-                <i class='bx bx-gift'></i>
+            <button class="category-btn" data-category="combos">
+                <i class='bx bx-dollar-circle'></i>
                 <span>Promociones</span>
             </button>
-            <button data-category="carlitos">
+            <button class="category-btn" data-category="carlitos">
                 <i class='bx bx-food-menu'></i>
                 <span>Carlitos</span>
             </button>
-            <button data-category="tostados">
-                <i class='bx bx-purchase-tag'></i>
+            <button class="category-btn" data-category="tostados">
+                <i class='bx bx-dish'></i>
                 <span>Tostados</span>
             </button>
-            <button data-category="bebidas">
+            <button class="category-btn" data-category="bebidas">
                 <i class='bx bx-drink'></i>
                 <span>Bebidas</span>
             </button>
@@ -69,46 +81,65 @@
     <div id="product-modal" class="modal">
         <div class="modal-content">
             <span class="close" data-modal-close="product-modal">×</span>
-            <img id="modal-img" src="" alt="Imagen del producto" />
-            <h3 id="modal-title"></h3>
-            <p id="modal-description"></p>
-            <p id="modal-price" class="price"></p>
-            <div id="modal-options-container"></div>
-            <div class="quantity-container">
-                <label for="cantidad">Cantidad:</label>
-                <button class="quantity-btn" id="quantity-minus">-</button>
-                <input type="number" id="cantidad" value="1" min="1" readonly />
-                <button class="quantity-btn" id="quantity-plus">+</button>
+            <div class="modal-image-container">
+                <img id="modal-img" src="" alt="Imagen del producto" />
             </div>
-            <button id="add-to-cart-btn" class="btn-primary">
-                <i class='bx bx-cart-add'></i>
-                <span>Agregar al carrito</span>
-            </button>
+            <div class="modal-body">
+                <h3 id="modal-title"></h3>
+                <p id="modal-description"></p>
+                <p id="modal-price" class="price"></p>
+                <div id="modal-options-container"></div>
+                <div class="quantity-container">
+                    <label for="cantidad">Cantidad:</label>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" id="quantity-minus">
+                            <i class='bx bx-minus'></i>
+                        </button>
+                        <input type="number" id="cantidad" value="1" min="1" readonly />
+                        <button class="quantity-btn" id="quantity-plus">
+                            <i class='bx bx-plus'></i>
+                        </button>
+                    </div>
+                </div>
+                <button id="add-to-cart-btn" class="btn-primary">
+                    <i class='bx bx-cart-add'></i>
+                    <span>Agregar al carrito</span>
+                </button>
+            </div>
         </div>
     </div>
     
     <div id="checkout-modal" class="modal">
         <div class="modal-content checkout-modal-content">
             <span class="close" data-modal-close="checkout-modal">×</span>
-            <h3><i class='bx bx-receipt'></i> Completá tus datos para el pedido</h3>
+            <h3 class="modal-title-checkout">
+                <i class='bx bx-clipboard'></i>
+                Completá tus datos para el pedido
+            </h3>
             <form id="checkout-form">
                 <div class="form-group">
-                    <label for="client-name"><i class='bx bx-user'></i> Tu nombre</label>
+                    <label for="client-name">
+                        <i class='bx bx-user'></i>
+                        Tu Nombre
+                    </label>
                     <input type="text" id="client-name" placeholder="Ingresá tu nombre completo" required>
                 </div>
 
                 <div class="form-group">
-                    <label><i class='bx bx-store'></i> Tipo de entrega</label>
+                    <label>
+                        <i class='bx bx-map-pin'></i>
+                        Tipo de entrega
+                    </label>
                     <div class="delivery-options" id="delivery-type-options">
-                        <label>
+                        <label class="delivery-option">
                             <input type="radio" name="delivery-type" value="pickup" required>
                             <div class="option-content">
-                                <i class='bx bx-walk'></i>
+                                <i class='bx bx-store'></i>
                                 <span>Retiro en local</span>
                                 <small>Laprida 3266</small>
                             </div>
                         </label>
-                        <label>
+                        <label class="delivery-option">
                             <input type="radio" name="delivery-type" value="delivery" required>
                             <div class="option-content">
                                 <i class='bx bx-cycling'></i>
@@ -121,41 +152,49 @@
 
                 <div id="delivery-info" class="hidden">
                     <div class="form-group">
-                        <label for="client-address"><i class='bx bx-map'></i> Tu dirección</label>
-                        <input type="text" id="client-address" placeholder="Calle, número, piso, depto...">
+                        <label for="client-address">
+                            <i class='bx bx-home'></i>
+                            Tu Dirección
+                        </label>
+                        <input type="text" id="client-address" placeholder="Calle, número, piso/depto">
                     </div>
                     <a href="img/zona_envios.png" target="_blank" class="delivery-zone-link">
-                        <i class='bx bx-map-alt'></i> Ver nuestra zona de envíos
+                        <i class='bx bx-map-alt'></i> 
+                        <span>Ver nuestra zona de envíos</span>
                     </a>
                 </div>
 
-                <div class="form-group">
-                    <label><i class='bx bx-time-five'></i> ¿Cuándo querés tu pedido?</label>
-                    <div class="order-time-options">
-                        <div id="order-time-type-options" class="delivery-options">
-                            <label>
-                                <input type="radio" name="order-time-type" value="asap" required>
-                                <div class="option-content">
-                                    <i class='bx bx-run'></i>
-                                    <span>Lo antes posible</span>
-                                </div>
-                            </label>
-                            <label>
-                                <input type="radio" name="order-time-type" value="schedule" required>
-                                <div class="option-content">
-                                    <i class='bx bx-calendar'></i>
-                                    <span>Programar hora</span>
-                                </div>
-                            </label>
-                        </div>
+                <div class="order-time-options">
+                    <label>
+                        <i class='bx bx-time'></i>
+                        ¿Cuándo querés tu pedido?
+                    </label>
+                    <div id="order-time-type-options" class="delivery-options">
+                        <label class="delivery-option">
+                            <input type="radio" name="order-time-type" value="asap" required>
+                            <div class="option-content">
+                                <i class='bx bx-run'></i>
+                                <span>Lo antes posible</span>
+                            </div>
+                        </label>
+                        <label class="delivery-option">
+                            <input type="radio" name="order-time-type" value="schedule" required>
+                            <div class="option-content">
+                                <i class='bx bx-calendar'></i>
+                                <span>Programar hora</span>
+                            </div>
+                        </label>
                     </div>
                 </div>
 
                 <div id="schedule-time-container" class="hidden">
                     <div class="form-group">
-                        <label for="order-time-select"><i class='bx bx-alarm'></i> Seleccioná un horario</label>
+                        <label for="order-time-select">
+                            <i class='bx bx-alarm'></i>
+                            Horario preferido
+                        </label>
                         <select id="order-time-select">
-                            <option value="" disabled selected>Elegí el horario</option>
+                            <option value="" disabled selected>Seleccioná un horario</option>
                             <option value="19:45">19:45 hs</option>
                             <option value="20:00">20:00 hs</option>
                             <option value="20:15">20:15 hs</option>
@@ -178,7 +217,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="payment-method"><i class='bx bx-money'></i> Método de pago</label>
+                    <label for="payment-method">
+                        <i class='bx bx-money'></i>
+                        Método de pago
+                    </label>
                     <select id="payment-method">
                         <option value="Efectivo">Pagar con Efectivo</option>
                         <option value="MercadoPago">Pagar con Transferencia</option>
@@ -186,13 +228,16 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="order-notes"><i class='bx bx-note'></i> Aclaraciones (opcional)</label>
+                    <label for="order-notes">
+                        <i class='bx bx-note'></i>
+                        Aclaraciones (opcional)
+                    </label>
                     <textarea id="order-notes" placeholder="Ej: piso 2B, timbre no funciona, bebidas del combo..."></textarea>
                 </div>
 
                 <button type="submit" class="btn-primary btn-submit">
                     <i class='bx bxl-whatsapp'></i>
-                    <span>Confirmar y Enviar Pedido</span>
+                    <span>Confirmar y Enviar Pedido por WhatsApp</span>
                 </button>
             </form>
         </div>
@@ -200,7 +245,10 @@
 
     <aside id="cart-panel" class="cart-panel">
         <div class="cart-header">
-            <h2><i class='bx bx-cart'></i> Tu Pedido</h2>
+            <h2>
+                <i class='bx bx-cart'></i>
+                Tu Pedido
+            </h2>
             <button id="close-cart-btn" class="close">×</button>
         </div>
         <div id="cart-items" class="cart-items"></div>
@@ -233,15 +281,21 @@
     <footer class="site-footer">
         <div class="footer-content">
             <div class="footer-contact">
-                <h3>Contacto</h3>
+                <h4>Contacto</h4>
                 <p>
                     <a href="https://www.instagram.com/monat.pides" target="_blank" rel="noopener noreferrer">
                         <i class='bx bxl-instagram'></i>
                         <span>Monãt.Pides</span>
                     </a>
                 </p>
-                <p><i class='bx bxs-map'></i> Laprida 3266, Rosario, Santa Fe</p>
-                <p><i class='bx bxs-phone'></i> 341 262 5341</p>
+                <p>
+                    <i class='bx bxs-map'></i> 
+                    <span>Laprida 3266, Rosario, Santa Fe</span>
+                </p>
+                <p>
+                    <i class='bx bxs-phone'></i> 
+                    <span>341 262 5341</span>
+                </p>
             </div>
 
             <div class="footer-legal">
@@ -256,16 +310,17 @@
         </div>
     </footer>
 
-</body>
-
-<div id="closed-store-modal" class="store-status-modal hidden">
-    <div class="modal-content">
-        <img src="img/logo_claro.png" alt="Monãt" class="modal-logo" /> 
-        <h3>¡Hola! Ahora mismo estamos cerrados.</h3>
-        <p>Nuestro horario de atención es de <strong>Jueves a Domingos, de 19:00 a 00:00 hs.</strong></p>
-        <p>Podes ver nuestro menú y preparar tu pedido para cuando abramos.</p>
-        <button id="close-store-modal-btn" class="btn-primary">Ver el menú de todos modos</button>
+    <div id="closed-store-modal" class="store-status-modal hidden">
+        <div class="modal-content">
+            <img src="img/logo_claro.png" alt="Monãt" class="modal-logo" /> 
+            <h3>¡Hola! Ahora mismo estamos cerrados.</h3>
+            <p>Nuestro horario de atención es de <strong>Jueves a Domingos, de 19:00 a 00:00 hs.</strong></p>
+            <p>Podes ver nuestro menú y preparar tu pedido para cuando abramos.</p>
+            <button id="close-store-modal-btn" class="btn-primary">
+                <i class='bx bx-menu'></i>
+                <span>Ver el menú de todos modos</span>
+            </button>
+        </div>
     </div>
-</div>
-
+</body>
 </html>
