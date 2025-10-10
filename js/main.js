@@ -150,10 +150,60 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+
+/**
+ * Habilita el desplazamiento por arrastre del mouse en un elemento.
+ * @param {HTMLElement} element - El elemento que se quiere hacer desplazable.
+ */
+function makeScrollable(element) {
+    if (!element) return;
+
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    element.addEventListener('mousedown', (e) => {
+        isDown = true;
+        element.style.cursor = 'grabbing';
+        startX = e.pageX - element.offsetLeft;
+        scrollLeft = element.scrollLeft;
+    });
+
+    element.addEventListener('mouseleave', () => {
+        isDown = false;
+        element.style.cursor = 'grab';
+    });
+
+    element.addEventListener('mouseup', () => {
+        isDown = false;
+        element.style.cursor = 'grab';
+    });
+
+    element.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - element.offsetLeft;
+        const walk = (x - startX) * 2; // El multiplicador * 2 hace el scroll más rápido
+        element.scrollLeft = scrollLeft - walk;
+    });
+
+    // Estilo inicial del cursor
+    element.style.cursor = 'grab';
+}
+
+
 // --- MANEJADORES DE EVENTOS Y OTRAS FUNCIONES ---
 
 function setupEventListeners() {
-    document.querySelector('.categories').addEventListener('click', handleCategoryClick);
+    const categoriesContainer = document.querySelector('.categories');
+    
+    // Habilita el arrastre en la barra de categorías
+    makeScrollable(categoriesContainer);
+
+    // Mantiene el listener de clic para la navegación por categorías
+    categoriesContainer.addEventListener('click', handleCategoryClick);
+
+    // El resto de los listeners permanecen sin cambios
     document.getElementById('product-sections-container').addEventListener('click', handleProductClick);
     const productModal = document.getElementById('product-modal');
     productModal.addEventListener('click', handleProductModalClick);
