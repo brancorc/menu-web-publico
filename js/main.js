@@ -8,9 +8,9 @@ let productosPorCategoria = {};
 let productoSeleccionado = null;
 let shippingCost = 0;
 let swiper;
-let siteSettings; // Variable global para almacenar la configuración del sitio.
+let siteSettings;
 
-// --- FUNCIONES DE INICIALIZACIÓN ---
+// --- FUNCIONES ---
 
 function getBusinessSlug() {
     const hostname = window.location.hostname;
@@ -20,6 +20,9 @@ function getBusinessSlug() {
     const pathParts = window.location.pathname.split('/').filter(part => part);
     if (pathParts.length > 0) {
         return pathParts[0];
+    }
+    if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
+        return 'monat';
     }
     return null; 
 }
@@ -31,12 +34,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    const [menuData, settingsData] = await Promise.all([
+    const [menuData, settings] = await Promise.all([
         apiFetch(`/api/public/menu-data/${slug}`),
         apiFetch(`/api/public/settings/${slug}`)
     ]);
     
-    siteSettings = settingsData;
+    siteSettings = settings;
 
     if (!siteSettings) {
          document.body.innerHTML = '<h1 style="color:white; text-align:center; padding-top: 50px;">Error al cargar la configuración del negocio.</h1>';
@@ -52,39 +55,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         deliveryOptionLabel.innerHTML = `<input type="radio" name="delivery-type" value="delivery" required> ${originalText} ($${shippingCost.toLocaleString('es-AR')})`;
     }
 
-    if (!menuData) {
+    if (!menuData || !menuData.productos) {
         const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
-        swiperWrapper.innerHTML = `<div class="no-results-message">No se pudo cargar el menú. Por favor, intenta de nuevo más tarde.</div>`;
+        swiperWrapper.innerHTML = `<div class="no-results-message">Este negocio aún no tiene productos cargados.</div>`;
         return;
     }
 
     allProducts = menuData.productos;
+    
     productosPorCategoria = menuData.categorias.reduce((acc, categoria) => {
-        acc[categoria] = [];
+        acc[categoria] = allProducts.filter(p => p.categoria === categoria);
         return acc;
     }, {});
-
-    allProducts.forEach(product => {
-        if (productosPorCategoria[product.categoria]) {
-            productosPorCategoria[product.categoria].push(product);
-        }
-    });
-
+    
     renderizarProductos(productosPorCategoria, menuData.categorias);
     renderizarCarrito(getCarrito(), 'pickup', shippingCost);
     setupEventListeners();
     checkStoreStatus();
 
-    swiper = new Swiper('.swiper', { spaceBetween: 20, autoHeight: true });
-    const showActiveSlideItems = () => {
-        document.querySelectorAll('.swiper-slide .item').forEach(item => item.classList.remove('visible'));
-        const activeSlide = swiper.slides[swiper.activeIndex];
-        if (!activeSlide) return;
-        const items = activeSlide.querySelectorAll('.item');
-        items.forEach((item, index) => {
-            setTimeout(() => item.classList.add('visible'), index * 75);
-        });
-    };
+    swiper = new Swiper('.swiper', {
+        spaceBetween: 20,
+        autoHeight: true,
+    });
+    
     swiper.on('slideChange', function () {
         const activeSlide = swiper.slides[swiper.activeIndex];
         if (!activeSlide) return;
@@ -92,41 +85,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelectorAll('.categories button').forEach(button => button.classList.remove('active'));
         const activeButton = document.querySelector(`.categories button[data-category="${activeCategory}"]`);
         if (activeButton) activeButton.classList.add('active');
-        showActiveSlideItems();
+        
+        // Animación de entrada para los items del slide activo
+        const items = activeSlide.querySelectorAll('.item');
+        items.forEach((item, index) => {
+            setTimeout(() => item.classList.add('visible'), index * 75);
+        });
     });
-    swiper.update();
-    showActiveSlideItems();
-    
+
     if (menuData.categorias.length > 0) {
         document.querySelector(`.categories button[data-category="${menuData.categorias[0]}"]`)?.classList.add('active');
-    }
-
-    // --- [CORRECCIÓN] LÓGICA DE PREVISUALIZACIÓN EN VIVO CON POSTMESSAGE ---
-    const urlParams = new URLSearchParams(window.location.search);
-    const isPreview = urlParams.get('preview') === 'true';
-
-    if (isPreview) {
-        window.addEventListener('message', (event) => {
-            // Seguridad: Idealmente, validar el origen. ej: if (event.origin !== 'https://comanda-central-frontend.onrender.com') return;
-            
-            const { type, payload } = event.data;
-
-            if (type === 'updateStyle') {
-                document.documentElement.style.setProperty(payload.key, payload.value);
-            }
-            if (type === 'updateContent') {
-                const element = document.querySelector(payload.selector);
-                if (element) {
-                    if (payload.textContent) element.textContent = payload.value;
-                    if (payload.attribute) element.setAttribute(payload.attribute, payload.value);
-                    if (payload.display) element.parentElement.style.display = payload.display;
-                }
-            }
-        });
+        // Disparamos la animación para el primer slide
+        setTimeout(() => swiper.emit('slideChange'), 100);
     }
 });
-
-// --- MANEJADORES DE EVENTOS Y OTRAS FUNCIONES ---
 
 function setupEventListeners() {
     document.querySelector('.categories').addEventListener('click', handleCategoryClick);
@@ -147,11 +119,13 @@ function setupEventListeners() {
 }
 
 function handleCategoryClick(event) {
-    if (event.target.tagName === 'BUTTON') {
-        const category = event.target.dataset.category;
+    const button = event.target.closest('button');
+    if (button) {
+        const category = button.dataset.category;
         const sections = Array.from(document.querySelectorAll('.category-section.swiper-slide'));
         const categoryIndex = sections.findIndex(s => s.id === category);
-        if (categoryIndex !== -1) {
+        
+        if (categoryIndex !== -1 && swiper) {
             swiper.slideTo(categoryIndex);
         }
     }
