@@ -8,63 +8,9 @@ let productosPorCategoria = {};
 let productoSeleccionado = null;
 let shippingCost = 0;
 let swiper;
-let siteSettings;
+let siteSettings; // Variable global para almacenar la configuración del sitio.
 
-// --- FUNCIONES ---
-
-/**
- * Habilita el desplazamiento por arrastre del mouse en un elemento,
- * distinguiendo entre un clic y un arrastre.
- * @param {HTMLElement} element - El elemento que se quiere hacer desplazable.
- */
-function makeScrollable(element) {
-    if (!element) return;
-
-    let isDown = false;
-    let startX;
-    let scrollLeft;
-    let hasDragged = false;
-
-    element.addEventListener('mousedown', (e) => {
-        isDown = true;
-        hasDragged = false;
-        element.style.cursor = 'grabbing';
-        startX = e.pageX - element.offsetLeft;
-        scrollLeft = element.scrollLeft;
-    });
-
-    element.addEventListener('mouseleave', () => {
-        isDown = false;
-        element.style.cursor = 'grab';
-    });
-
-    element.addEventListener('mouseup', () => {
-        isDown = false;
-        element.style.cursor = 'grab';
-    });
-
-    element.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - element.offsetLeft;
-        const walk = x - startX;
-        
-        if (Math.abs(walk) > 5) { // Umbral de 5 píxeles para considerar un arrastre
-            hasDragged = true;
-        }
-        
-        element.scrollLeft = scrollLeft - walk;
-    });
-
-    element.addEventListener('click', (e) => {
-        if (hasDragged) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-    }, true);
-
-    element.style.cursor = 'grab';
-}
+// --- FUNCIONES DE INICIALIZACIÓN ---
 
 function getBusinessSlug() {
     const hostname = window.location.hostname;
@@ -75,10 +21,7 @@ function getBusinessSlug() {
     if (pathParts.length > 0) {
         return pathParts[0];
     }
-    if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
-        return 'monat';
-    }
-    return null;
+    return null; 
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -109,21 +52,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         deliveryOptionLabel.innerHTML = `<input type="radio" name="delivery-type" value="delivery" required> ${originalText} ($${shippingCost.toLocaleString('es-AR')})`;
     }
 
-    if (!menuData || !menuData.productos) {
+    if (!menuData) {
         const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
-        swiperWrapper.innerHTML = `<div class="no-results-message">Este negocio aún no tiene productos para mostrar.</div>`;
+        swiperWrapper.innerHTML = `<div class="no-results-message">No se pudo cargar el menú. Por favor, intenta de nuevo más tarde.</div>`;
         return;
     }
 
     allProducts = menuData.productos;
-
     productosPorCategoria = menuData.categorias.reduce((acc, categoria) => {
         acc[categoria] = [];
         return acc;
     }, {});
 
     allProducts.forEach(product => {
-        if (productosPorCategoria.hasOwnProperty(product.categoria)) {
+        if (productosPorCategoria[product.categoria]) {
             productosPorCategoria[product.categoria].push(product);
         }
     });
@@ -133,48 +75,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
     checkStoreStatus();
 
-    swiper = new Swiper('.swiper', {
-        spaceBetween: 20,
-        autoHeight: true,
-        on: {
-            slideChange: function () {
-                const activeSlide = this.slides[this.activeIndex];
-                if (!activeSlide) return;
-                const activeCategory = activeSlide.id;
-                document.querySelectorAll('.categories button').forEach(button => button.classList.remove('active'));
-                const activeButton = document.querySelector(`.categories button[data-category="${activeCategory}"]`);
-                if (activeButton) activeButton.classList.add('active');
-            },
-            init: function() {
-                const activeSlide = this.slides[this.activeIndex];
-                if (!activeSlide) return;
-                const items = activeSlide.querySelectorAll('.item');
-                items.forEach((item, index) => {
-                    setTimeout(() => item.classList.add('visible'), index * 75);
-                });
-            }
-        }
+    swiper = new Swiper('.swiper', { spaceBetween: 20, autoHeight: true });
+    const showActiveSlideItems = () => {
+        document.querySelectorAll('.swiper-slide .item').forEach(item => item.classList.remove('visible'));
+        const activeSlide = swiper.slides[swiper.activeIndex];
+        if (!activeSlide) return;
+        const items = activeSlide.querySelectorAll('.item');
+        items.forEach((item, index) => {
+            setTimeout(() => item.classList.add('visible'), index * 75);
+        });
+    };
+    swiper.on('slideChange', function () {
+        const activeSlide = swiper.slides[swiper.activeIndex];
+        if (!activeSlide) return;
+        const activeCategory = activeSlide.id;
+        document.querySelectorAll('.categories button').forEach(button => button.classList.remove('active'));
+        const activeButton = document.querySelector(`.categories button[data-category="${activeCategory}"]`);
+        if (activeButton) activeButton.classList.add('active');
+        showActiveSlideItems();
     });
+    swiper.update();
+    showActiveSlideItems();
     
     if (menuData.categorias.length > 0) {
         document.querySelector(`.categories button[data-category="${menuData.categorias[0]}"]`)?.classList.add('active');
     }
 
+    // --- [CORRECCIÓN] LÓGICA DE PREVISUALIZACIÓN EN VIVO CON POSTMESSAGE ---
     const urlParams = new URLSearchParams(window.location.search);
     const isPreview = urlParams.get('preview') === 'true';
 
     if (isPreview) {
-        console.log("Modo Previsualización Activado.");
         window.addEventListener('message', (event) => {
+            // Seguridad: Idealmente, validar el origen. ej: if (event.origin !== 'https://comanda-central-frontend.onrender.com') return;
+            
             const { type, payload } = event.data;
 
             if (type === 'updateStyle') {
                 document.documentElement.style.setProperty(payload.key, payload.value);
             }
             if (type === 'updateContent') {
-                const element = document.querySelector(payload.element);
+                const element = document.querySelector(payload.selector);
                 if (element) {
-                    if (payload.text) element.textContent = payload.value;
+                    if (payload.textContent) element.textContent = payload.value;
                     if (payload.attribute) element.setAttribute(payload.attribute, payload.value);
                     if (payload.display) element.parentElement.style.display = payload.display;
                 }
@@ -183,18 +126,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-function setupEventListeners() {
-    const categoriesContainer = document.querySelector('.categories');
-    makeScrollable(categoriesContainer);
-    categoriesContainer.addEventListener('click', handleCategoryClick);
+// --- MANEJADORES DE EVENTOS Y OTRAS FUNCIONES ---
 
+function setupEventListeners() {
+    document.querySelector('.categories').addEventListener('click', handleCategoryClick);
     document.getElementById('product-sections-container').addEventListener('click', handleProductClick);
-    document.getElementById('product-modal').addEventListener('click', handleProductModalClick);
+    const productModal = document.getElementById('product-modal');
+    productModal.addEventListener('click', handleProductModalClick);
     document.getElementById('cart-toggle').addEventListener('click', toggleCartPanel);
     document.getElementById('close-cart-btn').addEventListener('click', toggleCartPanel);
     document.getElementById('checkout-btn').addEventListener('click', () => abrirModal(document.getElementById('checkout-modal')));
     document.getElementById('cart-items').addEventListener('click', handleCartItemInteraction);
-    document.querySelector('#checkout-modal .close').addEventListener('click', () => cerrarModal(document.getElementById('checkout-modal')));
+    const checkoutModal = document.getElementById('checkout-modal');
+    checkoutModal.querySelector('.close').addEventListener('click', () => cerrarModal(checkoutModal));
     document.getElementById('checkout-form').addEventListener('submit', handleCheckout);
     document.getElementById('search-form').addEventListener('submit', e => e.preventDefault());
     document.getElementById('search-input').addEventListener('input', handleSearch);
@@ -203,18 +147,12 @@ function setupEventListeners() {
 }
 
 function handleCategoryClick(event) {
-    const button = event.target.closest('button');
-    if (button) {
-        const category = button.dataset.category;
+    if (event.target.tagName === 'BUTTON') {
+        const category = event.target.dataset.category;
         const sections = Array.from(document.querySelectorAll('.category-section.swiper-slide'));
         const categoryIndex = sections.findIndex(s => s.id === category);
-        
-        if (categoryIndex !== -1 && swiper) {
+        if (categoryIndex !== -1) {
             swiper.slideTo(categoryIndex);
-            
-            // [CORRECCIÓN] Forzamos a Swiper a recalcular su estado y actualizar la vista.
-            // Esto es especialmente importante cuando se usa `autoHeight`.
-            swiper.update();
         }
     }
 }
@@ -232,11 +170,6 @@ function handleProductClick(event) {
 
 function handleProductModalClick(event) {
     const modal = document.getElementById('product-modal');
-    if (event.target.closest('.close')) {
-        cerrarModal(modal);
-        return;
-    }
-
     const cantidadInput = modal.querySelector('#cantidad');
     let cantidad = parseInt(cantidadInput.value);
 
@@ -258,6 +191,10 @@ function handleProductModalClick(event) {
             }
         });
         agregarAlCarrito(productoSeleccionado, cantidad, selecciones, adicionalesSeleccionados);
+        cerrarModal(modal);
+    }
+
+    if (event.target.classList.contains('modal') || event.target.classList.contains('close')) {
         cerrarModal(modal);
     }
 }
@@ -372,17 +309,14 @@ function handleCheckout(event) {
 function handleSearch(event) {
     const termino = event.target.value.toLowerCase().trim();
     const productosFiltrados = {};
-
     for (const categoria in productosPorCategoria) {
         productosFiltrados[categoria] = productosPorCategoria[categoria].filter(p => 
             p.nombre.toLowerCase().includes(termino) || (p.descripcion && p.descripcion.toLowerCase().includes(termino))
         );
     }
-
-    renderizarProductos(productosFiltrados, Object.keys(productosPorCategoria).filter(cat => productosFiltrados[cat].length > 0));
+    renderizarProductos(productosFiltrados, Object.keys(productosFiltrados));
     swiper.update();
     swiper.slideTo(0, 0);
-    
     setTimeout(() => {
         const activeSlide = swiper.slides[swiper.activeIndex];
         if (activeSlide) {
@@ -433,7 +367,7 @@ const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio) =>
         detalleEnvio = `\n*Costo de Envío:* $${costoEnvio.toLocaleString('es-AR')}`;
     }
 
-    const nombreNegocio = siteSettings ? siteSettings.web_nombre_negocio : 'la tienda';
+    const nombreNegocio = siteSettings ? siteSettings.web_nombre_negocio : 'tu negocio';
     const mensaje = `
 *¡Nuevo Pedido para ${nombreNegocio}!* 🎉
 
