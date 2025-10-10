@@ -100,17 +100,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+/**
+ * Permite el desplazamiento horizontal de un elemento usando la rueda del mouse.
+ * @param {HTMLElement} element - El elemento que se quiere hacer desplazable.
+ */
+function enableHorizontalScroll(element) {
+    if (!element) return;
+
+    element.addEventListener('wheel', (event) => {
+        // Si no hay scroll horizontal posible, no hacemos nada.
+        if (element.scrollWidth <= element.clientWidth) {
+            return;
+        }
+        
+        // Prevenimos el scroll vertical de la página
+        event.preventDefault();
+
+        // Aplicamos el delta del scroll de la rueda al scroll horizontal del elemento
+        element.scrollLeft += event.deltaY;
+    });
+}
+
+
 function setupEventListeners() {
-    document.querySelector('.categories').addEventListener('click', handleCategoryClick);
+    const categoriesContainer = document.querySelector('.categories');
+    
+    // Habilita el scroll horizontal con la rueda del mouse en el contenedor de categorías.
+    enableHorizontalScroll(categoriesContainer);
+
+    // Asigna los listeners de eventos.
+    categoriesContainer.addEventListener('click', handleCategoryClick);
     document.getElementById('product-sections-container').addEventListener('click', handleProductClick);
-    const productModal = document.getElementById('product-modal');
-    productModal.addEventListener('click', handleProductModalClick);
+    document.getElementById('product-modal').addEventListener('click', handleProductModalClick);
     document.getElementById('cart-toggle').addEventListener('click', toggleCartPanel);
     document.getElementById('close-cart-btn').addEventListener('click', toggleCartPanel);
     document.getElementById('checkout-btn').addEventListener('click', () => abrirModal(document.getElementById('checkout-modal')));
     document.getElementById('cart-items').addEventListener('click', handleCartItemInteraction);
-    const checkoutModal = document.getElementById('checkout-modal');
-    checkoutModal.querySelector('.close').addEventListener('click', () => cerrarModal(checkoutModal));
+    document.getElementById('checkout-modal').querySelector('.close').addEventListener('click', () => cerrarModal(document.getElementById('checkout-modal')));
     document.getElementById('checkout-form').addEventListener('submit', handleCheckout);
     document.getElementById('search-form').addEventListener('submit', e => e.preventDefault());
     document.getElementById('search-input').addEventListener('input', handleSearch);
