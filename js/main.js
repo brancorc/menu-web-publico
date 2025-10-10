@@ -10,17 +10,33 @@ let shippingCost = 0;
 let swiper;
 let siteSettings; // Variable global para almacenar la configuración del sitio.
 
-// --- FUNCIONES DE INICIALIZACIÓN ---
+// --- FUNCIONES ---
 
+/**
+ * Obtiene el slug del negocio de forma inteligente.
+ * 1. Si el dominio es 'monat.ar', siempre devuelve 'monat'.
+ * 2. Si no, busca un slug en la ruta (ej: midominio.com/pizzeria2 -> 'pizzeria2').
+ * 3. Como fallback para desarrollo local, devuelve 'monat'.
+ * 4. Si no hay slug, devuelve null.
+ * @returns {string|null} El slug del negocio.
+ */
 function getBusinessSlug() {
     const hostname = window.location.hostname;
+
     if (hostname === 'monat.ar' || hostname === 'www.monat.ar') {
         return 'monat';
     }
+
     const pathParts = window.location.pathname.split('/').filter(part => part);
     if (pathParts.length > 0) {
         return pathParts[0];
     }
+    
+    // Fallback para desarrollo local
+    if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
+        return 'monat';
+    }
+    
     return null; 
 }
 
@@ -52,20 +68,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         deliveryOptionLabel.innerHTML = `<input type="radio" name="delivery-type" value="delivery" required> ${originalText} ($${shippingCost.toLocaleString('es-AR')})`;
     }
 
-    if (!menuData) {
+    if (!menuData || !menuData.productos) {
         const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
-        swiperWrapper.innerHTML = `<div class="no-results-message">No se pudo cargar el menú. Por favor, intenta de nuevo más tarde.</div>`;
-        return;
+        swiperWrapper.innerHTML = `<div class="no-results-message">Este negocio aún no tiene productos para mostrar.</div>`;
+        // No detenemos la ejecución para que el resto de la UI (carrito, etc.) funcione.
+        return; 
     }
 
     allProducts = menuData.productos;
+
     productosPorCategoria = menuData.categorias.reduce((acc, categoria) => {
+        // Inicializa un array para cada categoría en el orden correcto
         acc[categoria] = [];
         return acc;
     }, {});
 
     allProducts.forEach(product => {
-        if (productosPorCategoria[product.categoria]) {
+        // Asegura que el producto pertenece a una categoría que existe
+        if (productosPorCategoria.hasOwnProperty(product.categoria)) {
             productosPorCategoria[product.categoria].push(product);
         }
     });
@@ -75,39 +95,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
     checkStoreStatus();
 
-    swiper = new Swiper('.swiper', { spaceBetween: 20, autoHeight: true });
-    const showActiveSlideItems = () => {
-        document.querySelectorAll('.swiper-slide .item').forEach(item => item.classList.remove('visible'));
-        const activeSlide = swiper.slides[swiper.activeIndex];
-        if (!activeSlide) return;
-        const items = activeSlide.querySelectorAll('.item');
-        items.forEach((item, index) => {
-            setTimeout(() => item.classList.add('visible'), index * 75);
-        });
-    };
-    swiper.on('slideChange', function () {
-        const activeSlide = swiper.slides[swiper.activeIndex];
-        if (!activeSlide) return;
-        const activeCategory = activeSlide.id;
-        document.querySelectorAll('.categories button').forEach(button => button.classList.remove('active'));
-        const activeButton = document.querySelector(`.categories button[data-category="${activeCategory}"]`);
-        if (activeButton) activeButton.classList.add('active');
-        showActiveSlideItems();
+    // Inicialización y configuración optimizada de Swiper
+    swiper = new Swiper('.swiper', {
+        spaceBetween: 20,
+        autoHeight: true,
+        on: {
+            slideChange: function () {
+                const activeSlide = this.slides[this.activeIndex];
+                if (!activeSlide) return;
+                const activeCategory = activeSlide.id;
+                document.querySelectorAll('.categories button').forEach(button => button.classList.remove('active'));
+                const activeButton = document.querySelector(`.categories button[data-category="${activeCategory}"]`);
+                if (activeButton) activeButton.classList.add('active');
+            },
+            init: function() {
+                const activeSlide = this.slides[this.activeIndex];
+                if (!activeSlide) return;
+                const items = activeSlide.querySelectorAll('.item');
+                items.forEach((item, index) => {
+                    setTimeout(() => item.classList.add('visible'), index * 75);
+                });
+            }
+        }
     });
-    swiper.update();
-    showActiveSlideItems();
     
     if (menuData.categorias.length > 0) {
         document.querySelector(`.categories button[data-category="${menuData.categorias[0]}"]`)?.classList.add('active');
     }
 
-    // --- [CORRECCIÓN] LÓGICA DE PREVISUALIZACIÓN EN VIVO CON POSTMESSAGE ---
+    // Lógica para la previsualización en vivo
     const urlParams = new URLSearchParams(window.location.search);
     const isPreview = urlParams.get('preview') === 'true';
 
     if (isPreview) {
+        console.log("Modo Previsualización Activado.");
         window.addEventListener('message', (event) => {
-            // Seguridad: Idealmente, validar el origen. ej: if (event.origin !== 'https://comanda-central-frontend.onrender.com') return;
+            // Se debe descomentar y ajustar el origen en producción
+            // if (event.origin !== 'https://comanda-central-frontend.onrender.com') return;
             
             const { type, payload } = event.data;
 
@@ -115,9 +139,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.documentElement.style.setProperty(payload.key, payload.value);
             }
             if (type === 'updateContent') {
-                const element = document.querySelector(payload.selector);
+                const element = document.querySelector(payload.element);
                 if (element) {
-                    if (payload.textContent) element.textContent = payload.value;
+                    if (payload.text) element.textContent = payload.value;
                     if (payload.attribute) element.setAttribute(payload.attribute, payload.value);
                     if (payload.display) element.parentElement.style.display = payload.display;
                 }
@@ -151,7 +175,7 @@ function handleCategoryClick(event) {
         const category = event.target.dataset.category;
         const sections = Array.from(document.querySelectorAll('.category-section.swiper-slide'));
         const categoryIndex = sections.findIndex(s => s.id === category);
-        if (categoryIndex !== -1) {
+        if (categoryIndex !== -1 && swiper) {
             swiper.slideTo(categoryIndex);
         }
     }
@@ -309,14 +333,18 @@ function handleCheckout(event) {
 function handleSearch(event) {
     const termino = event.target.value.toLowerCase().trim();
     const productosFiltrados = {};
+
     for (const categoria in productosPorCategoria) {
         productosFiltrados[categoria] = productosPorCategoria[categoria].filter(p => 
             p.nombre.toLowerCase().includes(termino) || (p.descripcion && p.descripcion.toLowerCase().includes(termino))
         );
     }
-    renderizarProductos(productosFiltrados, Object.keys(productosFiltrados));
+
+    renderizarProductos(productosFiltrados, Object.keys(productosPorCategoria).filter(cat => productosFiltrados[cat].length > 0));
     swiper.update();
-    swiper.slideTo(0, 0);
+    swiper.slideTo(0, 0); // Vuelve al primer slide con resultados
+    
+    // Dispara la animación de entrada para el primer slide visible
     setTimeout(() => {
         const activeSlide = swiper.slides[swiper.activeIndex];
         if (activeSlide) {
@@ -334,9 +362,9 @@ function checkStoreStatus() {
     const now = new Date();
     const day = now.getDay();
     const hour = now.getHours();
-    const openDays = [0, 4, 5, 6];
+    const openDays = [0, 4, 5, 6]; // Domingo=0, Jueves=4, Viernes=5, Sábado=6
     const isOpenDay = openDays.includes(day);
-    const isOpenHour = hour >= 19;
+    const isOpenHour = hour >= 19; // Abre a las 19:00
     const isStoreOpen = isOpenDay && isOpenHour;
     if (!isStoreOpen) {
         modal.classList.remove('hidden');
@@ -367,7 +395,7 @@ const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio) =>
         detalleEnvio = `\n*Costo de Envío:* $${costoEnvio.toLocaleString('es-AR')}`;
     }
 
-    const nombreNegocio = siteSettings ? siteSettings.web_nombre_negocio : 'tu negocio';
+    const nombreNegocio = siteSettings ? siteSettings.web_nombre_negocio : 'la tienda';
     const mensaje = `
 *¡Nuevo Pedido para ${nombreNegocio}!* 🎉
 
