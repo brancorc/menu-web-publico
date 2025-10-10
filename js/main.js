@@ -13,11 +13,15 @@ let siteSettings; // Variable global para almacenar la configuración del sitio.
 // --- FUNCIONES DE INICIALIZACIÓN ---
 
 function getBusinessSlug() {
-    const pathParts = window.location.pathname.split('/').filter(part => part);
-    if (pathParts.length === 0) {
-        return 'monat'; 
+    const hostname = window.location.hostname;
+    if (hostname === 'monat.ar' || hostname === 'www.monat.ar') {
+        return 'monat';
     }
-    return pathParts[0];
+    const pathParts = window.location.pathname.split('/').filter(part => part);
+    if (pathParts.length > 0) {
+        return pathParts[0];
+    }
+    return null; 
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -32,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         apiFetch(`/api/public/settings/${slug}`)
     ]);
     
-    siteSettings = settingsData; // Asignamos a la variable global.
+    siteSettings = settingsData;
 
     if (!siteSettings) {
          document.body.innerHTML = '<h1 style="color:white; text-align:center; padding-top: 50px;">Error al cargar la configuración del negocio.</h1>';
@@ -97,23 +101,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelector(`.categories button[data-category="${menuData.categorias[0]}"]`)?.classList.add('active');
     }
 
-    // Listener para la vista previa en vivo
-    window.addEventListener('storage', (event) => {
-        if (event.key.startsWith('preview_')) {
-            const previewSettings = {
-                web_titulo_pagina: localStorage.getItem('preview_web_titulo_pagina'),
-                web_descripcion_seo: localStorage.getItem('preview_web_descripcion_seo'),
-                logo_url: localStorage.getItem('preview_logo_url'),
-                telefono_whatsapp: localStorage.getItem('preview_telefono_whatsapp'),
-                link_instagram: localStorage.getItem('preview_link_instagram'),
-                link_pedidosya: localStorage.getItem('preview_link_pedidosya'),
-                web_nombre_negocio: localStorage.getItem('preview_web_nombre_negocio'),
-                web_color_primario: localStorage.getItem('preview_web_color_primario'),
-                web_color_acento: localStorage.getItem('preview_web_color_acento'),
-            };
-            aplicarIdentidadVisual(previewSettings);
-        }
-    });
+    // --- [CORRECCIÓN] LÓGICA DE PREVISUALIZACIÓN EN VIVO CON POSTMESSAGE ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const isPreview = urlParams.get('preview') === 'true';
+
+    if (isPreview) {
+        window.addEventListener('message', (event) => {
+            // Seguridad: Idealmente, validar el origen. ej: if (event.origin !== 'https://comanda-central-frontend.onrender.com') return;
+            
+            const { type, payload } = event.data;
+
+            if (type === 'updateStyle') {
+                document.documentElement.style.setProperty(payload.key, payload.value);
+            }
+            if (type === 'updateContent') {
+                const element = document.querySelector(payload.selector);
+                if (element) {
+                    if (payload.textContent) element.textContent = payload.value;
+                    if (payload.attribute) element.setAttribute(payload.attribute, payload.value);
+                    if (payload.display) element.parentElement.style.display = payload.display;
+                }
+            }
+        });
+    }
 });
 
 // --- MANEJADORES DE EVENTOS Y OTRAS FUNCIONES ---
