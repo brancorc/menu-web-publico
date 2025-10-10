@@ -208,8 +208,13 @@ function handleCategoryClick(event) {
         const category = button.dataset.category;
         const sections = Array.from(document.querySelectorAll('.category-section.swiper-slide'));
         const categoryIndex = sections.findIndex(s => s.id === category);
+        
         if (categoryIndex !== -1 && swiper) {
             swiper.slideTo(categoryIndex);
+            
+            // [CORRECCIÓN] Forzamos a Swiper a recalcular su estado y actualizar la vista.
+            // Esto es especialmente importante cuando se usa `autoHeight`.
+            swiper.update();
         }
     }
 }
