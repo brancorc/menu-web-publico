@@ -869,3 +869,32 @@ body {
 #adicionales-list-container::-webkit-scrollbar-thumb:hover {
     background-color: var(--color-claro);
 }
+
+/* ==========================================================================
+   ESTILOS PERSONALIZADOS PARA LA BARRA DE DESPLAZAMIENTO (SCROLLBAR)
+   ========================================================================== */
+
+/* Solo se aplica a navegadores basados en WebKit (Chrome, Safari, Edge, Opera) */
+
+/* La barra de desplazamiento completa */
+::-webkit-scrollbar {
+    width: 8px; /* Ancho de la barra */
+    height: 8px; /* Altura (para scroll horizontal) */
+}
+
+/* El "camino" o "riel" por donde se mueve la barra */
+::-webkit-scrollbar-track {
+    background: transparent; /* Hace que el fondo del riel sea invisible */
+}
+
+/* El "mango" o la parte de la barra que se arrastra */
+::-webkit-scrollbar-thumb {
+    background-color: #555; /* Un color gris oscuro para el mango */
+    border-radius: 4px; /* Bordes redondeados */
+    border: 2px solid var(--color-fondo-dinamico); /* Crea un borde del color del fondo para dar efecto de "flotación" */
+}
+
+/* Efecto al pasar el ratón por encima del mango */
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-acento-dinamico); /* Resalta con el color de acento */
+}
