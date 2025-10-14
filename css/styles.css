@@ -1,7 +1,7 @@
 :root {
     --color-fondo-dinamico: #1E1E1E;
     --color-acento-dinamico: #d16416;
-    
+    --color-texto-dinamico: #F2F2F2;
     /* Variables de texto se mantienen fijas para asegurar legibilidad */
     --color-texto-principal: #F2F2F2;
     --color-texto-secundario: #a0a0a0;
@@ -16,7 +16,7 @@ body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
     background-color: var(--color-fondo-dinamico);
-    color: var(--color-texto-principal);
+    color: var(--color-texto-dinamico);
     padding: 16px;
 }
 
