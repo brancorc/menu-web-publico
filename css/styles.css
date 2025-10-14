@@ -1,22 +1,19 @@
 :root {
-    --color-fondo-dinamico: #1E1E1E;
-    --color-acento-dinamico: #d16416;
-    --color-texto-dinamico: #F2F2F2;
-    /* Variables de texto se mantienen fijas para asegurar legibilidad */
-    --color-texto-principal: #F2F2F2;
+    --color-fondo-dinamico: #121212;
+    --color-acento-dinamico: #ff6b35;
+    --color-texto-principal: #f0f0f0;
     --color-texto-secundario: #a0a0a0;
-    --color-texto-inverso: #1E1E1E; /* Para usar sobre fondos claros */
     
-    /* Variables de estado se mantienen fijas */
-    --color-exito: #4CAF50;
-    --color-error: #ff6b6b;
+    /* Variables fijas */
+    --color-texto-inverso-fijo: #1E1E1E;
+    --color-error-fijo: #ff6b6b;
 }
 
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
     background-color: var(--color-fondo-dinamico);
-    color: var(--color-texto-dinamico);
+    color: var(--color-texto-principal);
     padding: 16px;
 }
 
@@ -30,7 +27,7 @@ body {
 
 .btn-primary {
     background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso);
+    color: var(--color-texto-inverso-fijo);
     border: none;
     padding: 12px 24px;
     width: 100%;
@@ -48,7 +45,7 @@ body {
 }
 
 .btn-primary:disabled {
-    background-color: #555;
+    background-color: rgba(0, 0, 0, 0.2);
     cursor: not-allowed;
     transform: none;
     opacity: 0.6;
@@ -111,7 +108,7 @@ body {
     top: 0;
     bottom: 0;
     width: 50px;
-    background: linear-gradient(to right, rgba(30, 30, 30, 0), var(--color-fondo-dinamico) 80%);
+    background: linear-gradient(to right, rgba(18, 18, 18, 0), var(--color-fondo-dinamico) 80%);
     pointer-events: none;
     z-index: 2;
 }
@@ -148,7 +145,7 @@ body {
 .categories button.active,
 .categories button:hover {
     background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso);
+    color: var(--color-texto-inverso-fijo);
     border-color: var(--color-acento-dinamico);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
     transform: translateY(-3px) scale(1.05);
@@ -245,7 +242,7 @@ body {
     left: 8px;
     transform: rotate(-8deg);
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
-    background-color: var(--color-error);
+    background-color: var(--color-error-fijo);
     color: white;
     padding: 5px 15px;
     font-size: 12px;
@@ -423,7 +420,7 @@ body {
 
 #toggle-adicionales-btn:hover {
     background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso);
+    color: var(--color-texto-inverso-fijo);
     border-color: var(--color-acento-dinamico);
 }
 
@@ -457,7 +454,7 @@ body {
 
 .adicional-quantity-btn {
     background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso);
+    color: var(--color-texto-inverso-fijo);
     border: none;
     width: 28px;
     height: 28px;
@@ -495,7 +492,7 @@ body {
 }
 
 #adicionales-list-container::-webkit-scrollbar-thumb {
-    background-color: #555;
+    background-color: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
     border: 2px solid var(--color-fondo-dinamico);
 }
@@ -536,7 +533,7 @@ body {
 
 .quantity-btn {
     background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso);
+    color: var(--color-texto-inverso-fijo);
     border: none;
     width: 35px;
     height: 35px;
@@ -619,7 +616,7 @@ body {
 
 .delivery-options label.selected {
     background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso);
+    color: var(--color-texto-inverso-fijo);
     font-weight: bold;
 }
 
@@ -670,7 +667,7 @@ body {
     width: 100%;
     max-width: 400px;
     height: 100%;
-    background-color: #181818;
+    background-color: rgba(24, 24, 24, 1);
     box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
     z-index: 1100;
     display: flex;
@@ -743,7 +740,7 @@ body {
 .cart-item-remove {
     background: none;
     border: none;
-    color: var(--color-error);
+    color: var(--color-error-fijo);
     font-size: 24px;
     cursor: pointer;
     padding: 0;
@@ -764,7 +761,7 @@ body {
 .cart-footer {
     padding: 16px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    background-color: #181818;
+    background-color: rgba(24, 24, 24, 1);
 }
 
 .cart-total {
@@ -790,7 +787,7 @@ body {
     width: 60px;
     height: 60px;
     background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso);
+    color: var(--color-texto-inverso-fijo);
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -810,7 +807,7 @@ body {
     position: absolute;
     top: -5px;
     right: -5px;
-    background-color: var(--color-error);
+    background-color: var(--color-error-fijo);
     color: white;
     border-radius: 50%;
     width: 24px;
@@ -874,7 +871,7 @@ body {
 }
 
 .toast {
-    background-color: var(--color-exito);
+    background-color: var(--color-acento-dinamico);
     color: white;
     padding: 12px 20px;
     border-radius: 8px;
@@ -932,7 +929,7 @@ body {
 }
 
 .footer-links a {
-    color: #aaa;
+    color: var(--color-texto-secundario);
     text-decoration: none;
     margin: 0 10px;
     transition: color 0.3s;
@@ -943,7 +940,8 @@ body {
 }
 
 .footer-links span {
-    color: #666;
+    color: var(--color-texto-secundario);
+    opacity: 0.6;
 }
 
 /* --- SCROLLBAR PERSONALIZADA --- */
@@ -958,7 +956,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #555;
+    background-color: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
     border: 2px solid var(--color-fondo-dinamico);
 }
@@ -970,7 +968,7 @@ body {
 /* Para Firefox */
 * {
     scrollbar-width: thin;
-    scrollbar-color: #555 transparent;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
 /* --- RESPONSIVE DESIGN --- */
