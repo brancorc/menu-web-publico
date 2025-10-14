@@ -63,10 +63,17 @@ export const aplicarIdentidadVisual = (settings) => {
     }
     
     // --- Información Operativa ---
-    const addressPickup = document.getElementById('dynamic-address-pickup');
-    if (addressPickup && settings.direccion_local) {
-        addressPickup.textContent = settings.direccion_local.split(',')[0].trim();
+    // [CORREGIDO] Lógica para la etiqueta de Retiro
+    const pickupLabel = document.getElementById('pickup-label-text');
+    if (pickupLabel) {
+        if (settings.direccion_local) {
+            const soloCalle = settings.direccion_local.split(',')[0].trim();
+            pickupLabel.textContent = `Retiro en el local (${soloCalle})`;
+        } else {
+            pickupLabel.textContent = 'Retiro en el local';
+        }
     }
+
     const addressFooter = document.getElementById('dynamic-address-footer');
     if (addressFooter && settings.direccion_local) {
         addressFooter.textContent = settings.direccion_local;
@@ -80,7 +87,6 @@ export const aplicarIdentidadVisual = (settings) => {
         hours.innerHTML = `<strong>${settings.texto_horarios}</strong>`;
     }
 
-    // --- [CORRECCIÓN] Costo de Envío Dinámico ---
     const shippingCostSpan = document.getElementById('dynamic-shipping-cost');
     if (shippingCostSpan && settings.costo_envio_predeterminado) {
         const cost = parseFloat(settings.costo_envio_predeterminado);
