@@ -3,56 +3,34 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Monãt - Pides, Rosario</title>
+    <title>Cargando...</title>
     <link rel="stylesheet" href="css/styles.css" />
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="icon" type="image/png" href="img/fotoportada.png">
-    <meta name="description" content="Descubrí los mejores pizzas turcas, empanadas y carlitos de Rosario. Hacé tu pedido online de forma rápida y fácil para delivery o retiro. ¡Te esperamos en Monãt!">
-    <!-- Link a Swiper's CSS -->
+    <link id="favicon" rel="icon" type="image/png" href="">
+    <meta name="description" content="">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-
 </head>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-DPFEPF7JZN"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-DPFEPF7JZN');
-</script>
 
 <body>
 
     <header class="header">
-        <a href="#"><img src="img/logo_claro.png" alt="Monãt" class="logo" /></a>
-
-        <h1 style="display: none;">Pides a Domicilio en Rosario - Monãt</h1> 
-        
+        <a href="#"><img src="" alt="" class="logo" /></a>
+        <h1 style="display: none;"></h1> 
         <form class="search-form" id="search-form">
-            <input type="search" id="search-input" placeholder="Buscar pides, bebidas, combos...">
+            <input type="search" id="search-input" placeholder="Buscar en el menú...">
             <i class='bx bx-search'></i>
         </form>
     </header>
 
     <div class="categories-container">
         <nav class="categories">
-            <button class="active" data-category="pizzas">Pizzas Individuales</button>
-            <button data-category="combos">Promociones</button>
-            <button data-category="carlitos">Carlitos</button>
-            <button data-category="tostados">Tostados</button>
-            <!--<button data-category="empanadas">Empanadas</button> -->
-            <button data-category="bebidas">Bebidas</button>
-            <!--<button data-category="empanadas">Nuestros horarios</button> -->
-            <!--<button data-category="empanadas">¿Donde estamos?</button> -->
-            <!--<button data-category="empanadas">Zona de envios</button> --> <!-- ¡AÑADE ESTO! -->
+            <!-- Las categorías se generan dinámicamente -->
         </nav>
     </div>
 
     <main id="product-sections-container" class="swiper">
         <div class="swiper-wrapper">
-            <div id="search-no-results" class="no-results-message hidden"></div>
+            <!-- Las secciones de productos se generan dinámicamente -->
         </div>
     </main>
 
@@ -80,34 +58,26 @@
             <h3>Completá tus datos para el pedido</h3>
             <form id="checkout-form">
                 <input type="text" id="client-name" placeholder="Tu Nombre" required>
-                <!-- <input type="tel" id="client-phone" placeholder="Tu Teléfono (ej: 2991234567)" required> -->
-
-                <!-- NUEVO: Selector de tipo de entrega -->
+                
                 <div class="delivery-options" id="delivery-type-options">
                     <label>
-                        <input type="radio" name="delivery-type" value="pickup" required> Retiro en el local (Laprida 3266)
+                        <input type="radio" name="delivery-type" value="pickup" required> Retiro en el local (<span id="dynamic-address-pickup"></span>)
                     </label>
                     <label>
-                        <input type="radio" name="delivery-type" value="delivery" required> Envío a domicilio ($1500)
+                        <input type="radio" name="delivery-type" value="delivery" required> Envío a domicilio
                     </label>
                 </div>
 
-                <!-- NUEVO: Contenedor para campos de envío -->
                 <div id="delivery-info" class="hidden">
                     <input type="text" id="client-address" placeholder="Tu Dirección">
-                    <a href="img/zona_envios.png" target="_blank" class="delivery-zone-link">
-                        <i class='bx bx-map-alt'></i> Ver nuestra zona de envíos ⚠️❗
+                    <a id="delivery-zone-link" href="#" target="_blank" class="delivery-zone-link" style="display: none;">
+                        <i class='bx bx-map-alt'></i> Ver nuestra zona de envíos
                     </a>
                 </div>
 
-                <!-- index.html (dentro de #checkout-form) -->
-
-                <!-- ... justo después del div #delivery-info -->
-
-                <!-- NUEVO: Selector de horario del pedido -->
                 <div class="order-time-options">
                     <h4>¿Cuándo querés tu pedido?</h4>
-                    <div id="order-time-type-options" class="delivery-options"> <!-- Reutilizamos el estilo -->
+                    <div id="order-time-type-options" class="delivery-options">
                         <label>
                             <input type="radio" name="order-time-type" value="asap" required> Lo antes posible
                         </label>
@@ -117,32 +87,29 @@
                     </div>
                 </div>
 
-                <!-- NUEVO: Contenedor para el selector de hora (oculto por defecto) -->
                 <div id="schedule-time-container" class="hidden">
                     <select id="order-time-select">
                         <option value="" disabled selected>Seleccioná un horario</option>
-                        <!-- Los horarios se podrían generar con JS, pero para empezar los ponemos aquí -->
+                         <!-- Las opciones se podrían generar dinámicamente en el futuro -->
                          <option value="19:45">19:45 hs</option>
-                        <option value="20:00">20:00 hs</option>
-                        <option value="20:15">20:15 hs</option>
-                        <option value="20:30">20:30 hs</option>
-                        <option value="20:45">20:45 hs</option>
-                        <option value="21:00">21:00 hs</option>
-                        <option value="21:15">21:15 hs</option>
-                        <option value="21:30">21:30 hs</option>
-                        <option value="21:45">21:45 hs</option>
-                        <option value="22:00">22:00 hs</option>
-                        <option value="22:15">22:15 hs</option>
-                        <option value="22:30">22:30 hs</option>
-                        <option value="22:45">22:45 hs</option>
-                        <option value="23:00">23:00 hs</option>
-                        <option value="23:15">23:15 hs</option>
-                        <option value="23:30">23:30 hs</option>
-                        <option value="23:45">23:45 hs</option>
+                         <option value="20:00">20:00 hs</option>
+                         <option value="20:15">20:15 hs</option>
+                         <option value="20:30">20:30 hs</option>
+                         <option value="20:45">20:45 hs</option>
+                         <option value="21:00">21:00 hs</option>
+                         <option value="21:15">21:15 hs</option>
+                         <option value="21:30">21:30 hs</option>
+                         <option value="21:45">21:45 hs</option>
+                         <option value="22:00">22:00 hs</option>
+                         <option value="22:15">22:15 hs</option>
+                         <option value="22:30">22:30 hs</option>
+                         <option value="22:45">22:45 hs</option>
+                         <option value="23:00">23:00 hs</option>
+                         <option value="23:15">23:15 hs</option>
+                         <option value="23:30">23:30 hs</option>
+                         <option value="23:45">23:45 hs</option>
                     </select>
                 </div>
-
-                <!-- El <select id="payment-method"> y el resto del form siguen aquí abajo -->
 
                 <select id="payment-method">
                     <option value="Efectivo">Pagar con Efectivo</option>
@@ -169,64 +136,55 @@
         </div>
     </aside>
 
-
-    <!-- Boton flotante carrito -->  
-
     <div id="cart-toggle" class="cart-toggle" role="button" aria-label="Abrir carrito de compras">
         <i class='bx bxs-cart'></i>
         <span id="cart-item-count" class="cart-item-count hidden">0</span>
     </div>
 
-    <!-- Botón Flotante de WhatsApp -->
-
-    <a href="https://wa.me/5493412625341?text=Hola!%20Quisiera%20hacer%20una%20consulta." class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Enviar mensaje por WhatsApp">
+    <a href="#" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Enviar mensaje por WhatsApp">
         <i class='bx bxl-whatsapp'></i>
     </a>
     
     <div id="toast-container"></div>
     
-    <!-- JS de Swiper -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>  
-
     <script src="js/main.js" type="module" defer></script>
 
     <footer class="site-footer">
         <div class="footer-content">
-            <!-- Nueva sección con información de contacto -->
             <div class="footer-contact">
                 <p>
-                    <a href="https://www.instagram.com/monat.pides" target="_blank" rel="noopener noreferrer">
+                    <a id="instagram-link" href="#" target="_blank" rel="noopener noreferrer">
                         <i class='bx bxl-instagram'></i>
-                        <span>Monãt.Pides</span>
+                        <span id="instagram-username"></span>
                     </a>
                 </p>
-                <p><i class='bx bxs-map'></i> Laprida 3266, Rosario, Santa Fe</p>
-                <p><i class='bx bxs-phone'></i> 341 262 5341</p>
+                <p>
+                    <a id="pedidosya-link" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">
+                        <i class='bx bxs-store-alt'></i>
+                        <span>PedidosYa</span>
+                    </a>
+                </p>
+                <p><i class='bx bxs-map'></i> <span id="dynamic-address-footer"></span></p>
+                <p><i class='bx bxs-phone'></i> <span id="dynamic-phone"></span></p>
             </div>
-
-            <!-- Información legal y copyright -->
-            <div class="footer-legal">
-                <br><p>© 2025 Monãt. Todos los derechos reservados.</p>
-                <p>Branco Blunda - CUIT 20-12345678-9</p>
-                <nav class="footer-links">
-                    <a href="terminos.html">Términos y Condiciones</a>
-                    <span>•</span>
-                    <a href="privacidad.html">Política de Privacidad</a>
-                </nav>
+            <div id="footer-legal-container" class="footer-legal" style="display: none;">
+                <br><p id="dynamic-copyright"></p>
+                <p id="dynamic-legal-owner"></p>
+                <!-- Links a términos y privacidad podrían ser dinámicos en el futuro -->
             </div>
         </div>
     </footer>
 
-</body>
-
-<div id="closed-store-modal" class="store-status-modal hidden">
-    <div class="modal-content">
-        <img src="img/logo_claro.png" alt="Monãt" class="modal-logo" /> 
-        <h3>¡Hola! Ahora mismo estamos cerrados.</h3>
-        <p>Nuestro horario de atención es de <strong>Jueves a Domingos, de 19:00 a 00:00 hs.</strong></p>
-        <p>Podes ver nuestro menú y preparar tu pedido para cuando abramos.</p>
-        <button id="close-store-modal-btn" class="btn-primary">Ver el menú de todos modos</button>
+    <div id="closed-store-modal" class="store-status-modal hidden">
+        <div class="modal-content">
+            <img src="" alt="" class="modal-logo" /> 
+            <h3>¡Hola! Ahora mismo estamos cerrados.</h3>
+            <p>Nuestro horario de atención es de <strong id="dynamic-hours"></strong></p>
+            <p>Puedes ver nuestro menú y preparar tu pedido para cuando abramos.</p>
+            <button id="close-store-modal-btn" class="btn-primary">Ver el menú de todos modos</button>
+        </div>
     </div>
-</div>
 
+</body>
 </html>

@@ -4,56 +4,99 @@ const cartItemCountEl = document.getElementById('cart-item-count');
 const checkoutBtn = document.getElementById('checkout-btn');
 
 /**
- * Aplica la identidad visual (logo, colores, textos) a la página.
- * @param {Object} data - Datos de configuración de la web.
- * @param {Object} settings - Datos de configuración del negocio (logo, redes).
+ * Aplica toda la identidad visual y datos del negocio a la página.
+ * @param {Object} settings - Objeto único con toda la configuración.
  */
 export const aplicarIdentidadVisual = (settings) => {
     if (!settings) return;
 
-    // 1. Aplicar Textos y SEO
+    // --- SEO y Branding Básico ---
     document.title = settings.web_titulo_pagina || 'Menú Online';
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
         metaDescription.content = settings.web_descripcion_seo || '';
     }
-
-    // 2. Aplicar Logo
+    const favicon = document.getElementById('favicon');
+    if (favicon && settings.favicon_url) {
+        favicon.href = settings.favicon_url;
+    }
     const logoImg = document.querySelector('.header .logo');
     if (logoImg && settings.logo_url) {
         logoImg.src = settings.logo_url;
         logoImg.alt = settings.web_nombre_negocio || 'Logo del Negocio';
     }
 
-    // 3. Aplicar Links de Redes Sociales
+    // --- Links Externos ---
     const whatsappLink = document.querySelector('.whatsapp-float');
     if (whatsappLink && settings.telefono_whatsapp) {
         whatsappLink.href = `https://wa.me/${settings.telefono_whatsapp}`;
     }
-    const instagramLink = document.querySelector('.footer-contact a[href*="instagram.com"]');
-    if (instagramLink && settings.link_instagram) {
+    const instagramLink = document.getElementById('instagram-link');
+    const instagramUsernameSpan = document.getElementById('instagram-username');
+    if (instagramLink && instagramUsernameSpan && settings.link_instagram) {
         instagramLink.href = settings.link_instagram;
+        try {
+            const url = new URL(settings.link_instagram);
+            const username = url.pathname.split('/').filter(p => p).pop();
+            instagramUsernameSpan.textContent = username || 'Instagram';
+        } catch (e) {
+            instagramUsernameSpan.textContent = 'Instagram';
+        }
+    }
+    const pedidosyaLink = document.getElementById('pedidosya-link');
+    if (pedidosyaLink) {
+        if (settings.link_pedidosya) {
+            pedidosyaLink.href = settings.link_pedidosya;
+            pedidosyaLink.parentElement.style.display = 'flex';
+        } else {
+            pedidosyaLink.parentElement.style.display = 'none';
+        }
+    }
+    const zoneLink = document.getElementById('delivery-zone-link');
+    if (zoneLink) {
+        if (settings.url_imagen_zona_envios) {
+            zoneLink.href = settings.url_imagen_zona_envios;
+            zoneLink.style.display = 'flex';
+        } else {
+            zoneLink.style.display = 'none';
+        }
     }
     
-    // 4. Aplicar Colores Dinámicos
+    // --- Información Operativa ---
+    const addressPickup = document.getElementById('dynamic-address-pickup');
+    if (addressPickup && settings.direccion_local) {
+        addressPickup.textContent = settings.direccion_local.split(',')[0].trim();
+    }
+    const addressFooter = document.getElementById('dynamic-address-footer');
+    if (addressFooter && settings.direccion_local) {
+        addressFooter.textContent = settings.direccion_local;
+    }
+    const phone = document.getElementById('dynamic-phone');
+    if (phone && settings.telefono_visible) {
+        phone.textContent = settings.telefono_visible;
+    }
+    const hours = document.getElementById('dynamic-hours');
+    if (hours && settings.texto_horarios) {
+        hours.innerHTML = settings.texto_horarios; // Usamos innerHTML para permitir <strong>, etc.
+    }
+
+    // --- Apariencia ---
     const colorPrimario = settings.web_color_primario || '#1E1E1E';
     const colorAcento = settings.web_color_acento || '#d16416';
     document.documentElement.style.setProperty('--color-fondo-dinamico', colorPrimario);
     document.documentElement.style.setProperty('--color-acento-dinamico', colorAcento);
 };
 
-export const renderizarProductos = (productosPorCategoria) => {
+// --- El resto de las funciones (renderizarProductos, renderizarCarrito, etc.) ---
+// --- no necesitan cambios y permanecen igual que en su archivo original. ---
+
+export const renderizarProductos = (productosPorCategoria, categoriasEnOrden) => {
     const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
-    if (!swiperWrapper) {
-        console.error("El contenedor .swiper-wrapper no se encontró.");
-        return;
-    }
+    if (!swiperWrapper) return;
     swiperWrapper.innerHTML = '';
 
     const categoriesContainer = document.querySelector('.categories');
     categoriesContainer.innerHTML = '';
-
-    const categoriasEnOrden = Object.keys(productosPorCategoria);
 
     categoriasEnOrden.forEach(categoria => {
         const button = document.createElement('button');
@@ -65,12 +108,13 @@ export const renderizarProductos = (productosPorCategoria) => {
         section.id = categoria;
         section.className = 'category-section swiper-slide';
         
-        if (productosPorCategoria[categoria].length === 0) {
+        const productosDeCategoria = productosPorCategoria[categoria] || [];
+        if (productosDeCategoria.length === 0) {
             section.classList.add('hidden');
         }
 
-        productosPorCategoria[categoria].forEach(producto => {
-            let priceHTML, ofertaTagHTML = '';
+        productosDeCategoria.forEach(producto => {
+            let priceHTML = '', ofertaTagHTML = '';
             
             if (producto.descuento_activo_porcentaje > 0) {
                 ofertaTagHTML = `<span class="oferta-tag">¡${producto.descuento_activo_porcentaje}% OFF!</span>`;
@@ -172,7 +216,7 @@ export const abrirModal = (modal, producto) => {
             select.className = 'modal-opcion-select';
             if (Array.isArray(opcion.items)) {
                 opcion.items.forEach(item => {
-                    select.innerHTML += `<option value="${item}">${item}</option>`;
+                    select.innerHTML += `<option value="${item.nombre}">${item.nombre}</option>`;
                 });
             }
             opcionWrapper.appendChild(select);
