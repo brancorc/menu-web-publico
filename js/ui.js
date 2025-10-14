@@ -77,7 +77,14 @@ export const aplicarIdentidadVisual = (settings) => {
     }
     const hours = document.getElementById('dynamic-hours');
     if (hours && settings.texto_horarios) {
-        hours.innerHTML = settings.texto_horarios; // Usamos innerHTML para permitir <strong>, etc.
+        hours.innerHTML = `<strong>${settings.texto_horarios}</strong>`;
+    }
+
+    // --- [CORRECCIÓN] Costo de Envío Dinámico ---
+    const shippingCostSpan = document.getElementById('dynamic-shipping-cost');
+    if (shippingCostSpan && settings.costo_envio_predeterminado) {
+        const cost = parseFloat(settings.costo_envio_predeterminado);
+        shippingCostSpan.textContent = `$${cost.toLocaleString('es-AR')}`;
     }
 
     // --- Apariencia ---
@@ -86,9 +93,6 @@ export const aplicarIdentidadVisual = (settings) => {
     document.documentElement.style.setProperty('--color-fondo-dinamico', colorPrimario);
     document.documentElement.style.setProperty('--color-acento-dinamico', colorAcento);
 };
-
-// --- El resto de las funciones (renderizarProductos, renderizarCarrito, etc.) ---
-// --- no necesitan cambios y permanecen igual que en su archivo original. ---
 
 export const renderizarProductos = (productosPorCategoria, categoriasEnOrden) => {
     const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
