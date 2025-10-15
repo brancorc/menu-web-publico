@@ -1,8 +1,8 @@
 :root {
-    --color-fondo-dinamico: #121212;
-    --color-acento-dinamico: #ff6b35;
+    --color-fondo-dinamico: #2d2d2d;
+    --color-acento-dinamico: #d4844f;
     --color-texto-principal: #f0f0f0;
-    --color-texto-secundario: #a0a0a0;
+    --color-texto-secundario: #999999;
     
     /* Variables fijas - NO dinámicas */
     --color-texto-inverso-fijo: #1E1E1E;
