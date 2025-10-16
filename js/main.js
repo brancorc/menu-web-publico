@@ -3,14 +3,9 @@ import { renderizarProductos, renderizarCarrito, abrirModal, cerrarModal, toggle
 import { apiFetch } from './api.js';
 
 // --- ESTADO GLOBAL ---
-let allProducts = [];
-let productosPorCategoria = {};
-let productoSeleccionado = null;
-let shippingCost = 0;
-let swiper;
-let siteSettings;
+let allProducts = [], productosPorCategoria = {}, productoSeleccionado = null, shippingCost = 0, swiper, siteSettings;
 
-// --- FUNCIONES ---
+// --- FUNCIONES AUXILIARES ---
 
 function getBusinessSlug() {
     const hostname = window.location.hostname;
@@ -30,6 +25,7 @@ function getBusinessSlug() {
 function makeDraggable(element) {
     if (!element) return;
     let isDown = false, startX, scrollLeft, hasDragged = false;
+
     element.addEventListener('mousedown', (e) => {
         if (e.button !== 0) return;
         isDown = true;
@@ -48,16 +44,17 @@ function makeDraggable(element) {
         if (Math.abs(walk) > 5) hasDragged = true;
         element.scrollLeft = scrollLeft - walk;
     });
-    element.querySelectorAll('button').forEach(child => {
-        child.addEventListener('click', (e) => {
-            if (hasDragged) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-        });
-    });
+
+    element.addEventListener('click', (e) => {
+        if (hasDragged && e.target.tagName === 'BUTTON') {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }, true);
     element.style.cursor = 'grab';
 }
+
+// --- INICIALIZACIÓN ---
 
 document.addEventListener('DOMContentLoaded', async () => {
     const slug = getBusinessSlug();
@@ -94,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!menuData || !menuData.productos) {
         const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
-        swiperWrapper.innerHTML = `<div class="no-results-message">Este negocio aún no tiene productos cargados.</div>`;
+        if(swiperWrapper) swiperWrapper.innerHTML = `<div class="no-results-message">Este negocio aún no tiene productos cargados.</div>`;
     } else {
         allProducts = menuData.productos;
         productosPorCategoria = menuData.categorias.reduce((acc, categoria) => {
@@ -108,24 +105,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
     checkStoreStatus();
 
-    swiper = new Swiper('.swiper', { spaceBetween: 20, autoHeight: true });
-    
-    swiper.on('slideChange', function () {
-        const activeSlide = swiper.slides[swiper.activeIndex];
-        if (!activeSlide) return;
-        const activeCategory = activeSlide.id;
-        document.querySelectorAll('.categories button').forEach(button => button.classList.remove('active'));
-        const activeButton = document.querySelector(`.categories button[data-category="${activeCategory}"]`);
-        if (activeButton) activeButton.classList.add('active');
-        const items = activeSlide.querySelectorAll('.item');
-        items.forEach((item, index) => {
-            setTimeout(() => item.classList.add('visible'), index * 75);
-        });
+    swiper = new Swiper('.swiper', {
+        spaceBetween: 20,
+        autoHeight: true,
+        on: {
+            slideChange: function () {
+                const activeSlide = this.slides[this.activeIndex];
+                if (!activeSlide) return;
+                const activeCategory = activeSlide.id;
+                document.querySelectorAll('.categories button').forEach(button => button.classList.remove('active'));
+                const activeButton = document.querySelector(`.categories button[data-category="${activeCategory}"]`);
+                if (activeButton) activeButton.classList.add('active');
+            }
+        }
     });
 
     if (menuData && menuData.categorias.length > 0) {
         document.querySelector(`.categories button[data-category="${menuData.categorias[0]}"]`)?.classList.add('active');
-        setTimeout(() => swiper.emit('slideChange'), 100);
     }
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -137,6 +133,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 });
+
+// --- MANEJADORES DE EVENTOS ---
 
 function setupEventListeners() {
     const categoriesContainer = document.querySelector('.categories');
@@ -181,13 +179,18 @@ function handleProductClick(event) {
 
 function handleProductModalClick(event) {
     const modal = document.getElementById('product-modal');
+    if (event.target.classList.contains('modal') || event.target.closest('.close')) {
+        cerrarModal(modal);
+        return;
+    }
+
     const cantidadInput = modal.querySelector('#cantidad');
     let cantidad = parseInt(cantidadInput.value);
     if (event.target.id === 'quantity-plus') cantidadInput.value = ++cantidad;
     if (event.target.id === 'quantity-minus' && cantidad > 1) cantidadInput.value = --cantidad;
+
     if (event.target.id === 'add-to-cart-btn') {
-        const selectores = modal.querySelectorAll('.modal-opcion-select');
-        const selecciones = Array.from(selectores).map(select => select.value);
+        const selecciones = Array.from(modal.querySelectorAll('.modal-opcion-select')).map(select => select.value);
         const adicionalesSeleccionados = [];
         modal.querySelectorAll('.adicional-item').forEach(item => {
             const cantidadAdicional = parseInt(item.querySelector('.adicional-cantidad').textContent);
@@ -202,105 +205,75 @@ function handleProductModalClick(event) {
         agregarAlCarrito(productoSeleccionado, cantidad, selecciones, adicionalesSeleccionados);
         cerrarModal(modal);
     }
-    if (event.target.classList.contains('modal') || event.target.classList.contains('close')) {
-        cerrarModal(modal);
-    }
 }
 
 function handleCartItemInteraction(event) {
     const itemEl = event.target.closest('.cart-item');
     if (!itemEl) return;
     const itemUniqueId = itemEl.dataset.id;
-    const itemEnCarrito = getCarrito().find(item => item.uniqueId === itemUniqueId);
-    if (!itemEnCarrito) return;
-    let cantidadActual = itemEnCarrito.cantidad;
-    if (event.target.classList.contains('cart-quantity-plus')) actualizarCantidad(itemUniqueId, cantidadActual + 1);
-    if (event.target.classList.contains('cart-quantity-minus')) actualizarCantidad(itemUniqueId, cantidadActual - 1);
-    if (event.target.classList.contains('cart-item-remove')) eliminarDelCarrito(itemUniqueId);
+    if (event.target.closest('.cart-quantity-plus')) {
+        actualizarCantidad(itemUniqueId, 1, true);
+    } else if (event.target.closest('.cart-quantity-minus')) {
+        actualizarCantidad(itemUniqueId, -1, true);
+    } else if (event.target.closest('.cart-item-remove')) {
+        eliminarDelCarrito(itemUniqueId);
+    }
 }
 
 function handleDeliveryTypeChange(event) {
     const deliveryType = event.target.value;
+    document.querySelectorAll('#delivery-type-options label').forEach(label => {
+        label.classList.toggle('selected', label.getAttribute('for') === event.target.id);
+    });
     const deliveryInfoDiv = document.getElementById('delivery-info');
-    const addressInput = document.getElementById('client-address');
-    
-    // [CORRECCIÓN 2] Aplicar estilos de forma síncrona
-    document.querySelectorAll('#delivery-type-options label').forEach(label => label.classList.remove('selected'));
-    if(event.target.checked) {
-        event.target.closest('label').classList.add('selected');
-    }
-
-    if (deliveryType === 'delivery') {
-        deliveryInfoDiv.classList.remove('hidden');
-        addressInput.required = true;
-    } else {
-        deliveryInfoDiv.classList.add('hidden');
-        addressInput.required = false;
-        addressInput.value = '';
-    }
+    document.getElementById('client-address').required = (deliveryType === 'delivery');
+    deliveryInfoDiv.classList.toggle('hidden', deliveryType !== 'delivery');
     renderizarCarrito(getCarrito(), deliveryType, shippingCost);
 }
 
 function handleOrderTimeChange(event) {
-    const scheduleContainer = document.getElementById('schedule-time-container');
-    const timeSelect = document.getElementById('order-time-select');
     const timeType = event.target.value;
-
-    // Aplicar estilos de forma síncrona
-    document.querySelectorAll('#order-time-type-options label').forEach(label => label.classList.remove('selected'));
-    if(event.target.checked) {
-        event.target.closest('label').classList.add('selected');
-    }
-
-    if (timeType === 'schedule') {
-        scheduleContainer.classList.remove('hidden');
-        timeSelect.required = true;
-    } else {
-        scheduleContainer.classList.add('hidden');
-        timeSelect.required = false;
-        timeSelect.value = "";
-    }
+    document.querySelectorAll('#order-time-type-options label').forEach(label => {
+        label.classList.toggle('selected', label.getAttribute('for') === event.target.id);
+    });
+    const scheduleContainer = document.getElementById('schedule-time-container');
+    document.getElementById('order-time-select').required = (timeType === 'schedule');
+    scheduleContainer.classList.toggle('hidden', timeType !== 'schedule');
 }
 
 function handleCheckout(event) {
     event.preventDefault();
+    const form = event.target;
 
-    // [CORRECCIÓN 3] Añadir todas las validaciones
-    if (getCarrito().length === 0) {
-        return mostrarToast("Tu carrito está vacío.");
+    if (getCarrito().length === 0) return mostrarToast("Tu carrito está vacío.");
+    
+    if (!form.checkValidity()) {
+        const firstInvalidField = form.querySelector(':invalid');
+        if (firstInvalidField) {
+            const fieldName = firstInvalidField.name;
+            if (fieldName === 'delivery-type') return mostrarToast("Por favor, selecciona un tipo de entrega.");
+            if (fieldName === 'order-time-type') return mostrarToast("Por favor, selecciona cuándo quieres tu pedido.");
+        }
+        form.reportValidity();
+        return;
     }
-    const deliveryTypeInput = document.querySelector('input[name="delivery-type"]:checked');
-    if (!deliveryTypeInput) {
-        return mostrarToast("Por favor, selecciona el tipo de entrega.");
-    }
-    const deliveryType = deliveryTypeInput.value;
-    const direccion = document.getElementById('client-address').value;
-    if (deliveryType === 'delivery' && !direccion.trim()) {
-        return mostrarToast("Por favor, ingresa tu dirección.");
-    }
-    const timeTypeInput = document.querySelector('input[name="order-time-type"]:checked');
-     if (!timeTypeInput) {
-        return mostrarToast("Por favor, selecciona cuándo quieres tu pedido.");
-    }
-    const timeType = timeTypeInput.value;
-    const timeSelect = document.getElementById('order-time-select');
+
+    const deliveryType = form.elements['delivery-type'].value;
+    const timeType = form.elements['order-time-type'].value;
     let horaPedido;
     if (timeType === 'schedule') {
-        if (!timeSelect.value) {
-            timeSelect.focus();
-            return mostrarToast("Por favor, seleccioná una hora.");
-        }
-        horaPedido = timeSelect.value + ' hs';
+        horaPedido = form.elements['order-time-select'].value + ' hs';
     } else {
         horaPedido = 'Lo antes posible';
     }
+    
     const datosCliente = {
-        nombre: document.getElementById('client-name').value,
+        nombre: form.elements['client-name'].value,
         tipoEntrega: deliveryType === 'delivery' ? 'Envío a domicilio' : 'Retiro en local',
-        direccion: deliveryType === 'delivery' ? direccion : 'N/A',
+        direccion: deliveryType === 'delivery' ? form.elements['client-address'].value : 'N/A',
         horaPedido: horaPedido,
-        pago: document.getElementById('payment-method').value,
-        notas: document.getElementById('order-notes').value
+        pago: form.elements['payment-method'].value,
+        notas: form.elements['order-notes'].value
     };
     
     enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType, shippingCost);
@@ -308,7 +281,6 @@ function handleCheckout(event) {
     cerrarModal(document.getElementById('checkout-modal'));
     limpiarCarrito(shippingCost);
     mostrarToast("¡Pedido enviado! Gracias por tu compra.");
-    const form = document.getElementById('checkout-form');
     form.reset();
     document.getElementById('delivery-info').classList.add('hidden');
     document.getElementById('schedule-time-container').classList.add('hidden');
@@ -319,42 +291,36 @@ function handleCheckout(event) {
 function handleSearch(event) {
     const termino = event.target.value.toLowerCase().trim();
     const productosFiltrados = {};
-
     const categoriasOrdenadas = Object.keys(productosPorCategoria);
-
     categoriasOrdenadas.forEach(categoria => {
         productosFiltrados[categoria] = productosPorCategoria[categoria].filter(p => 
             p.nombre.toLowerCase().includes(termino) || (p.descripcion && p.descripcion.toLowerCase().includes(termino))
         );
     });
-    
     renderizarProductos(productosFiltrados, categoriasOrdenadas);
-    swiper.update();
-    swiper.slideTo(0, 0);
+    if(swiper) swiper.update();
+    if(swiper) swiper.slideTo(0, 0);
 }
 
 function checkStoreStatus() {
     const modal = document.getElementById('closed-store-modal');
     const openButton = document.getElementById('close-store-modal-btn');
+    if (!modal || !openButton) return;
     const now = new Date();
     const day = now.getDay();
     const hour = now.getHours();
     const openDays = [0, 4, 5, 6];
     const isOpenDay = openDays.includes(day);
     const isOpenHour = hour >= 19;
-    const isStoreOpen = isOpenDay && isOpenHour;
-    if (!isStoreOpen) {
+    if (!(isOpenDay && isOpenHour)) {
         modal.classList.remove('hidden');
     }
-    openButton.addEventListener('click', () => {
-        modal.classList.add('hidden');
-    });
+    openButton.addEventListener('click', () => modal.classList.add('hidden'));
 }
 
 const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio) => {
     const numeroDestino = siteSettings ? siteSettings.telefono_whatsapp : null;
     if (!numeroDestino) {
-        console.error("Número de WhatsApp de destino no configurado.");
         alert("No se pudo enviar el pedido. El negocio no ha configurado un número de WhatsApp.");
         return;
     }
@@ -366,7 +332,7 @@ const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio) =>
         total += costoEnvio;
         detalleEnvio = `\n*Costo de Envío:* $${costoEnvio.toLocaleString('es-AR')}`;
     }
-    const nombreNegocio = siteSettings ? siteSettings.web_nombre_negocio : 'tu negocio';
+    const nombreNegocio = siteSettings ? siteSettings.web_nombre_negocio : 'el negocio';
     const mensaje = `
 *¡Nuevo Pedido para ${nombreNegocio}!* 🎉
 

@@ -63,12 +63,13 @@
                 <input type="text" id="client-name" placeholder="Tu Nombre" required>
                 
                 <div class="delivery-options" id="delivery-type-options">
-                    <label>
-                        <input type="radio" name="delivery-type" value="pickup" required>
+                    <label for="delivery-pickup">
+                        <input type="radio" name="delivery-type" value="pickup" id="delivery-pickup" required>
                         <span id="pickup-label-text">Retiro en el local</span>
                     </label>
-                    <label>
-                        <input type="radio" name="delivery-type" value="delivery" required> Envío a domicilio (<span id="dynamic-shipping-cost"></span>)
+                    <label for="delivery-delivery">
+                        <input type="radio" name="delivery-type" value="delivery" id="delivery-delivery" required>
+                        <span>Envío a domicilio (<span id="dynamic-shipping-cost"></span>)</span>
                     </label>
                 </div>
 

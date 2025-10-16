@@ -58,16 +58,16 @@ export const agregarAlCarrito = (producto, cantidad, selecciones = [], adicional
     }, 500);
 };
 
-export const actualizarCantidad = (itemUniqueId, nuevaCantidad) => {
+export const actualizarCantidad = (itemUniqueId, change, isRelative = false) => {
     const itemEnCarrito = carrito.find(item => item.uniqueId === itemUniqueId);
-    if (itemEnCarrito) {
-        if (nuevaCantidad > 0) {
-            itemEnCarrito.cantidad = nuevaCantidad;
-        } else {
-            // Si la cantidad es 0 o menos, lo eliminamos
-            eliminarDelCarrito(itemUniqueId, false); 
-            return; // Salimos de la función para evitar doble renderizado
-        }
+    if (!itemEnCarrito) return;
+    
+    const nuevaCantidad = isRelative ? itemEnCarrito.cantidad + change : change;
+
+    if (nuevaCantidad > 0) {
+        itemEnCarrito.cantidad = nuevaCantidad;
+    } else {
+        carrito = carrito.filter(item => item.uniqueId !== itemUniqueId);
     }
     guardarCarrito();
 };
