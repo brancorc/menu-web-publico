@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderizarProductos(productosPorCategoria, menuData.categorias);
     }
     
-    renderizarCarrito(getCarrito(), 'pickup', shippingCost);
+    renderizarCarrito(getCarrito());
     setupEventListeners();
     checkStoreStatus();
 
@@ -147,8 +147,10 @@ function setupEventListeners() {
     document.getElementById('checkout-form').addEventListener('submit', handleCheckout);
     document.getElementById('search-form').addEventListener('submit', e => e.preventDefault());
     document.getElementById('search-input').addEventListener('input', handleSearch);
-    document.getElementById('delivery-type-options').addEventListener('change', handleDeliveryTypeChange);
-    document.getElementById('order-time-type-options').addEventListener('change', handleOrderTimeChange);
+    
+    // [CORRECCIÓN 1] Se usa 'click' en lugar de 'change' para una respuesta visual inmediata.
+    document.getElementById('delivery-type-options').addEventListener('click', handleOptionClick);
+    document.getElementById('order-time-type-options').addEventListener('click', handleOptionClick);
 }
 
 function handleCategoryClick(event) {
@@ -206,77 +208,65 @@ function handleCartItemInteraction(event) {
     const itemEl = event.target.closest('.cart-item');
     if (!itemEl) return;
     const itemUniqueId = itemEl.dataset.id;
+    if (!itemUniqueId) return;
 
     if (event.target.classList.contains('cart-quantity-plus')) {
-        actualizarCantidad(itemUniqueId, 1, true); // true para sumar
+        actualizarCantidad(itemUniqueId, 1);
     } else if (event.target.classList.contains('cart-quantity-minus')) {
-        actualizarCantidad(itemUniqueId, -1, true); // true para sumar (con valor negativo)
+        actualizarCantidad(itemUniqueId, -1);
     } else if (event.target.classList.contains('cart-item-remove')) {
         eliminarDelCarrito(itemUniqueId);
     }
 }
 
-function handleDeliveryTypeChange(event) {
-    const deliveryType = event.target.value;
-    const deliveryInfoDiv = document.getElementById('delivery-info');
-    const addressInput = document.getElementById('client-address');
-    
-    document.querySelectorAll('#delivery-type-options label').forEach(label => {
-        const input = label.querySelector('input');
-        label.classList.toggle('selected', input.checked);
-    });
+// [CORRECCIÓN 2] Función unificada para manejar clics en las opciones.
+function handleOptionClick(event) {
+    const label = event.target.closest('label');
+    if (!label) return;
+    const input = label.querySelector('input[type="radio"]');
+    if (!input) return;
 
-    if (deliveryType === 'delivery') {
-        deliveryInfoDiv.classList.remove('hidden');
-        addressInput.required = true;
-    } else {
-        deliveryInfoDiv.classList.add('hidden');
-        addressInput.required = false;
-        addressInput.value = '';
-    }
-    renderizarCarrito(getCarrito(), deliveryType, shippingCost);
-}
+    // Asegurarse de que el input está lógicamente seleccionado
+    input.checked = true;
 
-function handleOrderTimeChange(event) {
-    const scheduleContainer = document.getElementById('schedule-time-container');
-    const timeSelect = document.getElementById('order-time-select');
-    const timeType = event.target.value;
+    // Actualizar estilos visuales
+    const group = event.currentTarget;
+    group.querySelectorAll('label').forEach(l => l.classList.remove('selected'));
+    label.classList.add('selected');
 
-    document.querySelectorAll('#order-time-type-options label').forEach(label => {
-        const input = label.querySelector('input');
-        label.classList.toggle('selected', input.checked);
-    });
-
-    if (timeType === 'schedule') {
-        scheduleContainer.classList.remove('hidden');
-        timeSelect.required = true;
-    } else {
-        scheduleContainer.classList.remove('hidden');
-        timeSelect.required = false;
-        timeSelect.value = "";
+    // Ejecutar lógicas específicas
+    if (input.name === 'delivery-type') {
+        const deliveryType = input.value;
+        const deliveryInfoDiv = document.getElementById('delivery-info');
+        document.getElementById('client-address').required = (deliveryType === 'delivery');
+        deliveryInfoDiv.classList.toggle('hidden', deliveryType !== 'delivery');
+        renderizarCarrito(getCarrito(), deliveryType, shippingCost);
+    } else if (input.name === 'order-time-type') {
+        const timeType = input.value;
+        const scheduleContainer = document.getElementById('schedule-time-container');
+        document.getElementById('order-time-select').required = (timeType === 'schedule');
+        scheduleContainer.classList.toggle('hidden', timeType !== 'schedule');
     }
 }
 
+// [CORRECCIÓN 3] Validación manual y explícita.
 function handleCheckout(event) {
     event.preventDefault();
 
-    if (getCarrito().length === 0) {
-        return mostrarToast("Tu carrito está vacío.");
-    }
+    if (getCarrito().length === 0) return mostrarToast("Tu carrito está vacío.");
+    
     const deliveryTypeInput = document.querySelector('input[name="delivery-type"]:checked');
-    if (!deliveryTypeInput) {
-        return mostrarToast("Por favor, selecciona el tipo de entrega.");
-    }
-    const deliveryType = deliveryTypeInput.value;
+    if (!deliveryTypeInput) return mostrarToast("Por favor, selecciona un tipo de entrega.");
+
+    const timeTypeInput = document.querySelector('input[name="order-time-type"]:checked');
+    if (!timeTypeInput) return mostrarToast("Por favor, selecciona cuándo quieres tu pedido.");
+
     const direccion = document.getElementById('client-address').value;
-    if (deliveryType === 'delivery' && !direccion.trim()) {
+    if (deliveryTypeInput.value === 'delivery' && !direccion.trim()) {
         document.getElementById('client-address').focus();
         return mostrarToast("Por favor, ingresa tu dirección.");
     }
-    const timeTypeInput = document.querySelector('input[name="order-time-type"]:checked');
-     if (!timeTypeInput) {
-        return mostrarToast("Por favor, selecciona cuándo quieres tu pedido.");
-    }
+    
     const timeType = timeTypeInput.value;
     const timeSelect = document.getElementById('order-time-select');
     let horaPedido;
@@ -289,40 +279,38 @@ function handleCheckout(event) {
     } else {
         horaPedido = 'Lo antes posible';
     }
+    
     const datosCliente = {
         nombre: document.getElementById('client-name').value,
-        tipoEntrega: deliveryType === 'delivery' ? 'Envío a domicilio' : 'Retiro en local',
-        direccion: deliveryType === 'delivery' ? direccion : 'N/A',
+        tipoEntrega: deliveryTypeInput.value === 'delivery' ? 'Envío a domicilio' : 'Retiro en local',
+        direccion: deliveryTypeInput.value === 'delivery' ? direccion : 'N/A',
         horaPedido: horaPedido,
         pago: document.getElementById('payment-method').value,
         notas: document.getElementById('order-notes').value
     };
     
-    enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType, shippingCost);
+    enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryTypeInput.value, shippingCost);
     
     cerrarModal(document.getElementById('checkout-modal'));
-    limpiarCarrito(shippingCost);
+    limpiarCarrito();
     mostrarToast("¡Pedido enviado! Gracias por tu compra.");
     const form = document.getElementById('checkout-form');
     form.reset();
     document.getElementById('delivery-info').classList.add('hidden');
     document.getElementById('schedule-time-container').classList.add('hidden');
     document.querySelectorAll('.delivery-options label.selected').forEach(l => l.classList.remove('selected'));
-    renderizarCarrito(getCarrito(), 'pickup', shippingCost); 
+    renderizarCarrito(getCarrito()); 
 }
 
 function handleSearch(event) {
     const termino = event.target.value.toLowerCase().trim();
     const productosFiltrados = {};
-
     const categoriasOrdenadas = Object.keys(productosPorCategoria);
-
     categoriasOrdenadas.forEach(categoria => {
         productosFiltrados[categoria] = productosPorCategoria[categoria].filter(p => 
             p.nombre.toLowerCase().includes(termino) || (p.descripcion && p.descripcion.toLowerCase().includes(termino))
         );
     });
-    
     renderizarProductos(productosFiltrados, categoriasOrdenadas);
     swiper.update();
     swiper.slideTo(0, 0);
