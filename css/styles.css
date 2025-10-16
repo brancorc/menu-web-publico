@@ -1,5 +1,5 @@
 :root {
-    /* Colores Dinámicos - Controlados por la API */
+    /* Colores Dinámicos */
     --color-fondo-dinamico: #1E1E1E;
     --color-acento-dinamico: #d16416;
     
@@ -10,19 +10,23 @@
     --color-exito: #4CAF50;
     --color-error: #ff6b6b;
     
-    /* Espaciado y bordes */
+    /* Espaciado */
     --spacing-xs: 8px;
     --spacing-sm: 12px;
     --spacing-md: 16px;
     --spacing-lg: 24px;
-    --border-radius-sm: 8px;
-    --border-radius-md: 12px;
-    --border-radius-lg: 16px;
+    --spacing-xl: 40px;
+    
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-full: 50%;
     
     /* Transiciones */
     --transition-fast: 0.2s ease;
     --transition-base: 0.3s ease;
-    --transition-slow: 0.4s ease;
+    --transition-slow: 0.4s ease-out;
 }
 
 * {
@@ -35,16 +39,17 @@ body {
     background-color: var(--color-fondo-dinamico);
     color: var(--color-texto-principal);
     padding: var(--spacing-md);
+    line-height: 1.5;
 }
 
-/* ====== BOTONES ====== */
+/* Botones */
 .btn-primary {
     background-color: var(--color-acento-dinamico);
     color: var(--color-texto-principal);
     border: none;
     padding: var(--spacing-sm) var(--spacing-lg);
     width: 100%;
-    border-radius: var(--border-radius-md);
+    border-radius: var(--radius-md);
     font-weight: bold;
     font-size: 16px;
     cursor: pointer;
@@ -59,15 +64,18 @@ body {
 .btn-primary:disabled {
     background-color: #555;
     cursor: not-allowed;
-    transform: none;
     opacity: 0.6;
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: translateY(0);
 }
 
 .hidden {
     display: none !important;
 }
 
-/* ====== HEADER Y LOGO ====== */
+/* Header */
 .header {
     text-align: center;
 }
@@ -76,9 +84,10 @@ body {
     max-width: 200px;
     height: auto;
     margin-bottom: var(--spacing-lg);
+    display: block;
 }
 
-/* ====== BÚSQUEDA ====== */
+/* Search */
 .search-form {
     position: relative;
     margin: 0 var(--spacing-md) var(--spacing-lg) var(--spacing-md);
@@ -87,7 +96,7 @@ body {
 .search-form input {
     width: 100%;
     padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) 40px;
-    border-radius: var(--border-radius-md);
+    border-radius: var(--radius-md);
     border: 1px solid rgba(255, 255, 255, 0.1);
     background-color: rgba(0, 0, 0, 0.2);
     color: var(--color-texto-principal);
@@ -98,7 +107,6 @@ body {
 .search-form input:focus {
     outline: none;
     border-color: var(--color-acento-dinamico);
-    background-color: rgba(0, 0, 0, 0.3);
 }
 
 .search-form i {
@@ -111,20 +119,29 @@ body {
     pointer-events: none;
 }
 
-/* ====== CATEGORÍAS ====== */
+/* Categorías */
 .categories {
     display: flex;
     gap: var(--spacing-sm);
     margin-bottom: var(--spacing-lg);
     overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
     padding: 0 var(--spacing-md);
     position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: #555 transparent;
 }
 
 .categories::-webkit-scrollbar {
-    display: none;
+    height: 6px;
+}
+
+.categories::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.categories::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 3px;
 }
 
 .categories-container {
@@ -138,7 +155,7 @@ body {
     top: 0;
     bottom: 0;
     width: 50px;
-    background: linear-gradient(to right, transparent, var(--color-fondo-dinamico) 80%);
+    background: linear-gradient(to right, rgba(30, 30, 30, 0), var(--color-fondo-dinamico) 80%);
     pointer-events: none;
     z-index: 2;
 }
@@ -146,7 +163,7 @@ body {
 .categories button {
     background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--border-radius-md);
+    border-radius: var(--radius-md);
     margin-top: 5px;
     padding: 10px 18px;
     font-size: 16px;
@@ -156,25 +173,30 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     transition: all var(--transition-base);
     flex-shrink: 0;
+    white-space: nowrap;
 }
 
-.categories button:hover,
+.categories button:hover {
+    background-color: var(--color-acento-dinamico);
+    color: var(--color-texto-invertido);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
 .categories button.active {
     background-color: var(--color-acento-dinamico);
     color: var(--color-texto-invertido);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
-    transform: translateY(-3px) scale(1.05);
     font-weight: bold;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
-/* ====== ITEMS ====== */
+/* Items */
 .category-section .item {
-    position: relative;
     display: flex;
     gap: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
     background-color: rgba(0, 0, 0, 0.2);
-    border-radius: var(--border-radius-md);
+    border-radius: var(--radius-md);
     padding: var(--spacing-sm);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
     align-items: center;
@@ -182,6 +204,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
     transition: opacity var(--transition-slow), transform var(--transition-slow);
+    position: relative;
 }
 
 .category-section .item:hover {
@@ -197,7 +220,7 @@ body {
     width: 120px;
     height: 90px;
     object-fit: cover;
-    border-radius: var(--border-radius-md);
+    border-radius: var(--radius-sm);
     flex-shrink: 0;
 }
 
@@ -210,7 +233,7 @@ body {
 
 .category-section .item-info h3 {
     margin: 0 0 var(--spacing-xs) 0;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .category-section .item-info p {
@@ -227,12 +250,7 @@ body {
     flex-wrap: wrap;
 }
 
-.price {
-    font-weight: 700;
-    color: var(--color-acento-dinamico);
-    font-size: 18px;
-}
-
+.price,
 .new-price {
     font-weight: 700;
     color: var(--color-acento-dinamico);
@@ -247,22 +265,22 @@ body {
 
 .oferta-tag {
     position: absolute;
-    z-index: 10;
     top: var(--spacing-xs);
     left: var(--spacing-xs);
+    z-index: 10;
     transform: rotate(-8deg);
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
     background-color: var(--color-error);
     color: white;
     padding: 5px 15px;
     font-size: 12px;
     font-weight: bold;
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--radius-sm);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
 }
 
-/* ====== MODAL ====== */
+/* Modal */
 .modal {
     position: fixed;
     top: 0;
@@ -274,10 +292,10 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 1200;
-    padding: 20px;
+    padding: var(--spacing-lg);
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--transition-slow);
+    transition: opacity var(--transition-base);
 }
 
 .modal.open {
@@ -288,7 +306,7 @@ body {
 .modal-content {
     background-color: var(--color-fondo-dinamico);
     padding: var(--spacing-lg);
-    border-radius: var(--border-radius-lg);
+    border-radius: var(--radius-lg);
     width: 100%;
     max-width: 400px;
     text-align: center;
@@ -296,7 +314,7 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     transform: scale(0.9);
     opacity: 0;
-    transition: all var(--transition-base) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transition-delay: 0.1s;
 }
 
@@ -316,28 +334,28 @@ body {
     background: none;
     border: none;
     padding: 0;
-    transition: transform var(--transition-base);
+    transition: color var(--transition-base);
 }
 
 .modal .close:hover {
-    transform: scale(1.2);
+    color: #ff8c42;
 }
 
 .modal-content img {
     width: 100%;
     height: 220px;
     object-fit: cover;
-    border-radius: var(--border-radius-md);
+    border-radius: var(--radius-sm);
     margin-bottom: var(--spacing-md);
 }
 
-/* ====== CANTIDAD ====== */
+/* Cantidad */
 .quantity-container {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 15px;
-    margin: 20px 0;
+    margin: var(--spacing-lg) 0;
 }
 
 .quantity-container input {
@@ -345,11 +363,12 @@ body {
     padding: var(--spacing-xs);
     font-size: 18px;
     font-weight: bold;
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--radius-sm);
     border: 1px solid var(--color-acento-dinamico);
     background-color: rgba(0, 0, 0, 0.2);
     color: var(--color-texto-principal);
     text-align: center;
+    appearance: none;
     -moz-appearance: textfield;
 }
 
@@ -359,13 +378,18 @@ body {
     margin: 0;
 }
 
+.quantity-container input:focus {
+    outline: none;
+    border-color: #ff8c42;
+}
+
 .quantity-btn {
     background-color: var(--color-acento-dinamico);
     color: var(--color-texto-invertido);
     border: none;
     width: 35px;
     height: 35px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     font-size: 24px;
     font-weight: bold;
     cursor: pointer;
@@ -381,12 +405,16 @@ body {
     transform: scale(1.1);
 }
 
-/* ====== FORMULARIO ====== */
+.quantity-btn:active {
+    transform: scale(0.95);
+}
+
+/* Formulario */
 #checkout-form {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
-    margin-top: 20px;
+    margin-top: var(--spacing-lg);
 }
 
 #checkout-form input,
@@ -394,7 +422,7 @@ body {
 #checkout-form textarea {
     width: 100%;
     padding: var(--spacing-sm);
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--radius-sm);
     border: 1px solid rgba(255, 255, 255, 0.1);
     background-color: var(--color-fondo-dinamico);
     color: var(--color-texto-principal);
@@ -407,22 +435,20 @@ body {
 #checkout-form textarea:focus {
     outline: none;
     border-color: var(--color-acento-dinamico);
-    background-color: rgba(0, 0, 0, 0.3);
 }
 
 #checkout-form textarea {
     min-height: 80px;
     resize: vertical;
-    font-family: inherit;
 }
 
-/* ====== ENTREGA ====== */
+/* Opciones de Entrega */
 .delivery-options {
     display: flex;
     gap: var(--spacing-md);
     background-color: rgba(0, 0, 0, 0.2);
     padding: var(--spacing-xs);
-    border-radius: 10px;
+    border-radius: var(--radius-sm);
     position: relative;
 }
 
@@ -439,12 +465,12 @@ body {
 
 .delivery-options label {
     flex: 1;
-    padding: var(--spacing-xs);
+    padding: 7px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--radius-sm);
     cursor: pointer;
     transition: background-color var(--transition-base);
 }
@@ -479,7 +505,7 @@ body {
     text-decoration: underline;
 }
 
-/* ====== CARRITO ====== */
+/* Carrito */
 .cart-panel {
     position: fixed;
     top: 0;
@@ -510,7 +536,7 @@ body {
 
 .cart-header h2 {
     margin: 0;
-    font-size: 20px;
+    font-size: 22px;
 }
 
 .cart-items {
@@ -530,17 +556,18 @@ body {
     width: 60px;
     height: 60px;
     object-fit: cover;
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--radius-sm);
     flex-shrink: 0;
 }
 
 .cart-item-info {
     flex-grow: 1;
+    min-width: 0;
 }
 
 .cart-item-info h4 {
     margin: 0 0 var(--spacing-xs) 0;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .cart-item-quantity {
@@ -566,7 +593,7 @@ body {
 
 .cart-empty-message {
     text-align: center;
-    padding: 40px;
+    padding: var(--spacing-xl);
     color: #888;
 }
 
@@ -580,8 +607,8 @@ body {
     display: flex;
     justify-content: space-between;
     font-size: 20px;
-    font-weight: bold;
     margin-bottom: var(--spacing-md);
+    font-weight: bold;
 }
 
 .cart-shipping span {
@@ -589,6 +616,7 @@ body {
     color: #ccc;
 }
 
+/* Botón del Carrito Flotante */
 .cart-toggle {
     position: fixed;
     bottom: 25px;
@@ -597,8 +625,7 @@ body {
     height: 60px;
     background-color: var(--color-acento-dinamico);
     color: var(--color-texto-principal);
-    border-radius: 50%;
-    border: none;
+    border-radius: var(--radius-full);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -607,10 +634,15 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     z-index: 1050;
     transition: transform var(--transition-fast);
+    border: none;
 }
 
 .cart-toggle:hover {
     transform: scale(1.1);
+}
+
+.cart-toggle:active {
+    transform: scale(0.95);
 }
 
 .cart-item-count {
@@ -619,7 +651,7 @@ body {
     right: -5px;
     background-color: var(--color-error);
     color: white;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     width: 24px;
     height: 24px;
     display: flex;
@@ -627,9 +659,10 @@ body {
     align-items: center;
     font-size: 14px;
     font-weight: bold;
+    line-height: 1;
 }
 
-/* ====== WHATSAPP ====== */
+/* WhatsApp Flotante */
 .whatsapp-float {
     position: fixed;
     bottom: 25px;
@@ -638,8 +671,7 @@ body {
     height: 60px;
     background-color: #25D366;
     color: #FFF;
-    border-radius: 50%;
-    border: none;
+    border-radius: var(--radius-full);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -649,13 +681,18 @@ body {
     transition: transform var(--transition-fast);
     text-decoration: none;
     font-size: 35px;
+    border: none;
 }
 
 .whatsapp-float:hover {
     transform: scale(1.1);
 }
 
-/* ====== NOTIFICACIONES ====== */
+.whatsapp-float:active {
+    transform: scale(0.95);
+}
+
+/* Toast */
 #toast-container {
     position: fixed;
     bottom: 20px;
@@ -666,17 +703,19 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 10px;
+    pointer-events: none;
 }
 
 .toast {
     background-color: var(--color-exito);
     color: white;
-    padding: var(--spacing-sm) 20px;
-    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-sm);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     opacity: 0;
     transform: translateY(20px);
-    transition: opacity var(--transition-base), transform var(--transition-base);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: auto;
 }
 
 .toast.show {
@@ -684,10 +723,10 @@ body {
     transform: translateY(0);
 }
 
-/* ====== HORARIO ====== */
+/* Opciones de Hora */
 .order-time-options {
     text-align: center;
-    margin-top: 20px;
+    margin-top: var(--spacing-lg);
 }
 
 .order-time-options h4 {
@@ -699,7 +738,7 @@ body {
     width: 100%;
 }
 
-/* ====== ESTADO TIENDA ====== */
+/* Modal de Estado */
 .store-status-modal {
     position: fixed;
     top: 0;
@@ -711,10 +750,10 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 3000;
-    padding: 20px;
+    padding: var(--spacing-lg);
     text-align: center;
     opacity: 1;
-    transition: opacity var(--transition-base);
+    transition: opacity 0.3s ease;
 }
 
 .store-status-modal.hidden {
@@ -723,14 +762,8 @@ body {
 }
 
 .store-status-modal .modal-content {
-    background-color: var(--color-fondo-dinamico);
-    padding: var(--spacing-lg);
-    border-radius: var(--border-radius-lg);
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-    position: relative;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    transform: scale(0.95);
+    opacity: 0;
     animation: fadeInScaleUp 0.4s 0.1s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -741,23 +774,17 @@ body {
     }
 }
 
-/* ====== PIE DE PÁGINA ====== */
+/* Footer */
 .site-footer {
     text-align: center;
-    padding: 40px 20px 20px 20px;
+    padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
     margin-top: 30px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     color: #888;
     font-size: 14px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-}
-
-.footer-contact {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-lg);
 }
 
 .footer-contact p {
@@ -787,16 +814,10 @@ body {
     margin: 5px 0;
 }
 
-.footer-links {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--spacing-md);
-}
-
 .footer-links a {
     color: #aaa;
     text-decoration: none;
+    margin: 0 10px;
     transition: color var(--transition-base);
 }
 
@@ -808,9 +829,9 @@ body {
     color: #666;
 }
 
-/* ====== OPCIONES MODAL ====== */
+/* Opciones Modal */
 #modal-options-container {
-    margin: 20px 0;
+    margin: var(--spacing-lg) 0;
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -826,7 +847,7 @@ body {
 .modal-opcion-select {
     width: 100%;
     padding: 10px;
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--radius-sm);
     border: 1px solid rgba(255, 255, 255, 0.1);
     background-color: rgba(0, 0, 0, 0.2);
     color: var(--color-texto-principal);
@@ -839,7 +860,7 @@ body {
     border-color: var(--color-acento-dinamico);
 }
 
-/* ====== ADICIONALES ====== */
+/* Adicionales */
 .modal-adicionales-wrapper {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding-top: 15px;
@@ -853,7 +874,7 @@ body {
     background-color: rgba(0, 0, 0, 0.2);
     color: var(--color-acento-dinamico);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all var(--transition-base);
 }
@@ -877,10 +898,14 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 8px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-sm);
 }
 
 .adicional-nombre {
     font-size: 15px;
+    flex-grow: 1;
 }
 
 .adicional-quantity-selector {
@@ -895,7 +920,7 @@ body {
     border: none;
     width: 28px;
     height: 28px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     font-size: 20px;
     font-weight: bold;
     cursor: pointer;
@@ -911,6 +936,10 @@ body {
     transform: scale(1.1);
 }
 
+.adicional-quantity-btn:active {
+    transform: scale(0.9);
+}
+
 .adicional-cantidad {
     font-size: 18px;
     font-weight: bold;
@@ -918,7 +947,7 @@ body {
     text-align: center;
 }
 
-/* ====== SCROLLBAR ====== */
+/* Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -932,7 +961,6 @@ body {
     background-color: #555;
     border-radius: 4px;
     border: 2px solid var(--color-fondo-dinamico);
-    transition: background-color var(--transition-base);
 }
 
 ::-webkit-scrollbar-thumb:hover {
