@@ -236,8 +236,11 @@ body {
 .delivery-options label { flex: 1; padding: 7px; display: flex; align-items: center; justify-content: center; text-align: center; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; }
 .delivery-options input[type="radio"] { display: none; }
 .delivery-options label.selected { background-color: var(--color-acento-dinamico); color: var(--color-texto-invertido-dinamico); font-weight: bold; }
-.delivery-options label:hover { background-color: rgba(255, 255, 255, 0.1); }
-
+/* [CORRECCIÓN] Se iguala el hover al estado seleccionado para evitar el "lag" visual */
+.delivery-options label:hover {
+    background-color: var(--color-acento-dinamico);
+    color: var(--color-texto-invertido-dinamico);
+}
 .delivery-zone-link { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--color-acento-dinamico); text-decoration: none; font-size: 14px; margin-top: 10px; }
 .delivery-zone-link:hover { text-decoration: underline; }
 

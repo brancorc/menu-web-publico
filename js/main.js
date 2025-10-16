@@ -238,6 +238,7 @@ function handleProductModalClick(event) {
 function handleCheckout(event) {
     event.preventDefault();
     
+    // Validaciones primero, antes que cualquier otra acción.
     if (getCarrito().length === 0) {
         mostrarToast("Tu carrito está vacío.");
         cerrarModal(document.getElementById('checkout-modal'));
@@ -246,18 +247,21 @@ function handleCheckout(event) {
     
     const deliveryTypeInput = document.querySelector('input[name="delivery-type"]:checked');
     if (!deliveryTypeInput) {
-        return mostrarToast("Por favor, selecciona si retiras o es envío a domicilio.");
+        mostrarToast("Por favor, selecciona si retiras o es envío a domicilio.");
+        return; // Detiene la ejecución aquí
     }
 
     const timeTypeInput = document.querySelector('input[name="order-time-type"]:checked');
     if (!timeTypeInput) {
-        return mostrarToast("Por favor, selecciona cuándo quieres tu pedido.");
+        mostrarToast("Por favor, selecciona cuándo quieres tu pedido.");
+        return; // Detiene la ejecución aquí
     }
-    
+
     const deliveryType = deliveryTypeInput.value;
     const direccion = document.getElementById('client-address').value;
     if (deliveryType === 'delivery' && !direccion.trim()) {
-        return mostrarToast("Por favor, ingresa tu dirección para el envío.");
+        mostrarToast("Por favor, ingresa tu dirección para el envío.");
+        return;
     }
     
     const timeType = timeTypeInput.value;
@@ -265,13 +269,16 @@ function handleCheckout(event) {
     let horaPedido;
     if (timeType === 'schedule') {
         if (!timeSelect.value) {
-            return mostrarToast("Por favor, seleccioná una hora para programar tu pedido.");
+            mostrarToast("Por favor, seleccioná una hora para programar tu pedido.");
+            timeSelect.focus();
+            return;
         }
         horaPedido = timeSelect.value + ' hs';
     } else {
         horaPedido = 'Lo antes posible';
     }
     
+    // Si todas las validaciones pasan, se procede a enviar el pedido.
     const datosCliente = {
         nombre: document.getElementById('client-name').value,
         tipoEntrega: deliveryType === 'delivery' ? 'Envío a domicilio' : 'Retiro en local',
@@ -281,8 +288,9 @@ function handleCheckout(event) {
         notas: document.getElementById('order-notes').value
     };
     
-    enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType, shippingCost);
+    enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType, shippingCost, siteSettings.telefono_whatsapp);
     
+    // Y finalmente, se limpia todo.
     cerrarModal(document.getElementById('checkout-modal'));
     limpiarCarrito(shippingCost);
     mostrarToast("¡Pedido enviado! Gracias por tu compra.");
@@ -293,7 +301,6 @@ function handleCheckout(event) {
     document.querySelectorAll('.delivery-options label.selected').forEach(l => l.classList.remove('selected'));
     renderizarCarrito(getCarrito(), 'pickup', shippingCost); 
 }
-
 function handleSearch(event) {
     const termino = event.target.value.toLowerCase().trim();
     const productosFiltrados = {};
