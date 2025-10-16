@@ -19,7 +19,7 @@ function getBusinessSlug() {
     if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
         return 'monat';
     }
-    return null;
+    return null; 
 }
 
 function makeDraggable(element) {
@@ -43,8 +43,7 @@ function makeDraggable(element) {
         if (Math.abs(walk) > 5) hasDragged = true;
         element.scrollLeft = scrollLeft - walk;
     });
-    const children = element.querySelectorAll('button');
-    children.forEach(child => {
+    element.querySelectorAll('button').forEach(child => {
         child.addEventListener('click', (e) => {
             if (hasDragged) {
                 e.preventDefault();
@@ -149,7 +148,7 @@ function setupEventListeners() {
     document.getElementById('search-form').addEventListener('submit', e => e.preventDefault());
     document.getElementById('search-input').addEventListener('input', handleSearch);
     
-    // Un solo listener para ambos grupos de opciones.
+    // [CORRECCIÓN] Se usa 'click' en lugar de 'change' y se unifica el listener.
     document.getElementById('delivery-type-options').addEventListener('click', handleOptionClick);
     document.getElementById('order-time-type-options').addEventListener('click', handleOptionClick);
 }
@@ -208,10 +207,13 @@ function handleProductModalClick(event) {
 function handleCartItemInteraction(event) {
     const itemEl = event.target.closest('.cart-item');
     if (!itemEl) return;
+    
     const itemUniqueId = itemEl.dataset.id;
     if (!itemUniqueId) return;
+
     const itemEnCarrito = getCarrito().find(item => item.uniqueId === itemUniqueId);
     if (!itemEnCarrito) return;
+
     let cantidadActual = itemEnCarrito.cantidad;
     if (event.target.classList.contains('cart-quantity-plus')) {
         actualizarCantidad(itemUniqueId, cantidadActual + 1);
@@ -228,7 +230,7 @@ function handleOptionClick(event) {
     const label = event.target.closest('label');
     if (!label) return;
     const input = label.querySelector('input[type="radio"]');
-    if (!input || input.checked) return;
+    if (!input) return;
 
     input.checked = true;
 
