@@ -19,7 +19,7 @@ function getBusinessSlug() {
     if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
         return 'monat';
     }
-    return null; 
+    return null;
 }
 
 function makeDraggable(element) {
@@ -43,7 +43,8 @@ function makeDraggable(element) {
         if (Math.abs(walk) > 5) hasDragged = true;
         element.scrollLeft = scrollLeft - walk;
     });
-    element.querySelectorAll('button').forEach(child => {
+    const children = element.querySelectorAll('button');
+    children.forEach(child => {
         child.addEventListener('click', (e) => {
             if (hasDragged) {
                 e.preventDefault();
@@ -148,7 +149,7 @@ function setupEventListeners() {
     document.getElementById('search-form').addEventListener('submit', e => e.preventDefault());
     document.getElementById('search-input').addEventListener('input', handleSearch);
     
-    // [CORRECCIÓN 1] Se usa 'click' en lugar de 'change' para una respuesta visual inmediata.
+    // Un solo listener para ambos grupos de opciones.
     document.getElementById('delivery-type-options').addEventListener('click', handleOptionClick);
     document.getElementById('order-time-type-options').addEventListener('click', handleOptionClick);
 }
@@ -209,32 +210,32 @@ function handleCartItemInteraction(event) {
     if (!itemEl) return;
     const itemUniqueId = itemEl.dataset.id;
     if (!itemUniqueId) return;
-
+    const itemEnCarrito = getCarrito().find(item => item.uniqueId === itemUniqueId);
+    if (!itemEnCarrito) return;
+    let cantidadActual = itemEnCarrito.cantidad;
     if (event.target.classList.contains('cart-quantity-plus')) {
-        actualizarCantidad(itemUniqueId, 1);
-    } else if (event.target.classList.contains('cart-quantity-minus')) {
-        actualizarCantidad(itemUniqueId, -1);
-    } else if (event.target.classList.contains('cart-item-remove')) {
+        actualizarCantidad(itemUniqueId, cantidadActual + 1);
+    }
+    if (event.target.classList.contains('cart-quantity-minus')) {
+        actualizarCantidad(itemUniqueId, cantidadActual - 1);
+    }
+    if (event.target.classList.contains('cart-item-remove')) {
         eliminarDelCarrito(itemUniqueId);
     }
 }
 
-// [CORRECCIÓN 2] Función unificada para manejar clics en las opciones.
 function handleOptionClick(event) {
     const label = event.target.closest('label');
     if (!label) return;
     const input = label.querySelector('input[type="radio"]');
-    if (!input) return;
+    if (!input || input.checked) return;
 
-    // Asegurarse de que el input está lógicamente seleccionado
     input.checked = true;
 
-    // Actualizar estilos visuales
     const group = event.currentTarget;
     group.querySelectorAll('label').forEach(l => l.classList.remove('selected'));
     label.classList.add('selected');
 
-    // Ejecutar lógicas específicas
     if (input.name === 'delivery-type') {
         const deliveryType = input.value;
         const deliveryInfoDiv = document.getElementById('delivery-info');
@@ -249,7 +250,6 @@ function handleOptionClick(event) {
     }
 }
 
-// [CORRECCIÓN 3] Validación manual y explícita.
 function handleCheckout(event) {
     event.preventDefault();
 
