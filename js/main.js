@@ -3,12 +3,7 @@ import { renderizarProductos, renderizarCarrito, abrirModal, cerrarModal, toggle
 import { apiFetch } from './api.js';
 
 // --- ESTADO GLOBAL ---
-let allProducts = [];
-let productosPorCategoria = {};
-let productoSeleccionado = null;
-let shippingCost = 0;
-let swiper;
-let siteSettings;
+let allProducts = [], productosPorCategoria = {}, productoSeleccionado = null, shippingCost = 0, swiper, siteSettings;
 
 // --- FUNCIONES ---
 
@@ -211,12 +206,14 @@ function handleCartItemInteraction(event) {
     const itemEl = event.target.closest('.cart-item');
     if (!itemEl) return;
     const itemUniqueId = itemEl.dataset.id;
-    const itemEnCarrito = getCarrito().find(item => item.uniqueId === itemUniqueId);
-    if (!itemEnCarrito) return;
-    let cantidadActual = itemEnCarrito.cantidad;
-    if (event.target.classList.contains('cart-quantity-plus')) actualizarCantidad(itemUniqueId, cantidadActual + 1);
-    if (event.target.classList.contains('cart-quantity-minus')) actualizarCantidad(itemUniqueId, cantidadActual - 1);
-    if (event.target.classList.contains('cart-item-remove')) eliminarDelCarrito(itemUniqueId);
+
+    if (event.target.classList.contains('cart-quantity-plus')) {
+        actualizarCantidad(itemUniqueId, 1, true); // true para sumar
+    } else if (event.target.classList.contains('cart-quantity-minus')) {
+        actualizarCantidad(itemUniqueId, -1, true); // true para sumar (con valor negativo)
+    } else if (event.target.classList.contains('cart-item-remove')) {
+        eliminarDelCarrito(itemUniqueId);
+    }
 }
 
 function handleDeliveryTypeChange(event) {
@@ -224,11 +221,10 @@ function handleDeliveryTypeChange(event) {
     const deliveryInfoDiv = document.getElementById('delivery-info');
     const addressInput = document.getElementById('client-address');
     
-    // [CORRECCIÓN 2] Aplicar estilos de forma síncrona
-    document.querySelectorAll('#delivery-type-options label').forEach(label => label.classList.remove('selected'));
-    if(event.target.checked) {
-        event.target.closest('label').classList.add('selected');
-    }
+    document.querySelectorAll('#delivery-type-options label').forEach(label => {
+        const input = label.querySelector('input');
+        label.classList.toggle('selected', input.checked);
+    });
 
     if (deliveryType === 'delivery') {
         deliveryInfoDiv.classList.remove('hidden');
@@ -246,17 +242,16 @@ function handleOrderTimeChange(event) {
     const timeSelect = document.getElementById('order-time-select');
     const timeType = event.target.value;
 
-    // Aplicar estilos de forma síncrona
-    document.querySelectorAll('#order-time-type-options label').forEach(label => label.classList.remove('selected'));
-    if(event.target.checked) {
-        event.target.closest('label').classList.add('selected');
-    }
+    document.querySelectorAll('#order-time-type-options label').forEach(label => {
+        const input = label.querySelector('input');
+        label.classList.toggle('selected', input.checked);
+    });
 
     if (timeType === 'schedule') {
         scheduleContainer.classList.remove('hidden');
         timeSelect.required = true;
     } else {
-        scheduleContainer.classList.add('hidden');
+        scheduleContainer.classList.remove('hidden');
         timeSelect.required = false;
         timeSelect.value = "";
     }
@@ -265,7 +260,6 @@ function handleOrderTimeChange(event) {
 function handleCheckout(event) {
     event.preventDefault();
 
-    // [CORRECCIÓN 3] Añadir todas las validaciones
     if (getCarrito().length === 0) {
         return mostrarToast("Tu carrito está vacío.");
     }
@@ -276,6 +270,7 @@ function handleCheckout(event) {
     const deliveryType = deliveryTypeInput.value;
     const direccion = document.getElementById('client-address').value;
     if (deliveryType === 'delivery' && !direccion.trim()) {
+        document.getElementById('client-address').focus();
         return mostrarToast("Por favor, ingresa tu dirección.");
     }
     const timeTypeInput = document.querySelector('input[name="order-time-type"]:checked');
