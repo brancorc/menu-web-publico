@@ -104,14 +104,15 @@ export const renderizarProductos = (productosPorCategoria, categoriasEnOrden) =>
     const productContainer = document.getElementById('product-container');
     const categoriesContainer = document.querySelector('.categories');
     
-    if (!productContainer || !categoriesContainer) return;
-
     productContainer.innerHTML = '';
     categoriesContainer.innerHTML = '';
 
-    categoriasEnOrden.forEach(categoria => {
-        if (!productosPorCategoria[categoria] || productosPorCategoria[categoria].length === 0) return;
+    if (!categoriasEnOrden || categoriasEnOrden.length === 0) {
+        productContainer.innerHTML = '<p class="cart-empty-message">No hay categorías para mostrar.</p>';
+        return;
+    }
 
+    categoriasEnOrden.forEach(categoria => {
         // Renderizar botón de categoría
         const button = document.createElement('button');
         button.dataset.category = categoria;
@@ -123,41 +124,41 @@ export const renderizarProductos = (productosPorCategoria, categoriasEnOrden) =>
         section.id = categoria;
         section.className = 'category-section';
         
-        const title = document.createElement('h2');
-        title.textContent = categoria;
-        section.appendChild(title);
+        // [CORRECCIÓN] Construir el HTML de los productos primero
+        let productsHTML = '';
+        if (productosPorCategoria[categoria] && productosPorCategoria[categoria].length > 0) {
+            productosPorCategoria[categoria].forEach(producto => {
+                let priceHTML = '', ofertaTagHTML = '';
+                
+                if (producto.descuento_activo_porcentaje > 0) {
+                    ofertaTagHTML = `<span class="oferta-tag">¡${producto.descuento_activo_porcentaje}% OFF!</span>`;
+                    priceHTML = `<div class="price-container"><span class="new-price">$${producto.precio_final.toLocaleString('es-AR')}</span><span class="original-price">$${producto.precio_original.toLocaleString('es-AR')}</span></div>`;
+                } else {
+                    priceHTML = `<p class="price">$${producto.precio_final.toLocaleString('es-AR')}</p>`;
+                }
 
-        productosPorCategoria[categoria].forEach(producto => {
-            let priceHTML = '', ofertaTagHTML = '';
-            
-            if (producto.descuento_activo_porcentaje > 0) {
-                ofertaTagHTML = `<span class="oferta-tag">¡${producto.descuento_activo_porcentaje}% OFF!</span>`;
-                priceHTML = `<div class="price-container"><span class="new-price">$${producto.precio_final.toLocaleString('es-AR')}</span><span class="original-price">$${producto.precio_original.toLocaleString('es-AR')}</span></div>`;
-            } else {
-                priceHTML = `<p class="price">$${producto.precio_final.toLocaleString('es-AR')}</p>`;
-            }
+                const imageUrl = producto.imagen_url || 'img/fotoportada.png';
 
-            const imageUrl = producto.imagen_url || 'img/fotoportada.png';
-            
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'item';
-            itemDiv.dataset.id = producto.id;
-            itemDiv.dataset.category = producto.categoria;
-            itemDiv.innerHTML = `
-                ${ofertaTagHTML}
-                <img src="${imageUrl}" alt="${producto.nombre}" />
-                <div class="item-info">
-                    <h3>${producto.nombre}</h3>
-                    <p>${producto.descripcion || ''}</p>
-                    ${priceHTML}
-                </div>
-            `;
-            section.appendChild(itemDiv);
-        });
+                productsHTML += `
+                    <div class="item" data-id="${producto.id}" data-category="${producto.categoria}">
+                        ${ofertaTagHTML}
+                        <img src="${imageUrl}" alt="${producto.nombre}" />
+                        <div class="item-info">
+                            <h3>${producto.nombre}</h3>
+                            <p>${producto.descripcion || ''}</p>
+                            ${priceHTML}
+                        </div>
+                    </div>`;
+            });
+        } else {
+            productsHTML = '<p class="cart-empty-message">No hay productos en esta categoría.</p>';
+        }
+
+        // [CORRECCIÓN] Asignar el HTML completo a la sección
+        section.innerHTML = `<h2>${categoria}</h2>` + productsHTML;
         productContainer.appendChild(section);
     });
 };
-
 
 export const renderizarCarrito = (carrito, tipoEntrega = 'pickup', costoEnvio = 0) => {
     const cartFooter = document.querySelector('.cart-footer');
