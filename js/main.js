@@ -120,7 +120,7 @@ function setupEventListeners() {
     document.getElementById('checkout-form').addEventListener('submit', handleCheckout);
     document.getElementById('search-form').addEventListener('submit', e => e.preventDefault());
     document.getElementById('search-input').addEventListener('input', handleSearch);
-
+    document.getElementById('submit-checkout-btn').addEventListener('click', handleCheckout);
     document.getElementById('delivery-type-options').addEventListener('change', handleOptionChange);
     document.getElementById('order-time-type-options').addEventListener('change', handleOptionChange);
 }
@@ -235,10 +235,7 @@ function handleProductModalClick(event) {
     }
 }
 
-function handleCheckout(event) {
-    // [CORRECCIÓN] Prevenimos el envío del formulario desde el inicio.
-    event.preventDefault();
-
+function handleCheckout() {
     let isValid = true;
     let errorMessage = '';
 
@@ -247,11 +244,10 @@ function handleCheckout(event) {
     const direccion = document.getElementById('client-address').value;
     const timeSelect = document.getElementById('order-time-select');
     
-    // Ejecutamos todas las validaciones en orden.
     if (getCarrito().length === 0) {
         isValid = false;
         errorMessage = "Tu carrito está vacío.";
-        cerrarModal(document.getElementById('checkout-modal')); // Cerramos el modal si el carrito está vacío
+        cerrarModal(document.getElementById('checkout-modal'));
     } else if (!deliveryTypeInput) {
         isValid = false;
         errorMessage = "Por favor, selecciona si retiras o es envío a domicilio.";
@@ -267,15 +263,11 @@ function handleCheckout(event) {
         timeSelect.focus();
     }
     
-    // Si alguna validación falló, mostramos el mensaje y detenemos la función.
     if (!isValid) {
-        if (errorMessage) {
-            mostrarToast(errorMessage);
-        }
+        if (errorMessage) mostrarToast(errorMessage);
         return;
     }
     
-    // Si todo es válido, procedemos a construir y enviar el pedido.
     const deliveryType = deliveryTypeInput.value;
     const timeType = timeTypeInput.value;
     const horaPedido = timeType === 'schedule' ? `${timeSelect.value} hs` : 'Lo antes posible';
@@ -291,7 +283,6 @@ function handleCheckout(event) {
     
     enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType, shippingCost, siteSettings.telefono_whatsapp);
     
-    // Limpieza final
     cerrarModal(document.getElementById('checkout-modal'));
     limpiarCarrito(shippingCost);
     mostrarToast("¡Pedido enviado! Gracias por tu compra.");
