@@ -236,49 +236,50 @@ function handleProductModalClick(event) {
 }
 
 function handleCheckout(event) {
+    // [CORRECCIÓN] Prevenimos el envío del formulario desde el inicio.
     event.preventDefault();
-    
-    // Validaciones primero, antes que cualquier otra acción.
-    if (getCarrito().length === 0) {
-        mostrarToast("Tu carrito está vacío.");
-        cerrarModal(document.getElementById('checkout-modal'));
-        return;
-    }
-    
+
+    let isValid = true;
+    let errorMessage = '';
+
     const deliveryTypeInput = document.querySelector('input[name="delivery-type"]:checked');
-    if (!deliveryTypeInput) {
-        mostrarToast("Por favor, selecciona si retiras o es envío a domicilio.");
-        return; // Detiene la ejecución aquí
-    }
-
     const timeTypeInput = document.querySelector('input[name="order-time-type"]:checked');
-    if (!timeTypeInput) {
-        mostrarToast("Por favor, selecciona cuándo quieres tu pedido.");
-        return; // Detiene la ejecución aquí
-    }
-
-    const deliveryType = deliveryTypeInput.value;
     const direccion = document.getElementById('client-address').value;
-    if (deliveryType === 'delivery' && !direccion.trim()) {
-        mostrarToast("Por favor, ingresa tu dirección para el envío.");
+    const timeSelect = document.getElementById('order-time-select');
+    
+    // Ejecutamos todas las validaciones en orden.
+    if (getCarrito().length === 0) {
+        isValid = false;
+        errorMessage = "Tu carrito está vacío.";
+        cerrarModal(document.getElementById('checkout-modal')); // Cerramos el modal si el carrito está vacío
+    } else if (!deliveryTypeInput) {
+        isValid = false;
+        errorMessage = "Por favor, selecciona si retiras o es envío a domicilio.";
+    } else if (deliveryTypeInput.value === 'delivery' && !direccion.trim()) {
+        isValid = false;
+        errorMessage = "Por favor, ingresa tu dirección para el envío.";
+    } else if (!timeTypeInput) {
+        isValid = false;
+        errorMessage = "Por favor, selecciona cuándo quieres tu pedido.";
+    } else if (timeTypeInput.value === 'schedule' && !timeSelect.value) {
+        isValid = false;
+        errorMessage = "Por favor, seleccioná una hora para programar tu pedido.";
+        timeSelect.focus();
+    }
+    
+    // Si alguna validación falló, mostramos el mensaje y detenemos la función.
+    if (!isValid) {
+        if (errorMessage) {
+            mostrarToast(errorMessage);
+        }
         return;
     }
     
+    // Si todo es válido, procedemos a construir y enviar el pedido.
+    const deliveryType = deliveryTypeInput.value;
     const timeType = timeTypeInput.value;
-    const timeSelect = document.getElementById('order-time-select');
-    let horaPedido;
-    if (timeType === 'schedule') {
-        if (!timeSelect.value) {
-            mostrarToast("Por favor, seleccioná una hora para programar tu pedido.");
-            timeSelect.focus();
-            return;
-        }
-        horaPedido = timeSelect.value + ' hs';
-    } else {
-        horaPedido = 'Lo antes posible';
-    }
+    const horaPedido = timeType === 'schedule' ? `${timeSelect.value} hs` : 'Lo antes posible';
     
-    // Si todas las validaciones pasan, se procede a enviar el pedido.
     const datosCliente = {
         nombre: document.getElementById('client-name').value,
         tipoEntrega: deliveryType === 'delivery' ? 'Envío a domicilio' : 'Retiro en local',
@@ -290,7 +291,7 @@ function handleCheckout(event) {
     
     enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType, shippingCost, siteSettings.telefono_whatsapp);
     
-    // Y finalmente, se limpia todo.
+    // Limpieza final
     cerrarModal(document.getElementById('checkout-modal'));
     limpiarCarrito(shippingCost);
     mostrarToast("¡Pedido enviado! Gracias por tu compra.");
@@ -301,6 +302,7 @@ function handleCheckout(event) {
     document.querySelectorAll('.delivery-options label.selected').forEach(l => l.classList.remove('selected'));
     renderizarCarrito(getCarrito(), 'pickup', shippingCost); 
 }
+
 function handleSearch(event) {
     const termino = event.target.value.toLowerCase().trim();
     const productosFiltrados = {};
