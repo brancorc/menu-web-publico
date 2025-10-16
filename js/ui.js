@@ -63,7 +63,6 @@ export const aplicarIdentidadVisual = (settings) => {
     }
     
     // --- Información Operativa ---
-    // [CORREGIDO] Lógica para la etiqueta de Retiro
     const pickupLabel = document.getElementById('pickup-label-text');
     if (pickupLabel) {
         if (settings.direccion_local) {
@@ -94,53 +93,65 @@ export const aplicarIdentidadVisual = (settings) => {
     }
 
     // --- Apariencia ---
-    const colorPrimario = settings.web_color_primario || '#1E1E1E';
-    const colorAcento = settings.web_color_acento || '#d16416';
-    
-    // Aplicar Colores
-    document.documentElement.style.setProperty('--color-fondo-dinamico', settings.web_color_primario);
-    document.documentElement.style.setProperty('--color-acento-dinamico', settings.web_color_acento);
-    document.documentElement.style.setProperty('--color-texto-principal-dinamico', settings.web_color_texto_principal);
-    document.documentElement.style.setProperty('--color-texto-secundario-dinamico', settings.web_color_texto_secundario);
+    document.documentElement.style.setProperty('--color-fondo-dinamico', settings.web_color_primario || '#1E1E1E');
+    document.documentElement.style.setProperty('--color-acento-dinamico', settings.web_color_acento || '#d16416');
+    document.documentElement.style.setProperty('--color-texto-principal-dinamico', settings.web_color_texto_principal || '#F2F2F2');
+    document.documentElement.style.setProperty('--color-texto-secundario-dinamico', settings.web_color_texto_secundario || '#CCCCCC');
 };
 
 export const renderizarProductos = (productosPorCategoria, categoriasEnOrden) => {
-    const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
-    if (!swiperWrapper) return;
-    swiperWrapper.innerHTML = '';
-
+    const productContainer = document.getElementById('product-container');
     const categoriesContainer = document.querySelector('.categories');
+    
+    productContainer.innerHTML = '';
     categoriesContainer.innerHTML = '';
 
+    if (!categoriasEnOrden || categoriasEnOrden.length === 0) {
+        productContainer.innerHTML = `<div class="no-results-message">No hay productos para mostrar.</div>`;
+        return;
+    }
+
     categoriasEnOrden.forEach(categoria => {
+        // Renderizar botón de categoría
         const button = document.createElement('button');
         button.dataset.category = categoria;
         button.textContent = categoria;
         categoriesContainer.appendChild(button);
 
-        const section = document.createElement('main');
+        // Renderizar sección de productos
+        const section = document.createElement('section');
         section.id = categoria;
-        section.className = 'category-section swiper-slide';
+        section.className = 'category-section';
         
+        const title = document.createElement('h2');
+        title.textContent = categoria;
+        section.appendChild(title);
+
         const productosDeCategoria = productosPorCategoria[categoria] || [];
         if (productosDeCategoria.length === 0) {
-            section.classList.add('hidden');
-        }
+            // Opcional: mostrar un mensaje si una categoría está vacía
+            const emptyMsg = document.createElement('p');
+            emptyMsg.textContent = 'No hay productos en esta categoría.';
+            emptyMsg.className = 'cart-empty-message';
+            section.appendChild(emptyMsg);
+        } else {
+            productosDeCategoria.forEach(producto => {
+                let priceHTML = '', ofertaTagHTML = '';
+                
+                if (producto.descuento_activo_porcentaje > 0) {
+                    ofertaTagHTML = `<span class="oferta-tag">¡${producto.descuento_activo_porcentaje}% OFF!</span>`;
+                    priceHTML = `<div class="price-container"><span class="new-price">$${producto.precio_final.toLocaleString('es-AR')}</span><span class="original-price">$${producto.precio_original.toLocaleString('es-AR')}</span></div>`;
+                } else {
+                    priceHTML = `<p class="price">$${producto.precio_final.toLocaleString('es-AR')}</p>`;
+                }
 
-        productosDeCategoria.forEach(producto => {
-            let priceHTML = '', ofertaTagHTML = '';
-            
-            if (producto.descuento_activo_porcentaje > 0) {
-                ofertaTagHTML = `<span class="oferta-tag">¡${producto.descuento_activo_porcentaje}% OFF!</span>`;
-                priceHTML = `<div class="price-container"><span class="new-price">$${producto.precio_final.toLocaleString('es-AR')}</span><span class="original-price">$${producto.precio_original.toLocaleString('es-AR')}</span></div>`;
-            } else {
-                priceHTML = `<p class="price">$${producto.precio_final.toLocaleString('es-AR')}</p>`;
-            }
-
-            const imageUrl = producto.imagen_url || 'img/fotoportada.png';
-
-            section.innerHTML += `
-                <div class="item" data-id="${producto.id}" data-category="${producto.categoria}">
+                const imageUrl = producto.imagen_url || 'img/fotoportada.png';
+                
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'item';
+                itemDiv.dataset.id = producto.id;
+                itemDiv.dataset.category = producto.categoria;
+                itemDiv.innerHTML = `
                     ${ofertaTagHTML}
                     <img src="${imageUrl}" alt="${producto.nombre}" />
                     <div class="item-info">
@@ -148,9 +159,11 @@ export const renderizarProductos = (productosPorCategoria, categoriasEnOrden) =>
                         <p>${producto.descripcion || ''}</p>
                         ${priceHTML}
                     </div>
-                </div>`;
-        });
-        swiperWrapper.appendChild(section);
+                `;
+                section.appendChild(itemDiv);
+            });
+        }
+        productContainer.appendChild(section);
     });
 };
 
@@ -166,10 +179,9 @@ export const renderizarCarrito = (carrito, tipoEntrega = 'pickup', costoEnvio = 
     } else {
         checkoutBtn.disabled = false;
         carrito.forEach(item => {
-            const itemId = item.uniqueId; 
             const itemImageUrl = item.imagen_url || 'img/fotoportada.png';
             cartItemsContainer.innerHTML += `
-                <div class="cart-item" data-id="${itemId}">
+                <div class="cart-item" data-id="${item.uniqueId}">
                     <img src="${itemImageUrl}" alt="${item.nombre}">
                     <div class="cart-item-info"><h4>${item.nombre}</h4><p class="price">$${item.precio.toLocaleString('es-AR')}</p></div>
                     <div class="cart-item-quantity"><button class="quantity-btn cart-quantity-minus">-</button><span>${item.cantidad}</span><button class="quantity-btn cart-quantity-plus">+</button></div>
