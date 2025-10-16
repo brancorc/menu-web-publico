@@ -3,9 +3,14 @@ import { renderizarProductos, renderizarCarrito, abrirModal, cerrarModal, toggle
 import { apiFetch } from './api.js';
 
 // --- ESTADO GLOBAL ---
-let allProducts = [], productosPorCategoria = {}, productoSeleccionado = null, shippingCost = 0, swiper, siteSettings;
+let allProducts = [];
+let productosPorCategoria = {};
+let productoSeleccionado = null;
+let shippingCost = 0;
+let swiper;
+let siteSettings;
 
-// --- FUNCIONES ---
+// --- FUNCIONES DE INICIALIZACIÓN Y LÓGICA PRINCIPAL ---
 
 function getBusinessSlug() {
     const hostname = window.location.hostname;
@@ -16,42 +21,11 @@ function getBusinessSlug() {
     if (pathParts.length > 0) {
         return pathParts[0];
     }
+    // Fallback para desarrollo local
     if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
         return 'monat';
     }
     return null; 
-}
-
-function makeDraggable(element) {
-    if (!element) return;
-    let isDown = false, startX, scrollLeft, hasDragged = false;
-    element.addEventListener('mousedown', (e) => {
-        if (e.button !== 0) return;
-        isDown = true;
-        hasDragged = false;
-        element.style.cursor = 'grabbing';
-        startX = e.pageX - element.offsetLeft;
-        scrollLeft = element.scrollLeft;
-    });
-    element.addEventListener('mouseleave', () => { isDown = false; element.style.cursor = 'grab'; });
-    element.addEventListener('mouseup', () => { isDown = false; element.style.cursor = 'grab'; });
-    element.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - element.offsetLeft;
-        const walk = x - startX;
-        if (Math.abs(walk) > 5) hasDragged = true;
-        element.scrollLeft = scrollLeft - walk;
-    });
-    element.querySelectorAll('button').forEach(child => {
-        child.addEventListener('click', (e) => {
-            if (hasDragged) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-        });
-    });
-    element.style.cursor = 'grab';
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -76,34 +50,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     aplicarIdentidadVisual(siteSettings);
     shippingCost = parseFloat(siteSettings.costo_envio_predeterminado);
 
-    if (siteSettings.google_analytics_id) {
-        const gtagScript = document.createElement('script');
-        gtagScript.async = true;
-        gtagScript.src = `https://www.googletagmanager.com/gtag/js?id=${siteSettings.google_analytics_id}`;
-        document.head.appendChild(gtagScript);
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', siteSettings.google_analytics_id);
+    // Actualiza dinámicamente el costo en el label de envío
+    const shippingCostSpan = document.getElementById('dynamic-shipping-cost');
+    if (shippingCostSpan) {
+        shippingCostSpan.textContent = `$${shippingCost.toLocaleString('es-AR')}`;
     }
 
     if (!menuData || !menuData.productos) {
         const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
         swiperWrapper.innerHTML = `<div class="no-results-message">Este negocio aún no tiene productos cargados.</div>`;
-    } else {
-        allProducts = menuData.productos;
-        productosPorCategoria = menuData.categorias.reduce((acc, categoria) => {
-            acc[categoria] = allProducts.filter(p => p.categoria === categoria);
-            return acc;
-        }, {});
-        renderizarProductos(productosPorCategoria, menuData.categorias);
+        return;
     }
+
+    allProducts = menuData.productos;
     
-    renderizarCarrito(getCarrito());
+    productosPorCategoria = menuData.categorias.reduce((acc, categoria) => {
+        acc[categoria] = allProducts.filter(p => p.categoria === categoria);
+        return acc;
+    }, {});
+    
+    renderizarProductos(productosPorCategoria, menuData.categorias);
+    renderizarCarrito(getCarrito(), 'pickup', shippingCost);
     setupEventListeners();
     checkStoreStatus();
 
-    swiper = new Swiper('.swiper', { spaceBetween: 20, autoHeight: true });
+    swiper = new Swiper('.swiper', {
+        spaceBetween: 20,
+        autoHeight: true,
+    });
     
     swiper.on('slideChange', function () {
         const activeSlide = swiper.slides[swiper.activeIndex];
@@ -112,31 +86,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelectorAll('.categories button').forEach(button => button.classList.remove('active'));
         const activeButton = document.querySelector(`.categories button[data-category="${activeCategory}"]`);
         if (activeButton) activeButton.classList.add('active');
+        
         const items = activeSlide.querySelectorAll('.item');
         items.forEach((item, index) => {
             setTimeout(() => item.classList.add('visible'), index * 75);
         });
     });
 
-    if (menuData && menuData.categorias.length > 0) {
+    if (menuData.categorias.length > 0) {
         document.querySelector(`.categories button[data-category="${menuData.categorias[0]}"]`)?.classList.add('active');
         setTimeout(() => swiper.emit('slideChange'), 100);
     }
 
+    // Lógica de Previsualización en Vivo
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('preview') === 'true') {
         window.addEventListener('message', (event) => {
             const previewSettings = event.data;
-            const mergedSettings = { ...siteSettings, ...previewSettings };
-            aplicarIdentidadVisual(mergedSettings);
+            aplicarIdentidadVisual(previewSettings);
         });
     }
 });
 
 function setupEventListeners() {
-    const categoriesContainer = document.querySelector('.categories');
-    makeDraggable(categoriesContainer);
-    categoriesContainer.addEventListener('click', handleCategoryClick);
+    document.querySelector('.categories').addEventListener('click', handleCategoryClick);
     document.getElementById('product-sections-container').addEventListener('click', handleProductClick);
     document.getElementById('product-modal').addEventListener('click', handleProductModalClick);
     document.getElementById('cart-toggle').addEventListener('click', toggleCartPanel);
@@ -147,10 +120,64 @@ function setupEventListeners() {
     document.getElementById('checkout-form').addEventListener('submit', handleCheckout);
     document.getElementById('search-form').addEventListener('submit', e => e.preventDefault());
     document.getElementById('search-input').addEventListener('input', handleSearch);
+
+    document.getElementById('delivery-type-options').addEventListener('change', handleOptionChange);
+    document.getElementById('order-time-type-options').addEventListener('change', handleOptionChange);
+}
+
+// --- MANEJADORES DE EVENTOS ---
+
+function handleOptionChange(event) {
+    const input = event.target;
+    const groupName = input.name;
+    const selectedValue = input.value;
+
+    document.querySelectorAll(`input[name="${groupName}"]`).forEach(radio => {
+        radio.closest('label').classList.toggle('selected', radio.value === selectedValue);
+    });
+
+    if (groupName === 'delivery-type') {
+        const deliveryInfoDiv = document.getElementById('delivery-info');
+        const addressInput = document.getElementById('client-address');
+        const isDelivery = selectedValue === 'delivery';
+        deliveryInfoDiv.classList.toggle('hidden', !isDelivery);
+        addressInput.required = isDelivery;
+        if (!isDelivery) addressInput.value = '';
+        renderizarCarrito(getCarrito(), selectedValue, shippingCost);
+    }
+
+    if (groupName === 'order-time-type') {
+        const scheduleContainer = document.getElementById('schedule-time-container');
+        const timeSelect = document.getElementById('order-time-select');
+        const isSchedule = selectedValue === 'schedule';
+        scheduleContainer.classList.toggle('hidden', !isSchedule);
+        timeSelect.required = isSchedule;
+        if (!isSchedule) timeSelect.value = "";
+    }
+}
+
+function handleCartItemInteraction(event) {
+    const button = event.target.closest('button');
+    if (!button) return;
     
-    // [CORRECCIÓN] Se usa 'click' en lugar de 'change' y se unifica el listener.
-    document.getElementById('delivery-type-options').addEventListener('click', handleOptionClick);
-    document.getElementById('order-time-type-options').addEventListener('click', handleOptionClick);
+    const itemEl = event.target.closest('.cart-item');
+    if (!itemEl) return;
+
+    const itemUniqueId = itemEl.dataset.id;
+    if (!itemUniqueId) return;
+    
+    const itemEnCarrito = getCarrito().find(i => i.uniqueId === itemUniqueId);
+    if (!itemEnCarrito) return;
+
+    if (button.classList.contains('cart-quantity-plus')) {
+        actualizarCantidad(itemUniqueId, itemEnCarrito.cantidad + 1);
+    }
+    if (button.classList.contains('cart-quantity-minus')) {
+        actualizarCantidad(itemUniqueId, itemEnCarrito.cantidad - 1);
+    }
+    if (button.classList.contains('cart-item-remove')) {
+        eliminarDelCarrito(itemUniqueId);
+    }
 }
 
 function handleCategoryClick(event) {
@@ -159,6 +186,7 @@ function handleCategoryClick(event) {
         const category = button.dataset.category;
         const sections = Array.from(document.querySelectorAll('.category-section.swiper-slide'));
         const categoryIndex = sections.findIndex(s => s.id === category);
+        
         if (categoryIndex !== -1 && swiper) {
             swiper.slideTo(categoryIndex);
         }
@@ -180,8 +208,10 @@ function handleProductModalClick(event) {
     const modal = document.getElementById('product-modal');
     const cantidadInput = modal.querySelector('#cantidad');
     let cantidad = parseInt(cantidadInput.value);
+
     if (event.target.id === 'quantity-plus') cantidadInput.value = ++cantidad;
     if (event.target.id === 'quantity-minus' && cantidad > 1) cantidadInput.value = --cantidad;
+
     if (event.target.id === 'add-to-cart-btn') {
         const selectores = modal.querySelectorAll('.modal-opcion-select');
         const selecciones = Array.from(selectores).map(select => select.value);
@@ -199,74 +229,35 @@ function handleProductModalClick(event) {
         agregarAlCarrito(productoSeleccionado, cantidad, selecciones, adicionalesSeleccionados);
         cerrarModal(modal);
     }
+
     if (event.target.classList.contains('modal') || event.target.classList.contains('close')) {
         cerrarModal(modal);
     }
 }
 
-function handleCartItemInteraction(event) {
-    const itemEl = event.target.closest('.cart-item');
-    if (!itemEl) return;
-    
-    const itemUniqueId = itemEl.dataset.id;
-    if (!itemUniqueId) return;
-
-    const itemEnCarrito = getCarrito().find(item => item.uniqueId === itemUniqueId);
-    if (!itemEnCarrito) return;
-
-    let cantidadActual = itemEnCarrito.cantidad;
-    if (event.target.classList.contains('cart-quantity-plus')) {
-        actualizarCantidad(itemUniqueId, cantidadActual + 1);
-    }
-    if (event.target.classList.contains('cart-quantity-minus')) {
-        actualizarCantidad(itemUniqueId, cantidadActual - 1);
-    }
-    if (event.target.classList.contains('cart-item-remove')) {
-        eliminarDelCarrito(itemUniqueId);
-    }
-}
-
-function handleOptionClick(event) {
-    const label = event.target.closest('label');
-    if (!label) return;
-    const input = label.querySelector('input[type="radio"]');
-    if (!input) return;
-
-    input.checked = true;
-
-    const group = event.currentTarget;
-    group.querySelectorAll('label').forEach(l => l.classList.remove('selected'));
-    label.classList.add('selected');
-
-    if (input.name === 'delivery-type') {
-        const deliveryType = input.value;
-        const deliveryInfoDiv = document.getElementById('delivery-info');
-        document.getElementById('client-address').required = (deliveryType === 'delivery');
-        deliveryInfoDiv.classList.toggle('hidden', deliveryType !== 'delivery');
-        renderizarCarrito(getCarrito(), deliveryType, shippingCost);
-    } else if (input.name === 'order-time-type') {
-        const timeType = input.value;
-        const scheduleContainer = document.getElementById('schedule-time-container');
-        document.getElementById('order-time-select').required = (timeType === 'schedule');
-        scheduleContainer.classList.toggle('hidden', timeType !== 'schedule');
-    }
-}
-
 function handleCheckout(event) {
     event.preventDefault();
-
-    if (getCarrito().length === 0) return mostrarToast("Tu carrito está vacío.");
+    
+    if (getCarrito().length === 0) {
+        mostrarToast("Tu carrito está vacío.");
+        cerrarModal(document.getElementById('checkout-modal'));
+        return;
+    }
     
     const deliveryTypeInput = document.querySelector('input[name="delivery-type"]:checked');
-    if (!deliveryTypeInput) return mostrarToast("Por favor, selecciona un tipo de entrega.");
+    if (!deliveryTypeInput) {
+        return mostrarToast("Por favor, selecciona si retiras o es envío a domicilio.");
+    }
 
     const timeTypeInput = document.querySelector('input[name="order-time-type"]:checked');
-    if (!timeTypeInput) return mostrarToast("Por favor, selecciona cuándo quieres tu pedido.");
-
+    if (!timeTypeInput) {
+        return mostrarToast("Por favor, selecciona cuándo quieres tu pedido.");
+    }
+    
+    const deliveryType = deliveryTypeInput.value;
     const direccion = document.getElementById('client-address').value;
-    if (deliveryTypeInput.value === 'delivery' && !direccion.trim()) {
-        document.getElementById('client-address').focus();
-        return mostrarToast("Por favor, ingresa tu dirección.");
+    if (deliveryType === 'delivery' && !direccion.trim()) {
+        return mostrarToast("Por favor, ingresa tu dirección para el envío.");
     }
     
     const timeType = timeTypeInput.value;
@@ -274,8 +265,7 @@ function handleCheckout(event) {
     let horaPedido;
     if (timeType === 'schedule') {
         if (!timeSelect.value) {
-            timeSelect.focus();
-            return mostrarToast("Por favor, seleccioná una hora.");
+            return mostrarToast("Por favor, seleccioná una hora para programar tu pedido.");
         }
         horaPedido = timeSelect.value + ' hs';
     } else {
@@ -284,38 +274,42 @@ function handleCheckout(event) {
     
     const datosCliente = {
         nombre: document.getElementById('client-name').value,
-        tipoEntrega: deliveryTypeInput.value === 'delivery' ? 'Envío a domicilio' : 'Retiro en local',
-        direccion: deliveryTypeInput.value === 'delivery' ? direccion : 'N/A',
+        tipoEntrega: deliveryType === 'delivery' ? 'Envío a domicilio' : 'Retiro en local',
+        direccion: deliveryType === 'delivery' ? direccion : 'N/A',
         horaPedido: horaPedido,
         pago: document.getElementById('payment-method').value,
         notas: document.getElementById('order-notes').value
     };
     
-    enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryTypeInput.value, shippingCost);
+    enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType, shippingCost);
     
     cerrarModal(document.getElementById('checkout-modal'));
-    limpiarCarrito();
+    limpiarCarrito(shippingCost);
     mostrarToast("¡Pedido enviado! Gracias por tu compra.");
     const form = document.getElementById('checkout-form');
     form.reset();
     document.getElementById('delivery-info').classList.add('hidden');
     document.getElementById('schedule-time-container').classList.add('hidden');
     document.querySelectorAll('.delivery-options label.selected').forEach(l => l.classList.remove('selected'));
-    renderizarCarrito(getCarrito()); 
+    renderizarCarrito(getCarrito(), 'pickup', shippingCost); 
 }
 
 function handleSearch(event) {
     const termino = event.target.value.toLowerCase().trim();
     const productosFiltrados = {};
-    const categoriasOrdenadas = Object.keys(productosPorCategoria);
-    categoriasOrdenadas.forEach(categoria => {
+
+    for (const categoria in productosPorCategoria) {
         productosFiltrados[categoria] = productosPorCategoria[categoria].filter(p => 
             p.nombre.toLowerCase().includes(termino) || (p.descripcion && p.descripcion.toLowerCase().includes(termino))
         );
-    });
-    renderizarProductos(productosFiltrados, categoriasOrdenadas);
-    swiper.update();
-    swiper.slideTo(0, 0);
+    }
+
+    renderizarProductos(productosFiltrados, Object.keys(productosPorCategoria));
+    if (swiper) {
+        swiper.update();
+        swiper.slideTo(0, 0);
+        setTimeout(() => swiper.emit('slideChange'), 100);
+    }
 }
 
 function checkStoreStatus() {
@@ -324,11 +318,12 @@ function checkStoreStatus() {
     const now = new Date();
     const day = now.getDay();
     const hour = now.getHours();
-    const openDays = [0, 4, 5, 6];
+    
+    const openDays = [0, 4, 5, 6]; // Domingo=0, Jueves=4, Viernes=5, Sábado=6
     const isOpenDay = openDays.includes(day);
-    const isOpenHour = hour >= 19;
-    const isStoreOpen = isOpenDay && isOpenHour;
-    if (!isStoreOpen) {
+    const isOpenHour = hour >= 19; // Abre a las 19:00 (7 PM)
+
+    if (!isOpenDay || !isOpenHour) {
         modal.classList.remove('hidden');
     }
     openButton.addEventListener('click', () => {
@@ -343,14 +338,20 @@ const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio) =>
         alert("No se pudo enviar el pedido. El negocio no ha configurado un número de WhatsApp.");
         return;
     }
-    const detallePedido = carrito.map(item => `- ${item.cantidad}x ${item.nombre} ($${(item.precio * item.cantidad).toLocaleString('es-AR')})`).join('\n');
+
+    const detallePedido = carrito.map(item => 
+        `- ${item.cantidad}x ${item.nombre} ($${(item.precio * item.cantidad).toLocaleString('es-AR')})`
+    ).join('\n');
+
     let subtotal = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
     let total = subtotal;
     let detalleEnvio = '';
+
     if (tipoEntrega === 'delivery' && carrito.length > 0) {
         total += costoEnvio;
         detalleEnvio = `\n*Costo de Envío:* $${costoEnvio.toLocaleString('es-AR')}`;
     }
+
     const nombreNegocio = siteSettings ? siteSettings.web_nombre_negocio : 'tu negocio';
     const mensaje = `
 *¡Nuevo Pedido para ${nombreNegocio}!* 🎉
@@ -372,6 +373,7 @@ ${detalleEnvio}
 
 *TOTAL: $${total.toLocaleString('es-AR')}*
     `;
+
     const url = `https://wa.me/${numeroDestino}?text=${encodeURIComponent(mensaje.trim())}`;
     window.open(url, '_blank');
 };
