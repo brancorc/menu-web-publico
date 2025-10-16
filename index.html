@@ -3,210 +3,132 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Menú en línea - Realiza tu pedido">
-    
     <title>Cargando Menú...</title>
     
-    <!-- CSS -->
+    <!-- Rutas absolutas para CSS y Favicon -->
     <link rel="stylesheet" href="/css/styles.css" />
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    
-    <!-- Favicon -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link id="favicon" rel="icon" type="image/png" href="">
+    
+    <meta name="description" content="">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 </head>
 
 <body>
-    <!-- Header -->
+
     <header class="header">
-        <a href="#"><img src="" alt="Logo" class="logo" /></a>
+        <a href="#"><img src="" alt="" class="logo" /></a>
+        <h1 style="display: none;"></h1> 
         <form class="search-form" id="search-form">
-            <input 
-                type="search" 
-                id="search-input" 
-                placeholder="Buscar en el menú..." 
-                aria-label="Buscar productos"
-            >
-            <i class="bx bx-search" aria-hidden="true"></i>
+            <input type="search" id="search-input" placeholder="Buscar en el menú...">
+            <i class='bx bx-search'></i>
         </form>
     </header>
 
-    <!-- Navigation -->
-    <nav class="categories-container">
-        <div class="categories" role="tablist">
+    <div class="categories-container">
+        <nav class="categories">
             <!-- Las categorías se generan dinámicamente -->
-        </div>
-    </nav>
+        </nav>
+    </div>
 
-    <!-- Main Content -->
     <main id="product-sections-container" class="swiper">
         <div class="swiper-wrapper">
             <!-- Las secciones de productos se generan dinámicamente -->
         </div>
     </main>
 
-    <!-- Modales -->
-    
-    <!-- Product Modal -->
-    <div id="product-modal" class="modal" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
+    <div id="product-modal" class="modal">
         <div class="modal-content">
-            <button 
-                class="close" 
-                data-modal-close="product-modal" 
-                type="button"
-                aria-label="Cerrar modal de producto"
-            >×</button>
-            <img id="modal-img" src="" alt="" />
-            <h2 id="modal-title"></h2>
+            <span class="close" data-modal-close="product-modal">×</span>
+            <img id="modal-img" src="" alt="Imagen del producto" />
+            <h3 id="modal-title"></h3>
             <p id="modal-description"></p>
             <p id="modal-price" class="price"></p>
             <div id="modal-options-container"></div>
             <div class="quantity-container">
                 <label for="cantidad">Cantidad:</label>
-                <button 
-                    class="quantity-btn" 
-                    id="quantity-minus" 
-                    type="button" 
-                    aria-label="Disminuir cantidad"
-                >−</button>
-                <input 
-                    type="number" 
-                    id="cantidad" 
-                    value="1" 
-                    min="1" 
-                    readonly 
-                    aria-label="Cantidad de productos"
-                />
-                <button 
-                    class="quantity-btn" 
-                    id="quantity-plus" 
-                    type="button" 
-                    aria-label="Aumentar cantidad"
-                >+</button>
+                <button class="quantity-btn" id="quantity-minus">-</button>
+                <input type="number" id="cantidad" value="1" min="1" readonly />
+                <button class="quantity-btn" id="quantity-plus">+</button>
             </div>
-            <button id="add-to-cart-btn" class="btn-primary" type="button">Agregar al carrito</button>
+            <button id="add-to-cart-btn" class="btn-primary">Agregar al carrito</button>
         </div>
     </div>
-
-    <!-- Checkout Modal -->
-    <div id="checkout-modal" class="modal" role="dialog" aria-labelledby="checkout-title" aria-hidden="true">
+    
+    <div id="checkout-modal" class="modal">
         <div class="modal-content">
-            <button 
-                class="close" 
-                data-modal-close="checkout-modal" 
-                type="button"
-                aria-label="Cerrar modal de compra"
-            >×</button>
-            <h2 id="checkout-title">Completá tus datos para el pedido</h2>
+            <span class="close" data-modal-close="checkout-modal">×</span>
+            <h3>Completá tus datos para el pedido</h3>
             <form id="checkout-form">
-                <input 
-                    type="text" 
-                    id="client-name" 
-                    placeholder="Tu Nombre" 
-                    required 
-                    aria-label="Nombre completo"
-                >
+                <input type="text" id="client-name" placeholder="Tu Nombre" required>
                 
-                <fieldset>
-                    <legend style="display: none;">Tipo de entrega</legend>
-                    <div class="delivery-options" id="delivery-type-options">
-                        <label>
-                            <input type="radio" name="delivery-type" value="pickup" required>
-                            <span id="pickup-label-text">Retiro en el local</span>
-                        </label>
-                        <label>
-                            <input type="radio" name="delivery-type" value="delivery" required>
-                            Envío a domicilio (<span id="dynamic-shipping-cost"></span>)
-                        </label>
-                    </div>
-                </fieldset>
+                <div class="delivery-options" id="delivery-type-options">
+                    <label>
+                        <input type="radio" name="delivery-type" value="pickup" required>
+                        <span id="pickup-label-text">Retiro en el local</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="delivery-type" value="delivery" required> Envío a domicilio (<span id="dynamic-shipping-cost"></span>)
+                    </label>
+                </div>
 
                 <div id="delivery-info" class="hidden">
-                    <input 
-                        type="text" 
-                        id="client-address" 
-                        placeholder="Tu Dirección"
-                        aria-label="Dirección de entrega"
-                    >
-                    <a 
-                        id="delivery-zone-link" 
-                        href="#" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        class="delivery-zone-link" 
-                        style="display: none;"
-                    >
-                        <i class="bx bx-map-alt" aria-hidden="true"></i> Ver nuestra zona de envíos
+                    <input type="text" id="client-address" placeholder="Tu Dirección">
+                    <a id="delivery-zone-link" href="#" target="_blank" class="delivery-zone-link" style="display: none;">
+                        <i class='bx bx-map-alt'></i> Ver nuestra zona de envíos
                     </a>
                 </div>
 
-                <fieldset>
-                    <legend class="order-time-options" style="display: block;">
-                        <h3 style="margin: 0 0 8px; font-size: 16px;">¿Cuándo querés tu pedido?</h3>
-                    </legend>
+                <div class="order-time-options">
+                    <h4>¿Cuándo querés tu pedido?</h4>
                     <div id="order-time-type-options" class="delivery-options">
                         <label>
-                            <input type="radio" name="order-time-type" value="asap" required>
-                            Lo antes posible
+                            <input type="radio" name="order-time-type" value="asap" required> Lo antes posible
                         </label>
                         <label>
-                            <input type="radio" name="order-time-type" value="schedule" required>
-                            Programar hora
+                            <input type="radio" name="order-time-type" value="schedule" required> Programar hora
                         </label>
                     </div>
-                </fieldset>
+                </div>
 
                 <div id="schedule-time-container" class="hidden">
-                    <label for="order-time-select" style="display: block; margin-bottom: 8px; font-weight: 600;">
-                        Selecciona una hora
-                    </label>
-                    <select id="order-time-select" aria-label="Horario de entrega">
+                    <select id="order-time-select">
                         <option value="" disabled selected>Seleccioná un horario</option>
-                        <option value="19:45">19:45 hs</option>
-                        <option value="20:00">20:00 hs</option>
-                        <option value="20:15">20:15 hs</option>
-                        <option value="20:30">20:30 hs</option>
-                        <option value="20:45">20:45 hs</option>
-                        <option value="21:00">21:00 hs</option>
-                        <option value="21:15">21:15 hs</option>
-                        <option value="21:30">21:30 hs</option>
-                        <option value="21:45">21:45 hs</option>
-                        <option value="22:00">22:00 hs</option>
-                        <option value="22:15">22:15 hs</option>
-                        <option value="22:30">22:30 hs</option>
-                        <option value="22:45">22:45 hs</option>
-                        <option value="23:00">23:00 hs</option>
-                        <option value="23:15">23:15 hs</option>
-                        <option value="23:30">23:30 hs</option>
-                        <option value="23:45">23:45 hs</option>
+                         <!-- Las opciones de horarios se podrían hacer dinámicas en el futuro -->
+                         <option value="19:45">19:45 hs</option>
+                         <option value="20:00">20:00 hs</option>
+                         <option value="20:15">20:15 hs</option>
+                         <option value="20:30">20:30 hs</option>
+                         <option value="20:45">20:45 hs</option>
+                         <option value="21:00">21:00 hs</option>
+                         <option value="21:15">21:15 hs</option>
+                         <option value="21:30">21:30 hs</option>
+                         <option value="21:45">21:45 hs</option>
+                         <option value="22:00">22:00 hs</option>
+                         <option value="22:15">22:15 hs</option>
+                         <option value="22:30">22:30 hs</option>
+                         <option value="22:45">22:45 hs</option>
+                         <option value="23:00">23:00 hs</option>
+                         <option value="23:15">23:15 hs</option>
+                         <option value="23:30">23:30 hs</option>
+                         <option value="23:45">23:45 hs</option>
                     </select>
                 </div>
 
-                <div>
-                    <label for="payment-method" style="display: block; margin-bottom: 8px; font-weight: 600;">
-                        Método de pago
-                    </label>
-                    <select id="payment-method" aria-label="Método de pago">
-                        <option value="Efectivo">Pagar con Efectivo</option>
-                        <option value="Transferencia">Pagar con Transferencia</option>
-                    </select>
-                </div>
-
-                <textarea 
-                    id="order-notes" 
-                    placeholder="Aclaraciones..." 
-                    aria-label="Notas adicionales del pedido"
-                ></textarea>
+                <select id="payment-method">
+                    <option value="Efectivo">Pagar con Efectivo</option>
+                    <option value="Transferencia">Pagar con Transferencia</option>
+                </select>
+                <textarea id="order-notes" placeholder="Aclaraciones..."></textarea>
                 <button type="submit" class="btn-primary">Confirmar y Enviar Pedido por WhatsApp</button>
             </form>
         </div>
     </div>
 
-    <!-- Cart Panel -->
-    <aside id="cart-panel" class="cart-panel" role="region" aria-label="Carrito de compras" aria-hidden="true">
+    <aside id="cart-panel" class="cart-panel">
         <div class="cart-header">
             <h2>Tu Pedido</h2>
-            <button id="close-cart-btn" class="close" type="button" aria-label="Cerrar carrito">×</button>
+            <button id="close-cart-btn" class="close">×</button>
         </div>
         <div id="cart-items" class="cart-items"></div>
         <div class="cart-footer">
@@ -214,89 +136,55 @@
                 <strong>Total:</strong>
                 <span id="cart-total-price">$0</span>
             </div>
-            <button id="checkout-btn" class="btn-primary" disabled type="button">Finalizar Pedido</button>
+            <button id="checkout-btn" class="btn-primary" disabled>Finalizar Pedido</button>
         </div>
     </aside>
 
-    <!-- Cart Toggle Button -->
-    <button 
-        id="cart-toggle" 
-        class="cart-toggle" 
-        type="button"
-        aria-label="Abrir carrito de compras"
-        aria-expanded="false"
-        aria-controls="cart-panel"
-    >
-        <i class="bx bxs-cart" aria-hidden="true"></i>
-        <span id="cart-item-count" class="cart-item-count hidden" aria-live="polite">0</span>
-    </button>
+    <div id="cart-toggle" class="cart-toggle" role="button" aria-label="Abrir carrito de compras">
+        <i class='bx bxs-cart'></i>
+        <span id="cart-item-count" class="cart-item-count hidden">0</span>
+    </div>
 
-    <!-- WhatsApp Float Button -->
-    <a 
-        href="#" 
-        class="whatsapp-float" 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        aria-label="Enviar mensaje por WhatsApp"
-    >
-        <i class="bx bxl-whatsapp" aria-hidden="true"></i>
+    <a href="#" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Enviar mensaje por WhatsApp">
+        <i class='bx bxl-whatsapp'></i>
     </a>
     
-    <!-- Toast Container -->
-    <div id="toast-container" role="region" aria-live="polite" aria-atomic="true"></div>
+    <div id="toast-container"></div>
     
-    <!-- Footer -->
     <footer class="site-footer">
         <div class="footer-content">
             <div class="footer-contact">
                 <p>
-                    <a 
-                        id="instagram-link" 
-                        href="#" 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        style="display: none;"
-                    >
-                        <i class="bx bxl-instagram" aria-hidden="true"></i>
+                    <a id="instagram-link" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">
+                        <i class='bx bxl-instagram'></i>
                         <span id="instagram-username"></span>
                     </a>
                 </p>
                 <p>
-                    <a 
-                        id="pedidosya-link" 
-                        href="#" 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        style="display: none;"
-                    >
-                        <i class="bx bxs-store-alt" aria-hidden="true"></i>
+                    <a id="pedidosya-link" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">
+                        <i class='bx bxs-store-alt'></i>
                         <span>PedidosYa</span>
                     </a>
                 </p>
-                <p style="display: none;" id="address-container">
-                    <i class="bx bxs-map" aria-hidden="true"></i>
-                    <span id="dynamic-address-footer"></span>
-                </p>
-                <p style="display: none;" id="phone-container">
-                    <i class="bx bxs-phone" aria-hidden="true"></i>
-                    <span id="dynamic-phone"></span>
-                </p>
+                <p style="display: none;" id="address-container"><i class='bx bxs-map'></i> <span id="dynamic-address-footer"></span></p>
+                <p style="display: none;" id="phone-container"><i class='bx bxs-phone'></i> <span id="dynamic-phone"></span></p>
             </div>
         </div>
     </footer>
 
-    <!-- Store Status Modal -->
-    <div id="closed-store-modal" class="store-status-modal hidden" role="dialog" aria-labelledby="store-status-title" aria-hidden="true">
+    <div id="closed-store-modal" class="store-status-modal hidden">
         <div class="modal-content">
-            <h2 id="store-status-title">¡Hola! Ahora mismo estamos cerrados.</h2>
+            <h3>¡Hola! Ahora mismo estamos cerrados.</h3>
             <p>Nuestro horario de atención es de <strong id="dynamic-hours"></strong></p>
             <p>Puedes ver nuestro menú y preparar tu pedido para cuando abramos.</p>
-            <button id="close-store-modal-btn" class="btn-primary" type="button">Ver el menú de todos modos</button>
+            <button id="close-store-modal-btn" class="btn-primary">Ver el menú de todos modos</button>
         </div>
     </div>
     
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>  
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>  
     <script src="/js/main.js" type="module" defer></script>
+    <!-- El script de Google Analytics se inyectará dinámicamente desde main.js -->
+
 </body>
 </html>
