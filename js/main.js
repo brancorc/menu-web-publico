@@ -95,7 +95,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!menuData || !menuData.productos) {
         const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
         swiperWrapper.innerHTML = `<div class="no-results-message">Este negocio aún no tiene productos cargados.</div>`;
-        // No detenemos la ejecución para que el resto de la UI (carrito, etc.) funcione.
     } else {
         allProducts = menuData.productos;
         productosPorCategoria = menuData.categorias.reduce((acc, categoria) => {
@@ -129,12 +128,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(() => swiper.emit('slideChange'), 100);
     }
 
-    // --- LÓGICA DE PREVISUALIZACIÓN EN VIVO ---
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('preview') === 'true') {
         window.addEventListener('message', (event) => {
             const previewSettings = event.data;
-            // Combina los datos de la preview con los datos originales para no perder información
             const mergedSettings = { ...siteSettings, ...previewSettings };
             aplicarIdentidadVisual(mergedSettings);
         });
@@ -213,7 +210,7 @@ function handleProductModalClick(event) {
 function handleCartItemInteraction(event) {
     const itemEl = event.target.closest('.cart-item');
     if (!itemEl) return;
-    const itemUniqueId = itemEl.dataset.id; 
+    const itemUniqueId = itemEl.dataset.id;
     const itemEnCarrito = getCarrito().find(item => item.uniqueId === itemUniqueId);
     if (!itemEnCarrito) return;
     let cantidadActual = itemEnCarrito.cantidad;
@@ -226,9 +223,13 @@ function handleDeliveryTypeChange(event) {
     const deliveryType = event.target.value;
     const deliveryInfoDiv = document.getElementById('delivery-info');
     const addressInput = document.getElementById('client-address');
-    document.querySelectorAll('input[name="delivery-type"]').forEach(input => {
-        input.closest('label').classList.toggle('selected', input.value === deliveryType);
-    });
+    
+    // [CORRECCIÓN 2] Aplicar estilos de forma síncrona
+    document.querySelectorAll('#delivery-type-options label').forEach(label => label.classList.remove('selected'));
+    if(event.target.checked) {
+        event.target.closest('label').classList.add('selected');
+    }
+
     if (deliveryType === 'delivery') {
         deliveryInfoDiv.classList.remove('hidden');
         addressInput.required = true;
@@ -244,9 +245,13 @@ function handleOrderTimeChange(event) {
     const scheduleContainer = document.getElementById('schedule-time-container');
     const timeSelect = document.getElementById('order-time-select');
     const timeType = event.target.value;
-    document.querySelectorAll('input[name="order-time-type"]').forEach(input => {
-        input.closest('label').classList.toggle('selected', input.value === timeType);
-    });
+
+    // Aplicar estilos de forma síncrona
+    document.querySelectorAll('#order-time-type-options label').forEach(label => label.classList.remove('selected'));
+    if(event.target.checked) {
+        event.target.closest('label').classList.add('selected');
+    }
+
     if (timeType === 'schedule') {
         scheduleContainer.classList.remove('hidden');
         timeSelect.required = true;
@@ -255,41 +260,35 @@ function handleOrderTimeChange(event) {
         timeSelect.required = false;
         timeSelect.value = "";
     }
-    const deliveryType = document.querySelector('input[name="delivery-type"]:checked')?.value || 'pickup';
-    renderizarCarrito(getCarrito(), deliveryType, shippingCost);
 }
 
 function handleCheckout(event) {
     event.preventDefault();
+
+    // [CORRECCIÓN 3] Añadir todas las validaciones
     if (getCarrito().length === 0) {
-        mostrarToast("Tu carrito está vacío.");
-        cerrarModal(document.getElementById('checkout-modal'));
-        return;
+        return mostrarToast("Tu carrito está vacío.");
     }
     const deliveryTypeInput = document.querySelector('input[name="delivery-type"]:checked');
     if (!deliveryTypeInput) {
-        mostrarToast("Por favor, selecciona el tipo de entrega.");
-        return;
+        return mostrarToast("Por favor, selecciona el tipo de entrega.");
     }
     const deliveryType = deliveryTypeInput.value;
     const direccion = document.getElementById('client-address').value;
     if (deliveryType === 'delivery' && !direccion.trim()) {
-        mostrarToast("Por favor, ingresa tu dirección.");
-        return;
+        return mostrarToast("Por favor, ingresa tu dirección.");
     }
     const timeTypeInput = document.querySelector('input[name="order-time-type"]:checked');
      if (!timeTypeInput) {
-        mostrarToast("Por favor, selecciona cuándo quieres tu pedido.");
-        return;
+        return mostrarToast("Por favor, selecciona cuándo quieres tu pedido.");
     }
     const timeType = timeTypeInput.value;
     const timeSelect = document.getElementById('order-time-select');
     let horaPedido;
     if (timeType === 'schedule') {
         if (!timeSelect.value) {
-            mostrarToast("Por favor, seleccioná una hora.");
             timeSelect.focus();
-            return;
+            return mostrarToast("Por favor, seleccioná una hora.");
         }
         horaPedido = timeSelect.value + ' hs';
     } else {
@@ -303,7 +302,9 @@ function handleCheckout(event) {
         pago: document.getElementById('payment-method').value,
         notas: document.getElementById('order-notes').value
     };
+    
     enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryType, shippingCost);
+    
     cerrarModal(document.getElementById('checkout-modal'));
     limpiarCarrito(shippingCost);
     mostrarToast("¡Pedido enviado! Gracias por tu compra.");
@@ -319,14 +320,15 @@ function handleSearch(event) {
     const termino = event.target.value.toLowerCase().trim();
     const productosFiltrados = {};
 
-    for (const categoria in productosPorCategoria) {
+    const categoriasOrdenadas = Object.keys(productosPorCategoria);
+
+    categoriasOrdenadas.forEach(categoria => {
         productosFiltrados[categoria] = productosPorCategoria[categoria].filter(p => 
             p.nombre.toLowerCase().includes(termino) || (p.descripcion && p.descripcion.toLowerCase().includes(termino))
         );
-    }
+    });
     
-    // Se pasa el array de categorías ordenadas para mantener la consistencia
-    renderizarProductos(productosFiltrados, Object.keys(productosPorCategoria));
+    renderizarProductos(productosFiltrados, categoriasOrdenadas);
     swiper.update();
     swiper.slideTo(0, 0);
 }
