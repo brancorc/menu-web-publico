@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cargando Menú...</title>
     
-    <!-- Se eliminan las rutas absolutas para compatibilidad con Vercel -->
-    <link rel="stylesheet" href="css/styles.css" />
+    <!-- Rutas absolutas para CSS y Favicon -->
+    <link rel="stylesheet" href="/css/styles.css" />
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link id="favicon" rel="icon" type="image/png" href="">
     
     <meta name="description" content="">
-    <!-- [ELIMINADO] El CSS de Swiper ya no es necesario -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 </head>
 
 <body>
@@ -31,9 +31,10 @@
         </nav>
     </div>
 
-    <!-- [REFACTOR] Se elimina la estructura de Swiper -->
-    <main id="product-container" class="product-container">
-        <!-- Las secciones y productos se generan dinámicamente -->
+    <main id="product-sections-container" class="swiper">
+        <div class="swiper-wrapper">
+            <!-- Las secciones de productos se generan dinámicamente -->
+        </div>
     </main>
 
     <div id="product-modal" class="modal">
@@ -58,7 +59,7 @@
         <div class="modal-content">
             <span class="close" data-modal-close="checkout-modal">×</span>
             <h3>Completá tus datos para el pedido</h3>
-            <form id="checkout-form" novalidate>
+            <form id="checkout-form">
                 <input type="text" id="client-name" placeholder="Tu Nombre" required>
                 
                 <div class="delivery-options" id="delivery-type-options">
@@ -82,11 +83,11 @@
                 <div class="order-time-options">
                     <h4>¿Cuándo querés tu pedido?</h4>
                     <div id="order-time-type-options" class="delivery-options">
-                        <label for="order-time-asap">
-                            <input type="radio" name="order-time-type" value="asap" id="order-time-asap" required> Lo antes posible
+                        <label>
+                            <input type="radio" name="order-time-type" value="asap" required> Lo antes posible
                         </label>
-                        <label for="order-time-schedule">
-                            <input type="radio" name="order-time-type" value="schedule" id="order-time-schedule" required> Programar hora
+                        <label>
+                            <input type="radio" name="order-time-type" value="schedule" required> Programar hora
                         </label>
                     </div>
                 </div>
@@ -94,6 +95,7 @@
                 <div id="schedule-time-container" class="hidden">
                     <select id="order-time-select">
                         <option value="" disabled selected>Seleccioná un horario</option>
+                         <!-- Las opciones de horarios se podrían hacer dinámicas en el futuro -->
                          <option value="19:45">19:45 hs</option>
                          <option value="20:00">20:00 hs</option>
                          <option value="20:15">20:15 hs</option>
@@ -181,8 +183,9 @@
     </div>
     
     <!-- Scripts -->
-    <!-- [ELIMINADO] El script de Swiper ya no es necesario -->
-    <script src="js/main.js" type="module" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>  
+    <script src="/js/main.js" type="module" defer></script>
+    <!-- El script de Google Analytics se inyectará dinámicamente desde main.js -->
 
 </body>
 </html>
