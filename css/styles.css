@@ -1,39 +1,25 @@
-/* Ocultar contenedor principal de productos (sidebar de Swiper) */
-#product-sections-container {
-    padding: 0 16px;
-}
-
-.category-section {
-    margin-bottom: 32px;
-}
-
-.category-section h2 {
-    font-size: 20px;
-    margin: 0 0 16px 0;
-    font-weight: 600;
-    color: var(--color-texto-principal);
-}:root {
-    --color-fondo-dinamico: #121212;
-    --color-acento-dinamico: #ff6b35;
-    --color-texto-principal: #f0f0f0;
-    --color-texto-secundario: #a0a0a0;
-    
-    --color-texto-inverso-fijo: #1E1E1E;
-    --color-error-fijo: #ff6b6b;
+:root {
+    --color-fondo-dinamico: #1E1E1E;
+    --color-acento-dinamico: #d16416;
+    --color-claro: #F2D6A2;
+    --color-oscuro: #8C4318;
+    --color-texto: #F2F2F2;
+    --color-boton-inactivo: #3A2A1E;
+    --color-exito: #4CAF50;
+    --color-error: #ff6b6b;
 }
 
 body {
     margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     background-color: var(--color-fondo-dinamico);
-    color: var(--color-texto-principal);
-    padding: 0 0 100px 0;
-    overflow-x: hidden;
+    color: var(--color-texto);
+    padding: 16px;
 }
 
 .btn-primary {
     background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso-fijo);
+    color: var(--color-texto);
     border: none;
     padding: 12px 24px;
     width: 100%;
@@ -46,14 +32,13 @@ body {
 }
 
 .btn-primary:hover:not(:disabled) {
-    background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso-fijo);
+    background-color: var(--color-claro);
+    color: var(--color-fondo-dinamico);
     transform: translateY(-2px);
-    filter: brightness(1.2);
 }
 
 .btn-primary:disabled {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: #555;
     cursor: not-allowed;
     transform: none;
 }
@@ -64,40 +49,28 @@ body {
 
 .header {
     text-align: center;
-    padding: 20px 16px 16px 16px;
 }
 
 .logo {
-    max-width: 180px;
+    max-width: 200px;
     height: auto;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .search-form {
     position: relative;
-    margin: 0 16px 20px 16px;
+    margin: 0 16px 24px 16px;
 }
 
 .search-form input {
     width: 100%;
-    padding: 12px 16px 12px 42px;
+    padding: 12px 16px 12px 40px;
     border-radius: 12px;
-    border: none;
-    background-color: rgba(0, 0, 0, 0.3);
-    color: var(--color-texto-principal);
-    font-size: 15px;
+    border: 1px solid var(--color-boton-inactivo);
+    background-color: var(--color-fondo-dinamico);
+    color: var(--color-texto);
+    font-size: 16px;
     box-sizing: border-box;
-    transition: all 0.3s ease;
-}
-
-.search-form input:focus {
-    outline: none;
-    background-color: rgba(0, 0, 0, 0.4);
-}
-
-.search-form input::placeholder {
-    color: var(--color-texto-secondary);
-    opacity: 0.7;
 }
 
 .search-form i {
@@ -105,19 +78,18 @@ body {
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--color-texto-secondary);
+    color: var(--color-claro);
     font-size: 20px;
-    opacity: 0.7;
 }
 
 .categories {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 24px;
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding: 0 16px 8px 16px;
+    padding: 0 16px;
     position: relative;
 }
 
@@ -132,7 +104,7 @@ body {
     top: 0;
     bottom: 0;
     width: 50px;
-    background: linear-gradient(to right, transparent, var(--color-fondo-dinamico) 80%);
+    background: linear-gradient(to right, rgba(30, 30, 30, 0), var(--color-fondo-dinamico) 80%);
     pointer-events: none;
     z-index: 2;
 }
@@ -142,30 +114,28 @@ body {
 }
 
 .categories button {
-    background-color: var(--color-acento-dinamico);
+    background-color: var(--color-oscuro);
     border: none;
     border-radius: 12px;
-    margin-top: 0;
-    padding: 10px 20px;
-    font-size: 15px;
+    margin-top: 5px;
+    padding: 10px 18px;
+    font-size: 16px;
     font-weight: 600;
-    color: var(--color-texto-inverso-fijo);
+    color: var(--color-texto);
     cursor: pointer;
-    box-shadow: none;
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
     flex-shrink: 0;
-    white-space: nowrap;
-    opacity: 0.7;
 }
 
+/* [CORRECCIÓN 1] Se restaura el color de texto oscuro para el estado activo/hover del botón */
 .categories button.active,
 .categories button:hover {
-    background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso-fijo);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    transform: translateY(-1px); 
-    font-weight: 700;
-    opacity: 1;
+    background-color: var(--color-claro);
+    color: #1E1E1E; /* Forzamos un color oscuro para el texto */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+    transform: translateY(-3px) scale(1.05); 
+    font-weight: bold;
 }
 
 @keyframes cart-jiggle {
@@ -182,23 +152,21 @@ body {
 .category-section .item {
     position: relative;
     display: flex;
-    gap: 14px;
-    margin-bottom: 12px;
-    background-color: rgba(0, 0, 0, 0.3);
-    border: none;
+    gap: 16px;
+    margin-bottom: 24px;
+    background-color: var(--color-boton-inactivo);
     border-radius: 12px;
     padding: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
     align-items: center;
     cursor: pointer;
     opacity: 0;
     transform: translateY(20px);
-    transition: all 0.3s ease;
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
 }
 
 .category-section .item:hover {
-    transform: scale(1.01) translateY(0);
-    background-color: rgba(0, 0, 0, 0.4);
+    transform: scale(1.02) translateY(0);
 }
 
 .category-section .item.visible {
@@ -207,10 +175,10 @@ body {
 }
 
 .category-section .item img {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 90px;
     object-fit: cover;
-    border-radius: 12px;
+    border-radius: 10px;
     flex-shrink: 0;
 }
 
@@ -222,33 +190,28 @@ body {
 }
 
 .category-section .item-info h3 {
-    margin: 0 0 6px 0;
-    font-size: 17px;
-    font-weight: 600;
-    line-height: 1.3;
+    margin: 0 0 8px 0;
 }
 
 .category-section .item-info p {
-    margin: 0 0 8px 0;
-    color: var(--color-texto-secundario);
-    font-size: 13px;
-    line-height: 1.4;
+    margin: 0 0 6px 0;
+    color: #ccc;
 }
 
 .price {
     font-weight: 700;
-    color: var(--color-acento-dinamico);
-    font-size: 19px;
-    margin-top: 4px;
+    color: var(--color-claro);
+    font-size: 18px;
 }
 
+/* [CORRECCIÓN 2] Se restaura el fondo semi-transparente para el modal genérico */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.7); /* Fondo oscuro fijo */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -266,7 +229,7 @@ body {
 }
 
 .modal-content {
-    background-color: var(--color-fondo-dinamico);
+    background-color: var(--color-fondo-dinamico); /* El contenido del modal sí usa el color dinámico */
     padding: 24px;
     border-radius: 16px;
     width: 100%;
@@ -291,7 +254,7 @@ body {
     right: 15px;
     font-size: 30px;
     cursor: pointer;
-    color: var(--color-acento-dinamico);
+    color: var(--color-claro);
     line-height: 1;
 }
 
@@ -317,9 +280,9 @@ body {
     font-size: 18px;
     font-weight: bold;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background-color: rgba(0, 0, 0, 0.2);
-    color: var(--color-texto-principal);
+    border: 1px solid var(--color-oscuro);
+    background-color: var(--color-boton-inactivo);
+    color: var(--color-texto);
     text-align: center;
     -moz-appearance: textfield;
     appearance: none;
@@ -332,8 +295,8 @@ body {
 }
 
 .quantity-btn {
-    background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso-fijo);
+    background-color: var(--color-claro);
+    color: var(--color-fondo-dinamico);
     border: none;
     width: 35px;
     height: 35px;
@@ -349,10 +312,9 @@ body {
 }
 
 .quantity-btn:hover {
-    background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso-fijo);
+    background-color: var(--color-oscuro);
+    color: var(--color-texto);
     transform: scale(1.1);
-    filter: brightness(1.2);
 }
 
 #checkout-form {
@@ -368,9 +330,9 @@ body {
     width: 100%;
     padding: 12px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--color-boton-inactivo);
     background-color: var(--color-fondo-dinamico);
-    color: var(--color-texto-principal);
+    color: var(--color-texto);
     font-size: 16px;
     box-sizing: border-box;
 }
@@ -383,7 +345,7 @@ body {
 .delivery-options {
     display: flex;
     gap: 16px;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: var(--color-boton-inactivo);
     padding: 8px;
     border-radius: 10px;
     position: relative;
@@ -397,7 +359,7 @@ body {
     transform: translate(-50%, -50%);
     width: 1px;
     height: 60%;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--color-oscuro);
 }
 
 .delivery-options label {
@@ -416,14 +378,14 @@ body {
 }
 
 .delivery-options label.selected {
-    background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso-fijo);
+    background-color: var(--color-oscuro);
+    color: var(--color-texto);
     font-weight: bold;
 }
 
 .delivery-options label:hover {
-    background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso-fijo);
+    background-color: var(--color-claro);
+    color: var(--color-fondo-dinamico);
 }
 
 .delivery-zone-link {
@@ -431,7 +393,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    color: var(--color-acento-dinamico);
+    color: var(--color-claro);
     text-decoration: none;
     font-size: 14px;
     margin-top: 10px;
@@ -448,7 +410,7 @@ body {
     width: 100%;
     max-width: 400px;
     height: 100%;
-    background-color: var(--color-fondo-dinamico);
+    background-color: #181818;
     box-shadow: -5px 0 15px rgba(0,0,0,0.5);
     z-index: 1100;
     display: flex;
@@ -466,7 +428,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--color-boton-inactivo);
 }
 
 .cart-header h2 {
@@ -510,7 +472,7 @@ body {
 .cart-item-remove {
     background: none;
     border: none;
-    color: var(--color-error-fijo);
+    color: var(--color-error);
     font-size: 24px;
     cursor: pointer;
 }
@@ -518,13 +480,13 @@ body {
 .cart-empty-message {
     text-align: center;
     padding: 40px;
-    color: var(--color-texto-secundario);
+    color: #888;
 }
 
 .cart-footer {
     padding: 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    background-color: var(--color-fondo-dinamico);
+    border-top: 1px solid var(--color-boton-inactivo);
+    background-color: #181818;
 }
 
 .cart-total {
@@ -536,22 +498,22 @@ body {
 
 .cart-shipping span {
     font-size: 16px;
-    color: var(--color-texto-secundario);
+    color: #ccc;
 }
 
 .cart-toggle {
     position: fixed;
     bottom: 25px;
     right: 25px;
-    width: 56px;
-    height: 56px;
+    width: 60px;
+    height: 60px;
     background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso-fijo);
+    color: var(--color-texto);
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 28px;
+    font-size: 32px;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     z-index: 1050;
@@ -566,7 +528,7 @@ body {
     position: absolute;
     top: -5px;
     right: -5px;
-    background-color: var(--color-error-fijo);
+    background-color: var(--color-error);
     color: white;
     border-radius: 50%;
     width: 24px;
@@ -582,8 +544,8 @@ body {
     position: fixed;
     bottom: 25px;
     left: 25px;
-    width: 56px;
-    height: 56px;
+    width: 60px;
+    height: 60px;
     background-color: #25D366;
     color: #FFF;
     border-radius: 50%;
@@ -595,7 +557,7 @@ body {
     z-index: 1050;
     transition: transform 0.2s ease;
     text-decoration: none;
-    font-size: 32px;
+    font-size: 35px;
 }
 
 .whatsapp-float:hover {
@@ -615,8 +577,8 @@ body {
 }
 
 .toast {
-    background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso-fijo);
+    background-color: var(--color-exito);
+    color: white;
     padding: 12px 20px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
@@ -644,13 +606,14 @@ body {
     width: 100%;
 }
 
+/* [CORRECCIÓN 3] Se restaura el fondo semi-transparente para el modal de tienda cerrada */
 .store-status-modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.85);
+    background-color: rgba(0, 0, 0, 0.85); /* Fondo oscuro fijo */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -700,8 +663,8 @@ body {
     text-align: center;
     padding: 40px 20px 20px 20px;
     margin-top: 30px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--color-texto-secundario);
+    border-top: 1px solid var(--color-boton-inactivo);
+    color: #888;
     font-size: 14px;
     display: flex;
     flex-direction: column;
@@ -710,7 +673,7 @@ body {
 
 .footer-contact p {
     margin: 8px 0;
-    color: var(--color-texto-secundario);
+    color: #ccc;
     font-size: 15px;
     display: flex;
     align-items: center;
@@ -723,18 +686,18 @@ body {
 }
 
 .footer-links a {
-    color: var(--color-texto-secundario);
+    color: #aaa;
     text-decoration: none;
     margin: 0 10px;
     transition: color 0.3s;
 }
 
 .footer-links a:hover {
-    color: var(--color-acento-dinamico);
+    color: var(--color-claro);
 }
 
 .footer-links span {
-    color: var(--color-texto-secundario);
+    color: #666;
 }
 
 .price-container {
@@ -752,13 +715,13 @@ body {
 
 .new-price {
     font-weight: 700;
-    color: var(--color-acento-dinamico);
+    color: var(--color-claro);
     font-size: 18px;
 }
 
 .original-price {
     font-size: 15px;
-    color: var(--color-texto-secundario);
+    color: #999;
     text-decoration: line-through;
 }
 
@@ -769,7 +732,7 @@ body {
     left: 8px;
     transform: rotate(-8deg);
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5); 
-    background-color: var(--color-error-fijo);
+    background-color: var(--color-error);
     color: white;
     padding: 5px 15px;
     font-size: 12px;
@@ -789,7 +752,7 @@ body {
 }
 
 .footer-contact a:hover {
-    color: var(--color-acento-dinamico);
+    color: var(--color-claro);
 }
 
 #modal-options-container {
@@ -803,21 +766,21 @@ body {
 .modal-opcion h4 {
     margin: 0 0 8px 0;
     font-size: 16px;
-    color: var(--color-acento-dinamico);
+    color: var(--color-claro);
 }
 
 .modal-opcion-select {
     width: 100%;
     padding: 10px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background-color: rgba(0, 0, 0, 0.2);
-    color: var(--color-texto-principal);
+    border: 1px solid var(--color-oscuro);
+    background-color: var(--color-boton-inactivo);
+    color: var(--color-texto);
     font-size: 16px;
 }
 
 .modal-adicionales-wrapper {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--color-boton-inactivo);
     padding-top: 15px;
 }
 
@@ -826,17 +789,17 @@ body {
     padding: 10px;
     font-size: 15px;
     font-weight: bold;
-    background-color: rgba(0, 0, 0, 0.2);
-    color: var(--color-acento-dinamico);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: var(--color-boton-inactivo);
+    color: var(--color-claro);
+    border: 1px solid var(--color-oscuro);
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
 #toggle-adicionales-btn:hover {
-    background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso-fijo);
+    background-color: var(--color-claro);
+    color: var(--color-oscuro);
 }
 
 #adicionales-list-container {
@@ -866,8 +829,8 @@ body {
 }
 
 .adicional-quantity-btn {
-    background-color: var(--color-acento-dinamico);
-    color: var(--color-texto-inverso-fijo);
+    background-color: var(--color-claro);
+    color: var(--color-fondo-dinamico);
     border: none;
     width: 28px;
     height: 28px;
@@ -893,17 +856,16 @@ body {
 }
 
 #adicionales-list-container::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--color-boton-inactivo);
     border-radius: 4px;
 }
 
 #adicionales-list-container::-webkit-scrollbar-thumb {
-    background-color: var(--color-acento-dinamico);
+    background-color: var(--color-oscuro);
     border-radius: 4px;
-    border: 2px solid rgba(0, 0, 0, 0.2);
+    border: 2px solid var(--color-boton-inactivo);
 }
 
 #adicionales-list-container::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-acento-dinamico);
-    filter: brightness(1.2);
+    background-color: var(--color-claro);
 }
