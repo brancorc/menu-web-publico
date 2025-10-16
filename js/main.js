@@ -2,30 +2,21 @@ import { getCarrito, agregarAlCarrito, actualizarCantidad, eliminarDelCarrito, l
 import { renderizarProductos, renderizarCarrito, abrirModal, cerrarModal, toggleCartPanel, mostrarToast, aplicarIdentidadVisual } from './ui.js';
 import { apiFetch } from './api.js';
 
-// --- ESTADO GLOBAL ---
 let allProducts = [], productosPorCategoria = {}, productoSeleccionado = null, shippingCost = 0, siteSettings;
-
-// --- FUNCIONES ---
 
 function getBusinessSlug() {
     const hostname = window.location.hostname;
-    if (hostname === 'monat.ar' || hostname === 'www.monat.ar') {
-        return 'monat';
-    }
+    if (hostname === 'monat.ar' || hostname === 'www.monat.ar') return 'monat';
     const pathParts = window.location.pathname.split('/').filter(part => part);
-    if (pathParts.length > 0) {
-        return pathParts[0];
-    }
-    if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
-        return 'monat';
-    }
+    if (pathParts.length > 0) return pathParts[0];
+    if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) return 'monat';
     return null; 
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
     const slug = getBusinessSlug();
     if (!slug) {
-        document.body.innerHTML = '<h1 style="color:white; text-align:center; padding-top: 50px;">Negocio no encontrado.</h1>';
+        document.body.innerHTML = '<h1>Negocio no encontrado.</h1>';
         return;
     }
 
@@ -35,41 +26,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     ]);
     
     siteSettings = settings;
-
     if (!siteSettings) {
-         document.body.innerHTML = '<h1 style="color:white; text-align:center; padding-top: 50px;">Error al cargar la configuración del negocio.</h1>';
+         document.body.innerHTML = '<h1>Error al cargar la configuración del negocio.</h1>';
         return;
     }
 
     aplicarIdentidadVisual(siteSettings);
     shippingCost = parseFloat(siteSettings.costo_envio_predeterminado);
 
-    if (!menuData || !menuData.productos) {
-        const productContainer = document.getElementById('product-container');
-        productContainer.innerHTML = `<div class="no-results-message">Este negocio aún no tiene productos cargados.</div>`;
+    if (!menuData || !menuData.productos || !menuData.categorias) {
+        document.getElementById('product-container').innerHTML = '<p class="cart-empty-message">No se pudo cargar el menú.</p>';
         return;
     }
 
     allProducts = menuData.productos;
+    const categoriasEnOrden = menuData.categorias;
     
-    productosPorCategoria = menuData.categorias.reduce((acc, categoria) => {
+    productosPorCategoria = categoriasEnOrden.reduce((acc, categoria) => {
         acc[categoria] = allProducts.filter(p => p.categoria === categoria);
         return acc;
     }, {});
     
-    renderizarProductos(productosPorCategoria, menuData.categorias);
-    renderizarCarrito(getCarrito(), 'pickup', shippingCost);
+    renderizarProductos(productosPorCategoria, categoriasEnOrden);
+    renderizarCarrito(getCarrito());
     setupEventListeners();
     checkStoreStatus();
 
     const firstCategoryButton = document.querySelector('.categories button');
-    if (firstCategoryButton) {
-        firstCategoryButton.classList.add('active');
+    if (firstCategoryButton) firstCategoryButton.classList.add('active');
+
+    // Animación inicial
+    if (categoriasEnOrden.length > 0) {
+        const firstSection = document.getElementById(categoriasEnOrden[0]);
+        if (firstSection) {
+            const items = firstSection.querySelectorAll('.item');
+            items.forEach((item, index) => {
+                setTimeout(() => item.classList.add('visible'), index * 75);
+            });
+        }
     }
 });
 
 function setupEventListeners() {
     document.querySelector('.categories').addEventListener('click', handleCategoryClick);
+    document.getElementById('product-container').addEventListener('scroll', handleProductScroll);
     document.getElementById('product-container').addEventListener('click', handleProductClick);
     document.getElementById('product-modal').addEventListener('click', handleProductModalClick);
     document.getElementById('cart-toggle').addEventListener('click', toggleCartPanel);
@@ -82,7 +82,6 @@ function setupEventListeners() {
     document.getElementById('search-input').addEventListener('input', handleSearch);
     document.getElementById('delivery-type-options').addEventListener('click', handleDeliveryTypeClick);
     document.getElementById('order-time-type-options').addEventListener('click', handleOrderTimeClick);
-    document.getElementById('product-container').addEventListener('scroll', handleProductScroll);
 }
 
 function handleCategoryClick(event) {
@@ -91,7 +90,7 @@ function handleCategoryClick(event) {
         const categoryId = button.dataset.category;
         const section = document.getElementById(categoryId);
         if (section) {
-            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            section.scrollIntoView({ behavior: 'smooth' });
         }
     }
 }
@@ -125,6 +124,11 @@ function handleProductClick(event) {
 
 function handleProductModalClick(event) {
     const modal = document.getElementById('product-modal');
+    if (event.target.classList.contains('close') || event.target.classList.contains('modal')) {
+        cerrarModal(modal);
+        return;
+    }
+
     const cantidadInput = modal.querySelector('#cantidad');
     let cantidad = parseInt(cantidadInput.value);
 
@@ -148,10 +152,6 @@ function handleProductModalClick(event) {
         agregarAlCarrito(productoSeleccionado, cantidad, selecciones, adicionalesSeleccionados);
         cerrarModal(modal);
     }
-
-    if (event.target.classList.contains('close')) {
-        cerrarModal(modal);
-    }
 }
 
 function handleCartItemInteraction(event) {
@@ -169,9 +169,8 @@ function handleDeliveryTypeClick(event) {
     if (!label) return;
     const input = label.querySelector('input[name="delivery-type"]');
     if (!input) return;
-    
-    input.checked = true;
 
+    input.checked = true;
     document.querySelectorAll('#delivery-type-options label').forEach(l => l.classList.remove('selected'));
     label.classList.add('selected');
 
@@ -190,13 +189,13 @@ function handleOrderTimeClick(event) {
     if (!input) return;
 
     input.checked = true;
-
     document.querySelectorAll('#order-time-type-options label').forEach(l => l.classList.remove('selected'));
     label.classList.add('selected');
 
+    const timeType = input.value;
     const scheduleContainer = document.getElementById('schedule-time-container');
-    document.getElementById('order-time-select').required = (input.value === 'schedule');
-    scheduleContainer.classList.toggle('hidden', input.value !== 'schedule');
+    document.getElementById('order-time-select').required = (timeType === 'schedule');
+    scheduleContainer.classList.toggle('hidden', timeType !== 'schedule');
 }
 
 function handleCheckout(event) {
@@ -212,92 +211,75 @@ function handleCheckout(event) {
     const direccion = document.getElementById('client-address').value;
     if (deliveryTypeInput.value === 'delivery' && !direccion.trim()) return mostrarToast("Por favor, ingresa tu dirección para el envío.");
 
-    const clientName = document.getElementById('client-name').value;
-    if (!clientName.trim()) return mostrarToast("Por favor, ingresa tu nombre.");
-
-    let horaPedido;
-    if (timeTypeInput.value === 'schedule') {
-        const timeSelect = document.getElementById('order-time-select');
-        if (!timeSelect.value) {
-            return mostrarToast("Por favor, seleccioná una hora para programar tu pedido.");
-        }
-        horaPedido = timeSelect.value + ' hs';
-    } else {
-        horaPedido = 'Lo antes posible';
-    }
+    const timeSelect = document.getElementById('order-time-select');
+    if (timeTypeInput.value === 'schedule' && !timeSelect.value) return mostrarToast("Por favor, seleccioná una hora para programar tu pedido.");
 
     const datosCliente = {
-        nombre: clientName,
+        nombre: document.getElementById('client-name').value,
         tipoEntrega: deliveryTypeInput.value === 'delivery' ? 'Envío a domicilio' : 'Retiro en local',
         direccion: deliveryTypeInput.value === 'delivery' ? direccion : 'N/A',
-        horaPedido: horaPedido,
+        horaPedido: timeTypeInput.value === 'schedule' ? timeSelect.value + ' hs' : 'Lo antes posible',
         pago: document.getElementById('payment-method').value,
         notas: document.getElementById('order-notes').value
     };
     
-    enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryTypeInput.value, shippingCost);
+    enviarPedidoWhatsApp(datosCliente, getCarrito(), deliveryTypeInput.value, shippingCost, siteSettings.telefono_whatsapp);
     
     cerrarModal(document.getElementById('checkout-modal'));
     limpiarCarrito();
-    mostrarToast("¡Pedido enviado! Gracias por tu compra.");
     document.getElementById('checkout-form').reset();
     document.getElementById('delivery-info').classList.add('hidden');
     document.getElementById('schedule-time-container').classList.add('hidden');
     document.querySelectorAll('.delivery-options label.selected').forEach(l => l.classList.remove('selected'));
-    renderizarCarrito(getCarrito(), 'pickup', shippingCost); 
+    renderizarCarrito(getCarrito()); 
 }
 
 function handleSearch(event) {
     const termino = event.target.value.toLowerCase().trim();
-    document.querySelectorAll('.category-section .item').forEach(item => {
-        const nombre = item.querySelector('h3').textContent.toLowerCase();
-        const descripcion = item.querySelector('p').textContent.toLowerCase();
-        const isVisible = nombre.includes(termino) || descripcion.includes(termino);
-        item.style.display = isVisible ? 'flex' : 'none';
+    document.querySelectorAll('.category-section').forEach(section => {
+        let hasVisibleItems = false;
+        section.querySelectorAll('.item').forEach(item => {
+            const nombre = item.querySelector('h3').textContent.toLowerCase();
+            const descripcion = item.querySelector('p').textContent.toLowerCase();
+            const isVisible = nombre.includes(termino) || descripcion.includes(termino);
+            item.style.display = isVisible ? 'flex' : 'none';
+            if (isVisible) hasVisibleItems = true;
+        });
+        section.style.display = hasVisibleItems ? 'block' : 'none';
     });
 }
 
 function checkStoreStatus() {
     const modal = document.getElementById('closed-store-modal');
     const openButton = document.getElementById('close-store-modal-btn');
+    if (!modal || !openButton) return;
+
     const now = new Date();
     const day = now.getDay();
     const hour = now.getHours();
-    const openDays = [0, 4, 5, 6];
-    const isOpenDay = openDays.includes(day);
-    const isOpenHour = hour >= 19;
-    const isStoreOpen = isOpenDay && isOpenHour;
-    if (!isStoreOpen) {
-        modal.classList.remove('hidden');
-    }
-    openButton.addEventListener('click', () => {
-        modal.classList.add('hidden');
-    });
+    
+    // Asumimos Jueves (4) a Domingo (0) de 19:00 a 23:59
+    const openDays = [0, 4, 5, 6]; 
+    const isStoreOpen = openDays.includes(day) && hour >= 19;
+    
+    if (!isStoreOpen) modal.classList.remove('hidden');
+    openButton.addEventListener('click', () => modal.classList.add('hidden'));
 }
 
-const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio) => {
-    const numeroDestino = siteSettings ? siteSettings.telefono_whatsapp : null;
+const enviarPedidoWhatsApp = (datosCliente, carrito, tipoEntrega, costoEnvio, numeroDestino) => {
     if (!numeroDestino) {
-        alert("No se pudo enviar el pedido. El negocio no ha configurado un número de WhatsApp.");
-        return;
+        return alert("Error: El número de WhatsApp del negocio no está configurado.");
     }
-
-    const detallePedido = carrito.map(item => 
-        `- ${item.cantidad}x ${item.nombre} ($${(item.precio * item.cantidad).toLocaleString('es-AR')})`
-    ).join('\n');
-
-    let subtotal = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
-    let total = subtotal;
+    const detallePedido = carrito.map(item => `- ${item.cantidad}x ${item.nombre} ($${(item.precio * item.cantidad).toLocaleString('es-AR')})`).join('\n');
+    let total = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
     let detalleEnvio = '';
 
     if (tipoEntrega === 'delivery' && carrito.length > 0) {
         total += costoEnvio;
         detalleEnvio = `\n*Costo de Envío:* $${costoEnvio.toLocaleString('es-AR')}`;
     }
-
-    const nombreNegocio = siteSettings ? siteSettings.web_nombre_negocio : 'tu negocio';
     const mensaje = `
-*¡Nuevo Pedido para ${nombreNegocio}!* 🎉
+*¡Nuevo Pedido para ${siteSettings.web_nombre_negocio || 'el local'}!* 🎉
 
 *Datos del Cliente:*
 - *Nombre:* ${datosCliente.nombre}
@@ -316,7 +298,6 @@ ${detalleEnvio}
 
 *TOTAL: $${total.toLocaleString('es-AR')}*
     `;
-
     const url = `https://wa.me/${numeroDestino}?text=${encodeURIComponent(mensaje.trim())}`;
     window.open(url, '_blank');
 };
