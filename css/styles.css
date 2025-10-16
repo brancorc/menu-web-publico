@@ -2,11 +2,11 @@
     /* Colores Dinámicos - Controlados por la API */
     --color-fondo-dinamico: #1E1E1E;
     --color-acento-dinamico: #d16416;
+    --color-texto-principal-dinamico: #F2F2F2;
+    --color-texto-secundario-dinamico: #ccc;
     
     /* Colores Estáticos */
-    --color-texto-principal: #F2F2F2;
-    --color-texto-secundario: #ccc;
-    --color-texto-invertido: #1E1E1E; /* Para usar sobre fondos claros */
+    --color-texto-invertido: #1E1E1E;
     --color-exito: #4CAF50;
     --color-error: #ff6b6b;
 }

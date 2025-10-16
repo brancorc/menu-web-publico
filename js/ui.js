@@ -96,8 +96,12 @@ export const aplicarIdentidadVisual = (settings) => {
     // --- Apariencia ---
     const colorPrimario = settings.web_color_primario || '#1E1E1E';
     const colorAcento = settings.web_color_acento || '#d16416';
-    document.documentElement.style.setProperty('--color-fondo-dinamico', colorPrimario);
-    document.documentElement.style.setProperty('--color-acento-dinamico', colorAcento);
+    
+    // Aplicar Colores
+    document.documentElement.style.setProperty('--color-fondo-dinamico', settings.web_color_primario);
+    document.documentElement.style.setProperty('--color-acento-dinamico', settings.web_color_acento);
+    document.documentElement.style.setProperty('--color-texto-principal-dinamico', settings.web_color_texto_principal);
+    document.documentElement.style.setProperty('--color-texto-secundario-dinamico', settings.web_color_texto_secundario);
 };
 
 export const renderizarProductos = (productosPorCategoria, categoriasEnOrden) => {
