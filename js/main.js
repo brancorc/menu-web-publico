@@ -27,11 +27,6 @@ function getBusinessSlug() {
     return null; 
 }
 
-/**
- * Habilita el desplazamiento por arrastre del mouse en un elemento,
- * distinguiendo entre un clic y un arrastre para no anular los clics en los hijos.
- * @param {HTMLElement} element - El elemento que se quiere hacer desplazable.
- */
 function makeDraggable(element) {
     if (!element) return;
     let isDown = false, startX, scrollLeft, hasDragged = false;
@@ -97,25 +92,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         gtag('config', siteSettings.google_analytics_id);
     }
 
-    const deliveryOptionLabel = document.querySelector('input[name="delivery-type"][value="delivery"]')?.parentElement;
-    if (deliveryOptionLabel) {
-        const originalText = deliveryOptionLabel.textContent.split('(')[0].trim();
-        deliveryOptionLabel.innerHTML = `<input type="radio" name="delivery-type" value="delivery" required> ${originalText} ($${shippingCost.toLocaleString('es-AR')})`;
-    }
-
     if (!menuData || !menuData.productos) {
         const swiperWrapper = document.querySelector('#product-sections-container .swiper-wrapper');
         swiperWrapper.innerHTML = `<div class="no-results-message">Este negocio aún no tiene productos cargados.</div>`;
-        return;
+        // No detenemos la ejecución para que el resto de la UI (carrito, etc.) funcione.
+    } else {
+        allProducts = menuData.productos;
+        productosPorCategoria = menuData.categorias.reduce((acc, categoria) => {
+            acc[categoria] = allProducts.filter(p => p.categoria === categoria);
+            return acc;
+        }, {});
+        renderizarProductos(productosPorCategoria, menuData.categorias);
     }
-
-    allProducts = menuData.productos;
-    productosPorCategoria = menuData.categorias.reduce((acc, categoria) => {
-        acc[categoria] = allProducts.filter(p => p.categoria === categoria);
-        return acc;
-    }, {});
     
-    renderizarProductos(productosPorCategoria, menuData.categorias);
     renderizarCarrito(getCarrito(), 'pickup', shippingCost);
     setupEventListeners();
     checkStoreStatus();
@@ -135,28 +124,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    if (menuData.categorias.length > 0) {
+    if (menuData && menuData.categorias.length > 0) {
         document.querySelector(`.categories button[data-category="${menuData.categorias[0]}"]`)?.classList.add('active');
         setTimeout(() => swiper.emit('slideChange'), 100);
     }
 
+    // --- LÓGICA DE PREVISUALIZACIÓN EN VIVO ---
     const urlParams = new URLSearchParams(window.location.search);
-    const isPreview = urlParams.get('preview') === 'true';
-
-    if (isPreview) {
+    if (urlParams.get('preview') === 'true') {
         window.addEventListener('message', (event) => {
-            const { type, payload } = event.data;
-            if (type === 'updateStyle') {
-                document.documentElement.style.setProperty(payload.key, payload.value);
-            }
-            if (type === 'updateContent') {
-                const element = document.querySelector(payload.selector);
-                if (element) {
-                    if (payload.textContent !== undefined) element.textContent = payload.value;
-                    if (payload.attribute) element.setAttribute(payload.attribute, payload.value);
-                    if (payload.parentDisplay) element.parentElement.style.display = payload.parentDisplay;
-                }
-            }
+            const previewSettings = event.data;
+            // Combina los datos de la preview con los datos originales para no perder información
+            const mergedSettings = { ...siteSettings, ...previewSettings };
+            aplicarIdentidadVisual(mergedSettings);
         });
     }
 });
@@ -338,11 +318,14 @@ function handleCheckout(event) {
 function handleSearch(event) {
     const termino = event.target.value.toLowerCase().trim();
     const productosFiltrados = {};
+
     for (const categoria in productosPorCategoria) {
         productosFiltrados[categoria] = productosPorCategoria[categoria].filter(p => 
             p.nombre.toLowerCase().includes(termino) || (p.descripcion && p.descripcion.toLowerCase().includes(termino))
         );
     }
+    
+    // Se pasa el array de categorías ordenadas para mantener la consistencia
     renderizarProductos(productosFiltrados, Object.keys(productosPorCategoria));
     swiper.update();
     swiper.slideTo(0, 0);
