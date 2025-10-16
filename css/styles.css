@@ -1,25 +1,24 @@
 :root {
-    --color-fondo-dinamico: #1E1E1E;
-    --color-acento-dinamico: #d16416;
-    --color-claro: #F2D6A2;
-    --color-oscuro: #8C4318;
-    --color-texto: #F2F2F2;
-    --color-boton-inactivo: #3A2A1E;
-    --color-exito: #4CAF50;
-    --color-error: #ff6b6b;
+    --color-fondo-dinamico: #121212;
+    --color-acento-dinamico: #ff6b35;
+    --color-texto-principal: #f0f0f0;
+    --color-texto-secundario: #a0a0a0;
+    
+    --color-texto-inverso-fijo: #1E1E1E;
+    --color-error-fijo: #ff6b6b;
 }
 
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
     background-color: var(--color-fondo-dinamico);
-    color: var(--color-texto);
+    color: var(--color-texto-principal);
     padding: 16px;
 }
 
 .btn-primary {
     background-color: var(--color-acento-dinamico);
-    color: var(--color-texto);
+    color: var(--color-texto-inverso-fijo);
     border: none;
     padding: 12px 24px;
     width: 100%;
@@ -32,13 +31,14 @@ body {
 }
 
 .btn-primary:hover:not(:disabled) {
-    background-color: var(--color-claro);
-    color: var(--color-fondo-dinamico);
+    background-color: var(--color-acento-dinamico);
+    color: var(--color-texto-inverso-fijo);
     transform: translateY(-2px);
+    filter: brightness(1.2);
 }
 
 .btn-primary:disabled {
-    background-color: #555;
+    background-color: rgba(0, 0, 0, 0.3);
     cursor: not-allowed;
     transform: none;
 }
@@ -66,9 +66,9 @@ body {
     width: 100%;
     padding: 12px 16px 12px 40px;
     border-radius: 12px;
-    border: 1px solid var(--color-boton-inactivo);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     background-color: var(--color-fondo-dinamico);
-    color: var(--color-texto);
+    color: var(--color-texto-principal);
     font-size: 16px;
     box-sizing: border-box;
 }
@@ -78,7 +78,7 @@ body {
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--color-claro);
+    color: var(--color-acento-dinamico);
     font-size: 20px;
 }
 
@@ -114,25 +114,24 @@ body {
 }
 
 .categories button {
-    background-color: var(--color-oscuro);
+    background-color: rgba(0, 0, 0, 0.2);
     border: none;
     border-radius: 12px;
     margin-top: 5px;
     padding: 10px 18px;
     font-size: 16px;
     font-weight: 600;
-    color: var(--color-texto);
+    color: var(--color-texto-principal);
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
     flex-shrink: 0;
 }
 
-/* [CORRECCIÓN 1] Se restaura el color de texto oscuro para el estado activo/hover del botón */
 .categories button.active,
 .categories button:hover {
-    background-color: var(--color-claro);
-    color: #1E1E1E; /* Forzamos un color oscuro para el texto */
+    background-color: var(--color-acento-dinamico);
+    color: var(--color-texto-inverso-fijo);
     box-shadow: 0 6px 12px rgba(0,0,0,0.4);
     transform: translateY(-3px) scale(1.05); 
     font-weight: bold;
@@ -154,7 +153,7 @@ body {
     display: flex;
     gap: 16px;
     margin-bottom: 24px;
-    background-color: var(--color-boton-inactivo);
+    background-color: rgba(0, 0, 0, 0.2);
     border-radius: 12px;
     padding: 12px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.5);
@@ -195,23 +194,22 @@ body {
 
 .category-section .item-info p {
     margin: 0 0 6px 0;
-    color: #ccc;
+    color: var(--color-texto-secundario);
 }
 
 .price {
     font-weight: 700;
-    color: var(--color-claro);
+    color: var(--color-acento-dinamico);
     font-size: 18px;
 }
 
-/* [CORRECCIÓN 2] Se restaura el fondo semi-transparente para el modal genérico */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7); /* Fondo oscuro fijo */
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -229,7 +227,7 @@ body {
 }
 
 .modal-content {
-    background-color: var(--color-fondo-dinamico); /* El contenido del modal sí usa el color dinámico */
+    background-color: var(--color-fondo-dinamico);
     padding: 24px;
     border-radius: 16px;
     width: 100%;
@@ -254,7 +252,7 @@ body {
     right: 15px;
     font-size: 30px;
     cursor: pointer;
-    color: var(--color-claro);
+    color: var(--color-acento-dinamico);
     line-height: 1;
 }
 
@@ -280,9 +278,9 @@ body {
     font-size: 18px;
     font-weight: bold;
     border-radius: 8px;
-    border: 1px solid var(--color-oscuro);
-    background-color: var(--color-boton-inactivo);
-    color: var(--color-texto);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(0, 0, 0, 0.2);
+    color: var(--color-texto-principal);
     text-align: center;
     -moz-appearance: textfield;
     appearance: none;
@@ -295,8 +293,8 @@ body {
 }
 
 .quantity-btn {
-    background-color: var(--color-claro);
-    color: var(--color-fondo-dinamico);
+    background-color: var(--color-acento-dinamico);
+    color: var(--color-texto-inverso-fijo);
     border: none;
     width: 35px;
     height: 35px;
@@ -312,9 +310,10 @@ body {
 }
 
 .quantity-btn:hover {
-    background-color: var(--color-oscuro);
-    color: var(--color-texto);
+    background-color: var(--color-acento-dinamico);
+    color: var(--color-texto-inverso-fijo);
     transform: scale(1.1);
+    filter: brightness(1.2);
 }
 
 #checkout-form {
@@ -330,9 +329,9 @@ body {
     width: 100%;
     padding: 12px;
     border-radius: 8px;
-    border: 1px solid var(--color-boton-inactivo);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     background-color: var(--color-fondo-dinamico);
-    color: var(--color-texto);
+    color: var(--color-texto-principal);
     font-size: 16px;
     box-sizing: border-box;
 }
@@ -345,7 +344,7 @@ body {
 .delivery-options {
     display: flex;
     gap: 16px;
-    background-color: var(--color-boton-inactivo);
+    background-color: rgba(0, 0, 0, 0.2);
     padding: 8px;
     border-radius: 10px;
     position: relative;
@@ -359,7 +358,7 @@ body {
     transform: translate(-50%, -50%);
     width: 1px;
     height: 60%;
-    background-color: var(--color-oscuro);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .delivery-options label {
@@ -378,14 +377,14 @@ body {
 }
 
 .delivery-options label.selected {
-    background-color: var(--color-oscuro);
-    color: var(--color-texto);
+    background-color: var(--color-acento-dinamico);
+    color: var(--color-texto-inverso-fijo);
     font-weight: bold;
 }
 
 .delivery-options label:hover {
-    background-color: var(--color-claro);
-    color: var(--color-fondo-dinamico);
+    background-color: var(--color-acento-dinamico);
+    color: var(--color-texto-inverso-fijo);
 }
 
 .delivery-zone-link {
@@ -393,7 +392,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    color: var(--color-claro);
+    color: var(--color-acento-dinamico);
     text-decoration: none;
     font-size: 14px;
     margin-top: 10px;
@@ -410,7 +409,7 @@ body {
     width: 100%;
     max-width: 400px;
     height: 100%;
-    background-color: #181818;
+    background-color: var(--color-fondo-dinamico);
     box-shadow: -5px 0 15px rgba(0,0,0,0.5);
     z-index: 1100;
     display: flex;
@@ -428,7 +427,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    border-bottom: 1px solid var(--color-boton-inactivo);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .cart-header h2 {
@@ -472,7 +471,7 @@ body {
 .cart-item-remove {
     background: none;
     border: none;
-    color: var(--color-error);
+    color: var(--color-error-fijo);
     font-size: 24px;
     cursor: pointer;
 }
@@ -480,13 +479,13 @@ body {
 .cart-empty-message {
     text-align: center;
     padding: 40px;
-    color: #888;
+    color: var(--color-texto-secundario);
 }
 
 .cart-footer {
     padding: 16px;
-    border-top: 1px solid var(--color-boton-inactivo);
-    background-color: #181818;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: var(--color-fondo-dinamico);
 }
 
 .cart-total {
@@ -498,7 +497,7 @@ body {
 
 .cart-shipping span {
     font-size: 16px;
-    color: #ccc;
+    color: var(--color-texto-secundario);
 }
 
 .cart-toggle {
@@ -508,7 +507,7 @@ body {
     width: 60px;
     height: 60px;
     background-color: var(--color-acento-dinamico);
-    color: var(--color-texto);
+    color: var(--color-texto-inverso-fijo);
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -528,7 +527,7 @@ body {
     position: absolute;
     top: -5px;
     right: -5px;
-    background-color: var(--color-error);
+    background-color: var(--color-error-fijo);
     color: white;
     border-radius: 50%;
     width: 24px;
@@ -577,8 +576,8 @@ body {
 }
 
 .toast {
-    background-color: var(--color-exito);
-    color: white;
+    background-color: var(--color-acento-dinamico);
+    color: var(--color-texto-inverso-fijo);
     padding: 12px 20px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
@@ -606,14 +605,13 @@ body {
     width: 100%;
 }
 
-/* [CORRECCIÓN 3] Se restaura el fondo semi-transparente para el modal de tienda cerrada */
 .store-status-modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.85); /* Fondo oscuro fijo */
+    background-color: rgba(0, 0, 0, 0.85);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -663,8 +661,8 @@ body {
     text-align: center;
     padding: 40px 20px 20px 20px;
     margin-top: 30px;
-    border-top: 1px solid var(--color-boton-inactivo);
-    color: #888;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-texto-secundario);
     font-size: 14px;
     display: flex;
     flex-direction: column;
@@ -673,7 +671,7 @@ body {
 
 .footer-contact p {
     margin: 8px 0;
-    color: #ccc;
+    color: var(--color-texto-secundario);
     font-size: 15px;
     display: flex;
     align-items: center;
@@ -686,18 +684,18 @@ body {
 }
 
 .footer-links a {
-    color: #aaa;
+    color: var(--color-texto-secundario);
     text-decoration: none;
     margin: 0 10px;
     transition: color 0.3s;
 }
 
 .footer-links a:hover {
-    color: var(--color-claro);
+    color: var(--color-acento-dinamico);
 }
 
 .footer-links span {
-    color: #666;
+    color: var(--color-texto-secundario);
 }
 
 .price-container {
@@ -715,13 +713,13 @@ body {
 
 .new-price {
     font-weight: 700;
-    color: var(--color-claro);
+    color: var(--color-acento-dinamico);
     font-size: 18px;
 }
 
 .original-price {
     font-size: 15px;
-    color: #999;
+    color: var(--color-texto-secundario);
     text-decoration: line-through;
 }
 
@@ -732,7 +730,7 @@ body {
     left: 8px;
     transform: rotate(-8deg);
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5); 
-    background-color: var(--color-error);
+    background-color: var(--color-error-fijo);
     color: white;
     padding: 5px 15px;
     font-size: 12px;
@@ -752,7 +750,7 @@ body {
 }
 
 .footer-contact a:hover {
-    color: var(--color-claro);
+    color: var(--color-acento-dinamico);
 }
 
 #modal-options-container {
@@ -766,21 +764,21 @@ body {
 .modal-opcion h4 {
     margin: 0 0 8px 0;
     font-size: 16px;
-    color: var(--color-claro);
+    color: var(--color-acento-dinamico);
 }
 
 .modal-opcion-select {
     width: 100%;
     padding: 10px;
     border-radius: 8px;
-    border: 1px solid var(--color-oscuro);
-    background-color: var(--color-boton-inactivo);
-    color: var(--color-texto);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(0, 0, 0, 0.2);
+    color: var(--color-texto-principal);
     font-size: 16px;
 }
 
 .modal-adicionales-wrapper {
-    border-top: 1px solid var(--color-boton-inactivo);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding-top: 15px;
 }
 
@@ -789,17 +787,17 @@ body {
     padding: 10px;
     font-size: 15px;
     font-weight: bold;
-    background-color: var(--color-boton-inactivo);
-    color: var(--color-claro);
-    border: 1px solid var(--color-oscuro);
+    background-color: rgba(0, 0, 0, 0.2);
+    color: var(--color-acento-dinamico);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
 #toggle-adicionales-btn:hover {
-    background-color: var(--color-claro);
-    color: var(--color-oscuro);
+    background-color: var(--color-acento-dinamico);
+    color: var(--color-texto-inverso-fijo);
 }
 
 #adicionales-list-container {
@@ -829,8 +827,8 @@ body {
 }
 
 .adicional-quantity-btn {
-    background-color: var(--color-claro);
-    color: var(--color-fondo-dinamico);
+    background-color: var(--color-acento-dinamico);
+    color: var(--color-texto-inverso-fijo);
     border: none;
     width: 28px;
     height: 28px;
@@ -856,16 +854,17 @@ body {
 }
 
 #adicionales-list-container::-webkit-scrollbar-track {
-    background: var(--color-boton-inactivo);
+    background: rgba(0, 0, 0, 0.2);
     border-radius: 4px;
 }
 
 #adicionales-list-container::-webkit-scrollbar-thumb {
-    background-color: var(--color-oscuro);
+    background-color: var(--color-acento-dinamico);
     border-radius: 4px;
-    border: 2px solid var(--color-boton-inactivo);
+    border: 2px solid rgba(0, 0, 0, 0.2);
 }
 
 #adicionales-list-container::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-claro);
+    background-color: var(--color-acento-dinamico);
+    filter: brightness(1.2);
 }
