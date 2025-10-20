@@ -16,10 +16,7 @@ export const aplicarIdentidadVisual = (settings) => {
     if (metaDescription) {
         metaDescription.content = settings.web_descripcion_seo || '';
     }
-    const favicon = document.getElementById('dynamic-favicon');
-    if (favicon && settings.favicon_url) {
-        favicon.href = settings.favicon_url;
-    }
+
     const logoImg = document.querySelector('.header .logo');
     if (logoImg && settings.logo_url) {
         logoImg.src = settings.logo_url;
