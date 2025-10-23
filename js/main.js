@@ -5,12 +5,13 @@ import { apiFetch } from './api.js';
 // --- ESTADO GLOBAL ---
 let allProducts = [];
 let productosPorCategoria = {};
+let categoriasOrdenadas = []; // [NUEVO] Para mantener el orden
 let productoSeleccionado = null;
 let shippingCost = 0;
 let swiper;
 let siteSettings;
 
-// --- FUNCIONES DE INICIALIZACIÓN Y LÓGICA PRINCIPAL ---
+// --- FUNCIONES ---
 
 function getBusinessSlug() {
     const hostname = window.location.hostname;
@@ -21,7 +22,6 @@ function getBusinessSlug() {
     if (pathParts.length > 0) {
         return pathParts[0];
     }
-    // Fallback para desarrollo local
     if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
         return 'monat';
     }
@@ -50,7 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     aplicarIdentidadVisual(siteSettings);
     shippingCost = parseFloat(siteSettings.costo_envio_predeterminado);
 
-    // Actualiza dinámicamente el costo en el label de envío
     const shippingCostSpan = document.getElementById('dynamic-shipping-cost');
     if (shippingCostSpan) {
         shippingCostSpan.textContent = `$${shippingCost.toLocaleString('es-AR')}`;
@@ -63,13 +62,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     allProducts = menuData.productos;
+    categoriasOrdenadas = menuData.categorias; // [NUEVO] Guardamos el orden correcto
     
-    productosPorCategoria = menuData.categorias.reduce((acc, categoria) => {
+    productosPorCategoria = categoriasOrdenadas.reduce((acc, categoria) => {
         acc[categoria] = allProducts.filter(p => p.categoria === categoria);
         return acc;
     }, {});
     
-    renderizarProductos(productosPorCategoria, menuData.categorias);
+    renderizarProductos(productosPorCategoria, categoriasOrdenadas);
     renderizarCarrito(getCarrito(), 'pickup', shippingCost);
     setupEventListeners();
     checkStoreStatus();
@@ -93,23 +93,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    if (menuData.categorias.length > 0) {
-        document.querySelector(`.categories button[data-category="${menuData.categorias[0]}"]`)?.classList.add('active');
+    if (categoriasOrdenadas.length > 0) {
+        document.querySelector(`.categories button[data-category="${categoriasOrdenadas[0]}"]`)?.classList.add('active');
         setTimeout(() => swiper.emit('slideChange'), 100);
     }
 
-    // Lógica de Previsualización en Vivo
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('preview') === 'true') {
         window.addEventListener('message', (event) => {
-            const previewSettings = event.data;
-            aplicarIdentidadVisual(previewSettings);
+            aplicarIdentidadVisual(event.data);
         });
     }
 });
 
 function setupEventListeners() {
-    document.querySelector('.categories').addEventListener('click', handleCategoryClick);
+    const categoriesContainer = document.querySelector('.categories');
+    categoriesContainer.addEventListener('click', handleCategoryClick);
+    
     document.getElementById('product-sections-container').addEventListener('click', handleProductClick);
     document.getElementById('product-modal').addEventListener('click', handleProductModalClick);
     document.getElementById('cart-toggle').addEventListener('click', toggleCartPanel);
@@ -117,10 +117,9 @@ function setupEventListeners() {
     document.getElementById('checkout-btn').addEventListener('click', () => abrirModal(document.getElementById('checkout-modal')));
     document.getElementById('cart-items').addEventListener('click', handleCartItemInteraction);
     document.getElementById('checkout-modal').querySelector('.close').addEventListener('click', () => cerrarModal(document.getElementById('checkout-modal')));
-    document.getElementById('checkout-form').addEventListener('submit', handleCheckout);
+    document.getElementById('submit-checkout-btn').addEventListener('click', handleCheckout);
     document.getElementById('search-form').addEventListener('submit', e => e.preventDefault());
     document.getElementById('search-input').addEventListener('input', handleSearch);
-    document.getElementById('submit-checkout-btn').addEventListener('click', handleCheckout);
     document.getElementById('delivery-type-options').addEventListener('change', handleOptionChange);
     document.getElementById('order-time-type-options').addEventListener('change', handleOptionChange);
 }
@@ -294,17 +293,20 @@ function handleCheckout() {
     renderizarCarrito(getCarrito(), 'pickup', shippingCost); 
 }
 
+// [CORRECCIÓN] Se modifica la función handleSearch
 function handleSearch(event) {
     const termino = event.target.value.toLowerCase().trim();
     const productosFiltrados = {};
 
-    for (const categoria in productosPorCategoria) {
+    for (const categoria of categoriasOrdenadas) {
         productosFiltrados[categoria] = productosPorCategoria[categoria].filter(p => 
             p.nombre.toLowerCase().includes(termino) || (p.descripcion && p.descripcion.toLowerCase().includes(termino))
         );
     }
 
-    renderizarProductos(productosFiltrados, Object.keys(productosPorCategoria));
+    // Pasamos el array de categorías ordenadas para mantener la consistencia
+    renderizarProductos(productosFiltrados, categoriasOrdenadas);
+    
     if (swiper) {
         swiper.update();
         swiper.slideTo(0, 0);
